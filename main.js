@@ -3,15 +3,6 @@ const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const { ipcMain } = require('electron');
 const server = require('./app');
-// var request = require('request'); // "Request" library
-// var cors = require('cors');
-// var querystring = require('querystring');
-// var cookieParser = require('cookie-parser');
-
-
-// var client_id = '13aaf88d6e5144d19ae63969c976c861'; // Your client id
-// var client_secret = '263f372ce07c4da281f59335e104cb7c'; // Your secret
-// var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
 
 function createWindow () {
   // Create the browser window.
