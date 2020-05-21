@@ -19,7 +19,6 @@ function createWindow () {
         //create new window
        console.log("test button clicked")
        authSpot()
-
        // inform the render process that the assigned task finished. Show a message in html
       // event.sender.send in ipcMain will return the reply to renderprocess
        event.sender.send("test-button-task-finished", "yes");

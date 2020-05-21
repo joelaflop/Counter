@@ -7,7 +7,8 @@
 
 const { ipcRenderer } = require("electron");
 
-const btnclick = document.getElementById("test button");
+const btnclick = document.getElementById("auth button");
+
 btnclick.addEventListener('click', function () {
     var arg ="secondparam";
 
