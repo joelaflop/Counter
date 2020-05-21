@@ -7,15 +7,27 @@
 
 const { ipcRenderer } = require("electron");
 
-const btnclick = document.getElementById("auth button");
+const authbutton = document.getElementById("auth button");
+const nowplayingbutton = document.getElementById("now playing button");
 
-btnclick.addEventListener('click', function () {
+authbutton.addEventListener('click', function () {
     var arg ="secondparam";
 
    //send the info to main process . we can pass any arguments as second param.
-    ipcRenderer.send("test_button_click", arg); // ipcRender.send will pass the information to main process
+    ipcRenderer.send("authbutton_click", arg); // ipcRender.send will pass the information to main process
 });
 
-ipcRenderer.on("test-button-task-finished",function (event, arg) {
-   console.log("renderer got confirmation")
+nowplayingbutton.addEventListener('click', function () {
+    var arg ="secondparam";
+
+   //send the info to main process . we can pass any arguments as second param.
+    ipcRenderer.send("nowplaying_click", arg); // ipcRender.send will pass the information to main process
+});
+
+ipcRenderer.on("auth-button-task-finished",function (event, arg) {
+   console.log("renderer got confirmation of authbutton click")
+});
+
+ipcRenderer.on("nowplaying-button-task-finished",function (event, arg) {
+   console.log("renderer got confirmation of nowplaying click")
 });
