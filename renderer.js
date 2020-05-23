@@ -9,7 +9,7 @@ const { ipcRenderer } = require("electron");
 
 const authbutton = document.getElementById("auth button");
 const nowplayingbutton = document.getElementById("now playing button");
-const refreshtokenbutton = document.getElementById("token refresh button");
+const recentlyplayedbutton = document.getElementById("recently played button");
 
 authbutton.addEventListener('click', function () {
     var arg ="secondparam";
@@ -29,4 +29,14 @@ nowplayingbutton.addEventListener('click', function () {
 });
 ipcRenderer.on("nowplaying-button-task-finished",function (event, arg) {
    console.log("renderer got confirmation of nowplaying click")
+});
+
+recentlyplayedbutton.addEventListener('click', function () {
+    var arg ="secondparam";
+
+   //send the info to main process . we can pass any arguments as second param.
+    ipcRenderer.send("recentlyplayed_click", arg); // ipcRender.send will pass the information to main process
+});
+ipcRenderer.on("recentlyplayed-button-task-finished",function (event, arg) {
+   console.log("renderer got confirmation of recentlyplayed click")
 });

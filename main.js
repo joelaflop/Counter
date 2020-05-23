@@ -2,7 +2,7 @@
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const { ipcMain } = require('electron');
-const server = require('./app');
+const spotify = require('./spotify');
 //const nowplaying = require('./nowplaying');
 
 function createWindow () {
@@ -29,10 +29,20 @@ function createWindow () {
          //create new window
         console.log("nowplaying button clicked")
 
-        server.nowPlaying()
+        spotify.nowPlaying()
         // inform the render process that the assigned task finished. Show a message in html
        // event.sender.send in ipcMain will return the reply to renderprocess
         event.sender.send("nowplaying-button-task-finished", "yes");
+   });
+
+   ipcMain.on("recentlyplayed_click",function (event, arg) {
+         //create new window
+        console.log("nowplaying button clicked")
+
+        spotify.recentlyPlayed()
+        // inform the render process that the assigned task finished. Show a message in html
+       // event.sender.send in ipcMain will return the reply to renderprocess
+        event.sender.send("recentlyplayed-button-task-finished", "yes");
    });
 
   // and load the index.html of the app.
