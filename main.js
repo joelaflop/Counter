@@ -3,6 +3,7 @@ const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const { ipcMain } = require('electron');
 const server = require('./app');
+//const nowplaying = require('./nowplaying');
 
 function createWindow () {
   // Create the browser window.
@@ -15,14 +16,24 @@ function createWindow () {
     }
   })
 
-  ipcMain.on("test_button_click",function (event, arg) {
+  ipcMain.on("authbutton_click",function (event, arg) {
         //create new window
        console.log("test button clicked")
        authSpot()
        // inform the render process that the assigned task finished. Show a message in html
       // event.sender.send in ipcMain will return the reply to renderprocess
-       event.sender.send("test-button-task-finished", "yes");
-});
+       event.sender.send("auth-button-task-finished", "yes");
+   });
+
+   ipcMain.on("nowplaying_click",function (event, arg) {
+         //create new window
+        console.log("nowplaying button clicked")
+
+        server.nowPlaying()
+        // inform the render process that the assigned task finished. Show a message in html
+       // event.sender.send in ipcMain will return the reply to renderprocess
+        event.sender.send("nowplaying-button-task-finished", "yes");
+   });
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
