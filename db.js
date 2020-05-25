@@ -8,3 +8,13 @@ const client = new Client({
   port: 5432,
 })
 client.connect()
+
+
+module.exports = {
+  newUser() {
+
+ },
+ getUser(){
+    
+}
+};
