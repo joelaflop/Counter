@@ -3,20 +3,50 @@
   <head>
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'"> -->
     <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <title>Hello World!</title>
+    <title>Counter alphalphalphalpha</title>
   </head>
   <body>
-    <h1>Hello World!</h1>
+    <h1>Counter alphalphalphalpha</h1>
     We are using Node.js <span id="node-version"></span>,
     Chromium <span id="chrome-version"></span>,
     and Electron <span id="electron-version"></span>.
     <button id="auth button" type="button">auth spot</button>
     <button id="now playing button" type="button">now playing</button>
     <button id="recently played button" type="button">recently played</button>
+    <h3>Now playing:</h3>
+    <div id="nowplaying"></div>
+    <h3>Recently playing:</h3>
+    <div id="recentlyplaying"></div>
 
     <!-- You can also require other files to run in this process -->
     <script src="./renderer.js"></script>
+    <!-- <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+    <script src="./Handlebars/track_object_full.precompiled.js"></script>
+
+    <script>
+       var full_track_template = Handlebars.templates.track_object_full;
+       var simple_track_template = Handlebars.templates.track_object_simplified;
+       ipcRenderer.on("auth-button-task-finished",function (event, arg) {
+         console.log("renderer got confirmation of authbutton click")
+       });
+       ipcRenderer.on("nowplaying-button-task-finished",function (event, track) {
+          document.getElementById('nowplaying').innerHTML = full_track_template(track)
+       });
+       ipcRenderer.on("recentlyplayed-button-task-finished",function (event, tracks) {
+          parent = document.getElementById('recentlyplaying')
+          for(i = 0; i < tracks.length; i++){
+             console.log(tracks[i])
+             child = document.createElement('div');
+             appendChild = parent.appendChild(child)
+             appendChild.innerHTML = full_track_template(tracks[i].track);
+             console.log(1)
+          }
+       });
+
+
+   </script>
   </body>
 </html>
