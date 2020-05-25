@@ -32,6 +32,7 @@ var generateRandomString = function(length) {
 };
 
 var access_token;
+var refresh_token;
 
 var stateKey = 'spotify_auth_state';
 
@@ -91,7 +92,7 @@ app.get('/callback', function(req, res) {
       if (!error && response.statusCode === 200) {
 
         access_token = body.access_token;
-      var    refresh_token = body.refresh_token;
+        refresh_token = body.refresh_token;
 
         var options = {
           url: 'https://api.spotify.com/v1/me',
@@ -121,9 +122,8 @@ app.get('/callback', function(req, res) {
 });
 
 app.get('/refresh_token', function(req, res) {
-
   // requesting access token from refresh token
-  var refresh_token = req.query.refresh_token;
+  refresh_token = req.query.refresh_token;
   var authOptions = {
     url: 'https://accounts.spotify.com/api/token',
     headers: { 'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64')) },
@@ -171,5 +171,25 @@ module.exports = {
      request.get(recentlyplayedoptions, function(error, response, body) {
          callback(body);
      });
-  }
+  },
+  refreshToken: function (){
+     var authOptions = {
+      url: 'https://accounts.spotify.com/api/token',
+      headers: { 'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64')) },
+      form: {
+        grant_type: 'refresh_token',
+        refresh_token: refresh_token
+      },
+      json: true
+     };
+
+     request.post(authOptions, function(error, response, body) {
+      if (!error && response.statusCode === 200) {
+        access_token = body.access_token;
+        // res.send({
+        //   'access_token': access_token
+        // });
+      }
+     });
+ }
 };
