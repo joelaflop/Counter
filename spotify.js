@@ -149,30 +149,27 @@ app.listen(8888);
 
 
 module.exports = {
-  nowPlaying: function () {
+  nowPlaying: function (callback) {
      var nowplayingoptions = {
        url: 'https://api.spotify.com/v1/me/player/currently-playing',
        headers: { 'Authorization': 'Bearer ' + access_token },
        json: true
      };
-
      // use the access token to access the Spotify Web API
      request.get(nowplayingoptions, function(error, response, body) {
-       console.log("nowplaying body")
-       console.log(body);
+        callback(body);
      });
   },
-  recentlyPlayed: function () {
-     var nowplayingoptions = {
+  recentlyPlayed: function (callback) {
+     var recentlyplayedoptions = {
       url: 'https://api.spotify.com/v1/me/player/recently-played',
       headers: { 'Authorization': 'Bearer ' + access_token },
       json: true
      };
 
      // use the access token to access the Spotify Web API
-     request.get(nowplayingoptions, function(error, response, body) {
-      console.log("recentlyPlayed body")
-      console.log(body);
+     request.get(recentlyplayedoptions, function(error, response, body) {
+         callback(body);
      });
   }
 };

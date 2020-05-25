@@ -26,23 +26,17 @@ function createWindow () {
    });
 
    ipcMain.on("nowplaying_click",function (event, arg) {
-         //create new window
         console.log("nowplaying button clicked")
-
-        spotify.nowPlaying()
-        // inform the render process that the assigned task finished. Show a message in html
-       // event.sender.send in ipcMain will return the reply to renderprocess
-        event.sender.send("nowplaying-button-task-finished", "yes");
+        response = spotify.nowPlaying(function(track){
+           event.sender.send("nowplaying-button-task-finished", track.item);
+        });
    });
 
    ipcMain.on("recentlyplayed_click",function (event, arg) {
-         //create new window
-        console.log("nowplaying button clicked")
-
-        spotify.recentlyPlayed()
-        // inform the render process that the assigned task finished. Show a message in html
-       // event.sender.send in ipcMain will return the reply to renderprocess
-        event.sender.send("recentlyplayed-button-task-finished", "yes");
+        console.log("recentplaying button clicked")
+        spotify.recentlyPlayed(function(tracks){
+            event.sender.send("recentlyplayed-button-task-finished", tracks.items);
+        });
    });
 
   // and load the index.html of the app.
