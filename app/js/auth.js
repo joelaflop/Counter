@@ -14,7 +14,6 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-
 module.exports = {
     signup: function (email, password){
         firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {

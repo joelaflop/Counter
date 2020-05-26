@@ -3,8 +3,8 @@ const {app, BrowserWindow} = require('electron')
 // const remote = require('electron').remote;
 const path = require('path')
 const { ipcMain } = require('electron');
-const spotify = require('./spotify');
-const auth = require('./auth');
+const spotify = require('./app/js/spotify');
+const auth = require('./app/js/auth');
 
 //const nowplaying = require('./nowplaying');
 
@@ -15,11 +15,11 @@ function createLoginWindow () {
      width: 500,
      height: 500,
      webPreferences: {
-       preload: path.join(__dirname, 'preload.js'),
+       preload: path.join(__dirname, 'app/js/preload.js'),
        nodeIntegration: true
      }
    })
-   loginWindow.loadFile('login.html')
+   loginWindow.loadFile('app/login.html')
 
    // Open the DevTools.
    loginWindow.webContents.openDevTools()
@@ -31,7 +31,7 @@ function createMainWindow () {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'app/js/preload.js'),
       nodeIntegration: true
     }
   })
@@ -47,7 +47,7 @@ function authSpot () {
      width: 600,
      height: 800,
      webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'app/js/preload.js'),
 
      }
    })
@@ -96,4 +96,22 @@ ipcMain.on("authbutton_click",function (event, arg) {
       spotify.recentlyPlayed(function(tracks){
           event.sender.send("recentlyplayed-button-task-finished", tracks.items);
       });
+ });
+
+ ipcMain.on("loginbutton_click",function (event, arg) {
+      console.log("login button clicked")
+
+      auth.login(arg[0], arg[1]);
+
+      //loginWindow.close();
+      createMainWindow();
+ });
+
+ ipcMain.on("signupbutton_click",function (event, arg) {
+      console.log("signup button clicked")
+
+      auth.signup(arg[0], arg[1]);
+
+      //loginWindow.close();
+      createMainWindow();
  });
