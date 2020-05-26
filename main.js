@@ -4,6 +4,8 @@ const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const { ipcMain } = require('electron');
 const spotify = require('./spotify');
+const auth = require('./auth');
+
 //const nowplaying = require('./nowplaying');
 
 let loginWindow, mainWindow;
@@ -11,7 +13,7 @@ let loginWindow, mainWindow;
 function createLoginWindow () {
    loginWindow = new BrowserWindow({
      width: 500,
-     height: 300,
+     height: 500,
      webPreferences: {
        preload: path.join(__dirname, 'preload.js'),
        nodeIntegration: true
@@ -94,11 +96,4 @@ ipcMain.on("authbutton_click",function (event, arg) {
       spotify.recentlyPlayed(function(tracks){
           event.sender.send("recentlyplayed-button-task-finished", tracks.items);
       });
- });
-
- ipcMain.on("loginbutton_click",function (event, arg) {
-      console.log("login button clicked")
-
-      loginWindow.close();
-      createMainWindow();
  });
