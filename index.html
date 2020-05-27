@@ -23,7 +23,7 @@
    <div id="recentlyplaying"></div>
 
    <!-- You can also require other files to run in this process -->
-   <script src="./mainRenderer.js"></script>
+   <script src="app/js/mainRenderer.js"></script>
    <!-- <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script> -->
    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
    <script src="./app/resources/Handlebars/track_object_full.precompiled.js"></script>
@@ -39,6 +39,7 @@
       });
       ipcRenderer.on("recentlyplayed-button-task-finished", function(event, tracks) {
          parent = document.getElementById('recentlyplaying')
+         parent.innerHTML = ""
          for (i = 0; i < tracks.length; i++) {
             console.log(tracks[i])
             child = document.createElement('div');

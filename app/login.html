@@ -16,7 +16,16 @@
    <input type="text" id="password" name="password"><br><br>
    <button id="login button" type="button">login</button>
    <button id="singup-button" type="button">signup</button>
+   <div id="errorDiv"> </div>
    <script src="js/loginRenderer.js"></script>
+   <script>
+      ipcRenderer.on("login-error", function(event, errorMessage) {
+         document.getElementById('errorDiv').innerHTML = errorMessage
+      });
+      ipcRenderer.on("signup-error", function(event, errorMessage) {
+         document.getElementById('errorDiv').innerHTML = errorMessage
+      });
+   </script>
 </body>
 
 </html>

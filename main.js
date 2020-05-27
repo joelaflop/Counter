@@ -115,11 +115,12 @@ ipcMain.on("loginbutton_click", function(event, arg) {
          case "auth/user-token-expired":
             break;
          default:
-            var errorMessage = error.message;
             console.log(error)
             console.log(error.code)
             console.log(error.message)
+
       }
+      event.sender.send("login-error", error.message);
    }, function(success) {
       console.log(success);
       loginWindow.close();
@@ -140,12 +141,14 @@ ipcMain.on("signupbutton_click", function(event, arg) {
             break;
          case "auth/user-token-expired":
             break;
+         case "auth/email-already-in-use":
+            break;
          default:
-            var errorMessage = error.message;
             console.log(error)
             console.log(error.code)
             console.log(error.message)
       }
+      event.sender.send("login-error", error.message);
    }, function(success) {
       console.log(success);
       loginWindow.close();
