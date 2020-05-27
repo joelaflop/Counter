@@ -1,4 +1,6 @@
-const {ipcRenderer} = require("electron");
+const {
+   ipcRenderer
+} = require("electron");
 
 var email = document.getElementById("email")
 var password = document.getElementById("password")

@@ -5,7 +5,9 @@
 // selectively enable features needed in the rendering
 // process.
 
-const {ipcRenderer} = require("electron");
+const {
+   ipcRenderer
+} = require("electron");
 
 const authbutton = document.getElementById("auth button");
 const nowplayingbutton = document.getElementById("now playing button");

@@ -1,31 +1,31 @@
 {
-  "name": "electron-quick-start",
-  "version": "1.0.0",
-  "description": "A minimal Electron application",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "repository": "https://github.com/electron/electron-quick-start",
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
-  ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
-  "devDependencies": {
-    "electron": "^8.2.5"
-  },
-  "dependencies": {
-    "cookie-parser": "^1.4.5",
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "firebase": "^7.14.5",
-    "firebaseui": "^4.5.0",
-    "handlebars": "^4.7.6",
-    "request": "^2.88.2"
-  }
+   "name": "electron-quick-start",
+   "version": "1.0.0",
+   "description": "A minimal Electron application",
+   "main": "main.js",
+   "scripts": {
+      "start": "electron ."
+   },
+   "repository": "https://github.com/electron/electron-quick-start",
+   "keywords": [
+      "Electron",
+      "quick",
+      "start",
+      "tutorial",
+      "demo"
+   ],
+   "author": "GitHub",
+   "license": "CC0-1.0",
+   "devDependencies": {
+      "electron": "^8.2.5"
+   },
+   "dependencies": {
+      "cookie-parser": "^1.4.5",
+      "cors": "^2.8.5",
+      "express": "^4.17.1",
+      "firebase": "^7.14.5",
+      "firebaseui": "^4.5.0",
+      "handlebars": "^4.7.6",
+      "request": "^2.88.2"
+   }
 }
