@@ -5,29 +5,29 @@
 // selectively enable features needed in the rendering
 // process.
 
-const { ipcRenderer } = require("electron");
+const {ipcRenderer} = require("electron");
 
 const authbutton = document.getElementById("auth button");
 const nowplayingbutton = document.getElementById("now playing button");
 const recentlyplayedbutton = document.getElementById("recently played button");
 
-authbutton.addEventListener('click', function () {
-    var arg ="secondparam";
+authbutton.addEventListener('click', function() {
+   var arg = "secondparam";
 
    //send the info to main process . we can pass any arguments as second param.
-    ipcRenderer.send("authbutton_click", arg); // ipcRender.send will pass the information to main process
+   ipcRenderer.send("authbutton_click", arg); // ipcRender.send will pass the information to main process
 });
 
-nowplayingbutton.addEventListener('click', function () {
-    var arg ="secondparam";
+nowplayingbutton.addEventListener('click', function() {
+   var arg = "secondparam";
 
    //send the info to main process . we can pass any arguments as second param.
-    ipcRenderer.send("nowplaying_click", arg); // ipcRender.send will pass the information to main process
+   ipcRenderer.send("nowplaying_click", arg); // ipcRender.send will pass the information to main process
 });
 
-recentlyplayedbutton.addEventListener('click', function () {
-    var arg ="secondparam";
+recentlyplayedbutton.addEventListener('click', function() {
+   var arg = "secondparam";
 
-  //send the info to main process . we can pass any arguments as second param.
-    ipcRenderer.send("recentlyplayed_click", arg); // ipcRender.send will pass the information to main process
+   //send the info to main process . we can pass any arguments as second param.
+   ipcRenderer.send("recentlyplayed_click", arg); // ipcRender.send will pass the information to main process
 });

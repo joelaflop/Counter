@@ -1,11 +1,11 @@
-const { ipcRenderer } = require("electron");
+const {ipcRenderer} = require("electron");
 
 var email = document.getElementById("email")
 var password = document.getElementById("password")
 
 const loginButton = document.getElementById("login button");
 
-loginButton.addEventListener('click', function () {
+loginButton.addEventListener('click', function() {
 
    info = [email.value, password.value];
 
@@ -15,7 +15,7 @@ loginButton.addEventListener('click', function () {
 
 const signupButton = document.getElementById("singup-button");
 
-signupButton.addEventListener('click', function () {
+signupButton.addEventListener('click', function() {
    info = [email.value, password.value];
 
    //send the info to main process . we can pass any arguments as second param.
