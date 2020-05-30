@@ -8,6 +8,7 @@ const {
 const path = require('path')
 const spotify = require('./app/js/spotify');
 const auth = require('./app/js/auth');
+const db = require('./app/js/db')
 
 //const nowplaying = require('./nowplaying');
 
@@ -18,7 +19,7 @@ function createLoginWindow() {
       width: 500,
       height: 500,
       webPreferences: {
-         preload: path.join(__dirname, 'app/js/preload.js'),
+         preload: path.join(__dirname, 'app/js/preload/login.js'),
          nodeIntegration: true
       }
    })
@@ -34,7 +35,7 @@ function createMainWindow() {
       width: 800,
       height: 600,
       webPreferences: {
-         preload: path.join(__dirname, 'app/js/preload.js'),
+         preload: path.join(__dirname, 'app/js/preload/main.js'),
          nodeIntegration: true
       }
    })
@@ -49,10 +50,10 @@ function authSpot() {
    const authWindow = new BrowserWindow({
       width: 600,
       height: 800,
-      webPreferences: {
-         preload: path.join(__dirname, 'app/js/preload.js'),
-
-      }
+      // webPreferences: {
+      //    preload: path.join(__dirname, 'app/js/preload/main.js'),
+      //
+      // }
    })
    authWindow.loadURL('http://localhost:8888/')
 }
@@ -136,10 +137,6 @@ ipcMain.on("signupbutton_click", function(event, arg) {
          case "auth/invalid-email":
             break;
          case "auth/invalid-user-token":
-            break;
-         case "auth/requires-recent-login":
-            break;
-         case "auth/user-token-expired":
             break;
          case "auth/email-already-in-use":
             break;

@@ -23,3 +23,10 @@ signupButton.addEventListener('click', function() {
    //send the info to main process . we can pass any arguments as second param.
    ipcRenderer.send("signupbutton_click", info); // ipcRender.send will pass the information to main process
 });
+
+ipcRenderer.on("login-error", function(event, errorMessage) {
+   document.getElementById('errorDiv').innerHTML = errorMessage
+});
+ipcRenderer.on("signup-error", function(event, errorMessage) {
+   document.getElementById('errorDiv').innerHTML = errorMessage
+});
