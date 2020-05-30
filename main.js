@@ -55,7 +55,17 @@ function authSpot() {
       //
       // }
    })
-   authWindow.loadURL('http://localhost:8888/')
+   authWindow.loadURL('http://localhost:8888/login')
+
+   console.log("peepeestart")
+
+   authWindow.webContents.on("will-redirect", function(event, url){
+      if(url.startsWith("https://spotify")){
+         authWindow.close();
+      }
+   })
+
+   console.log("peepeedone")
 }
 
 // This method will be called when Electron has finished
@@ -81,7 +91,7 @@ app.on('activate', function() {
 
 ipcMain.on("authbutton_click", function(event, arg) {
    //create new window
-   console.log("test button clicked")
+   console.log("auth button clicked")
    authSpot()
    // inform the render process that the assigned task finished. Show a message in html
    // event.sender.send in ipcMain will return the reply to renderprocess

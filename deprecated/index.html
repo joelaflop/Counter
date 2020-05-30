@@ -24,15 +24,22 @@
       <div id="login">
          <h1>This is an example of the Authorization Code flow</h1>
          <a href="/login" class="btn btn-primary">Log in with Spotify</a>
+         <button id="login button" type="button">login</button>
       </div>
       <div id="loggedin">
          <div id="user-profile">
          </div>
          <div id="oauth">
          </div>
-         <!-- <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button> -->
+         <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
       </div>
    </div>
+   <script>
+      const loginButton = document.getElementById("login button");
+      loginButton.addEventListener('click', function() {
+         window.location.href="/login"
+      });
+   </script>
 
    <script id="user-profile-template" type="text/x-handlebars-template">
       <h1>Logged in as {{display_name}}</h1>
@@ -92,14 +99,14 @@
          var params = getHashParams();
 
          var access_token = params.access_token,
-            refresh_token = params.refresh_token,
-            error = params.error;
+             refresh_token = params.refresh_token,
+             error = params.error;
 
          if (error) {
             alert('There was an error during the authentication');
          } else {
             if (access_token) {
-               // render oauth info
+               render oauth info
                oauthPlaceholder.innerHTML = oauthTemplate({
                   access_token: access_token,
                   refresh_token: refresh_token

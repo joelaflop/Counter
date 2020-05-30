@@ -10,9 +10,6 @@ const {
 } = require("electron");
 
 const authbutton = document.getElementById("auth button");
-const nowplayingbutton = document.getElementById("now playing button");
-const recentlyplayedbutton = document.getElementById("recently played button");
-
 authbutton.addEventListener('click', function() {
    var arg = "secondparam";
 
@@ -20,6 +17,7 @@ authbutton.addEventListener('click', function() {
    ipcRenderer.send("authbutton_click", arg); // ipcRender.send will pass the information to main process
 });
 
+const nowplayingbutton = document.getElementById("now playing button");
 nowplayingbutton.addEventListener('click', function() {
    var arg = "secondparam";
 
@@ -27,6 +25,7 @@ nowplayingbutton.addEventListener('click', function() {
    ipcRenderer.send("nowplaying_click", arg); // ipcRender.send will pass the information to main process
 });
 
+const recentlyplayedbutton = document.getElementById("recently played button");
 recentlyplayedbutton.addEventListener('click', function() {
    var arg = "secondparam";
 
