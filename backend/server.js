@@ -1,7 +1,3 @@
-/*
-            Server
-*/
-
 var net = require('net');
 
 const spotify = require('./js/spotify');
@@ -21,21 +17,19 @@ var server = net.createServer(function(connection) {
 
    connection.on('data', function(dat) {
       data = dat.toString()
-      console.log("server recieved:")
-      console.log(data)
-      console.log("----------------------------------")
-      split = data.split("\n");
+      console.log("server recieved: " + data)
+      split = data.split("\v");
       if (data === 'nowplaying\r') {
          spotify.nowPlaying(function(track) {
-            connection.write('nowplaying\n' + JSON.stringify(track.item))
+            connection.write('nowplaying\v' + JSON.stringify(track.item))
          });
       }
-      if (data === 'recentlyplayed\r') {
+      else if (data === 'recentlyplayed\r') {
          spotify.recentlyPlayed(function(tracks) {
-            connection.write('recentlyplayed\n' + JSON.stringify(tracks.items))
+            connection.write('recentlyplayed\v' + JSON.stringify(tracks.items))
          });
       }
-      if (split[0] == 'login') {
+      else if (split[0] == 'login') {
          console.log("login attempt")
          auth.login(split[1], split[2].substring(0, split[2].length - 1), function(error) {
             switch (error.code) {
@@ -52,12 +46,12 @@ var server = net.createServer(function(connection) {
                   console.log(error.code)
                   console.log(error.message)
             }
-            connection.write('loginerror\n' + error.message);
+            connection.write('loginerror\v' + error.message);
          }, function(success) {
             connection.write('loginsuccess')
          });
       }
-      if (split[0] == 'signup') {
+      else if (split[0] == 'signup') {
          auth.signup(split[1], split[2].substring(0, split[2].length - 1), function(error) {
             switch (error.code) {
                case "auth/invalid-email":
@@ -71,16 +65,15 @@ var server = net.createServer(function(connection) {
                   console.log(error.code)
                   console.log(error.message)
             }
-            connection.write('signuperror\n' + error.message);
+            connection.write('signuperror\v' + error.message);
          }, function(success) {
             connection.write('signupsuccess')
          });
       }
    });
-
    //connection.pipe(connection);
 });
 
 server.listen(8080, function() {
-   console.log('server is listening');
+   console.log('server is up');
 });

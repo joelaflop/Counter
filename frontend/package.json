@@ -20,13 +20,6 @@
       "electron": "^8.2.5"
    },
    "dependencies": {
-      "cookie-parser": "^1.4.5",
-      "cors": "^2.8.5",
-      "express": "^4.17.1",
-      "firebase": "^7.14.5",
-      "firebaseui": "^4.5.0",
-      "handlebars": "^4.7.6",
-      "pg": "^8.2.1",
-      "request": "^2.88.2"
+      "handlebars": "^4.7.6"
    }
 }
