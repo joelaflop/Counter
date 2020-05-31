@@ -94,6 +94,7 @@ app.get('/callback', function(req, res) {
             refresh_token = body.refresh_token;
 
             res.redirect("https://spotify.com")
+            spot.close()
 
             // var options = {
             //    url: 'https://api.spotify.com/v1/me',

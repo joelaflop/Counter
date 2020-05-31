@@ -6,11 +6,11 @@ const {
 } = require('electron')
 // const remote = require('electron').remote;
 const path = require('path')
-const spotify = require('./app/js/spotify');
-const auth = require('./app/js/auth');
-const db = require('./app/js/db')
-
-//const nowplaying = require('./nowplaying');
+// const spotify = require('./app/js/spotify');
+var net = require('net');
+var client = net.connect({port: 8080}, function() {
+   console.log('connected to server!');
+});
 
 let loginWindow, mainWindow;
 
@@ -46,28 +46,6 @@ function createMainWindow() {
    mainWindow.webContents.openDevTools()
 }
 
-function authSpot() {
-   const authWindow = new BrowserWindow({
-      width: 600,
-      height: 800,
-      // webPreferences: {
-      //    preload: path.join(__dirname, 'app/js/preload/main.js'),
-      //
-      // }
-   })
-   authWindow.loadURL('http://localhost:8888/login')
-
-   console.log("peepeestart")
-
-   authWindow.webContents.on("will-redirect", function(event, url){
-      if(url.startsWith("https://spotify")){
-         authWindow.close();
-      }
-   })
-
-   console.log("peepeedone")
-}
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -92,7 +70,22 @@ app.on('activate', function() {
 ipcMain.on("authbutton_click", function(event, arg) {
    //create new window
    console.log("auth button clicked")
-   authSpot()
+
+   const authWindow = new BrowserWindow({
+      width: 600,
+      height: 800,
+      // webPreferences: {
+      //    preload: path.join(__dirname, 'app/js/preload/main.js'),
+      //
+      // }
+   })
+   authWindow.loadURL('http://localhost:8888/login')
+
+   authWindow.webContents.on("will-redirect", function(event, url){
+      if(url.startsWith("https://spotify")){
+         authWindow.close();
+      }
+   })
    // inform the render process that the assigned task finished. Show a message in html
    // event.sender.send in ipcMain will return the reply to renderprocess
    event.sender.send("auth-button-task-finished", "yes");
@@ -100,65 +93,50 @@ ipcMain.on("authbutton_click", function(event, arg) {
 
 ipcMain.on("nowplaying_click", function(event, arg) {
    console.log("nowplaying button clicked")
-   response = spotify.nowPlaying(function(track) {
-      event.sender.send("nowplaying-button-task-finished", track.item);
-   });
+   client.write('nowplaying\r');
 });
 
 ipcMain.on("recentlyplayed_click", function(event, arg) {
-   console.log("recentplaying button clicked")
-   spotify.recentlyPlayed(function(tracks) {
-      event.sender.send("recentlyplayed-button-task-finished", tracks.items);
-   });
+   console.log("recentplayed button clicked")
+   client.write('recentlyplayed\r');
 });
 
 ipcMain.on("loginbutton_click", function(event, arg) {
    console.log("login button clicked")
+   client.write('login\n' + arg[0] + '\n' + arg[1] + '\r');
 
-   auth.login(arg[0], arg[1], function(error) {
-      switch (error.code) {
-         case "auth/invalid-email":
-            break;
-         case "auth/invalid-user-token":
-            break;
-         case "auth/requires-recent-login":
-            break;
-         case "auth/user-token-expired":
-            break;
-         default:
-            console.log(error)
-            console.log(error.code)
-            console.log(error.message)
-
-      }
-      event.sender.send("login-error", error.message);
-   }, function(success) {
-      console.log(success);
-      loginWindow.close();
-      createMainWindow();
-   });
 });
 
 ipcMain.on("signupbutton_click", function(event, arg) {
    console.log("signup button clicked")
+   client.write('signup\n' + arg[0] + '\n' + arg[1] + '\r');
 
-   auth.signup(arg[0], arg[1], function(error) {
-      switch (error.code) {
-         case "auth/invalid-email":
-            break;
-         case "auth/invalid-user-token":
-            break;
-         case "auth/email-already-in-use":
-            break;
-         default:
-            console.log(error)
-            console.log(error.code)
-            console.log(error.message)
-      }
-      event.sender.send("login-error", error.message);
-   }, function(success) {
-      console.log(success);
-      loginWindow.close();
-      createMainWindow();
-   });
+
+});
+
+client.on('data', function(dat) {
+   data = dat.toString()
+   split = data.split("\n");
+   if(split[0] == 'recentlyplayed'){
+      mainWindow.webContents.send("recentlyplayed-button-task-finished", JSON.parse(split[1]));
+   }
+   if(split[0] == 'nowplaying'){
+      mainWindow.webContents.send("nowplaying-button-task-finished", JSON.parse(split[1]));
+   }
+
+   if(split[0] == 'loginerror'){
+      loginWindow.webContents.send("login-error", split[1]);
+   }
+   if(split[0] == 'loginsuccess'){
+      createMainWindow()
+      loginWindow.close()
+   }
+   if(split[0] == 'signuperror'){
+      loginWindow.webContents.send("signup-error", split[1]);
+   }
+   if(split[0] == 'signupsuccess'){
+      createMainWindow()
+      loginwindow.close()
+   }
+
 });
