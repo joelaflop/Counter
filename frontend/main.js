@@ -4,9 +4,7 @@ const {
    BrowserWindow,
    ipcMain
 } = require('electron')
-// const remote = require('electron').remote;
 const path = require('path')
-// const spotify = require('./app/js/spotify');
 var net = require('net');
 var client = net.connect({port: 8080}, function() {
    console.log('connected to server!');
@@ -87,7 +85,8 @@ client.on('data', function(dat) {
    data = dat.toString()
    split = data.split("\v");
    if(split[0] == 'recentlyplayed'){
-      mainWindow.webContents.send("recentlyplayed-button-task-finished", JSON.parse(split[1]));
+      mainWindow.webContents.send("recentlyplayed-button-task-finished",
+                        JSON.parse(split[1]));
    }
    else if(split[0] == 'nowplaying'){
       mainWindow.webContents.send("nowplaying-button-task-finished", JSON.parse(split[1]));
@@ -109,7 +108,6 @@ client.on('data', function(dat) {
    }
 
 });
-
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

@@ -162,9 +162,14 @@ module.exports = {
          },
          json: true
       };
-      // use the access token to access the Spotify Web API
       request.get(nowplayingoptions, function(error, response, body) {
-         callback(body);
+         if (!error && response.statusCode === 200) {
+            callback(body);
+
+         } else {
+            console.log(error)
+            // console.log(response)
+         }
       });
    },
 
@@ -177,9 +182,14 @@ module.exports = {
          json: true
       };
 
-      // use the access token to access the Spotify Web API
       request.get(recentlyplayedoptions, function(error, response, body) {
-         callback(body);
+         if (!error && response.statusCode === 200) {
+            callback(body);
+
+         } else {
+            console.log(error)
+            // console.log(response)
+         }
       });
    },
 
