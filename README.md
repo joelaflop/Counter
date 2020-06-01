@@ -21,10 +21,11 @@ npm start
     - [ ] Saving users
     - [ ] Users info
 - [ ] Aesthetic
+    - [ ] a lot
 - [ ] Usability
     - [ ] Enter key to login
     - [ ] Save username/password locally
-- [ ] security
+- [ ] Security
     - [x] seperate front- and back-end
 
 ## DB architecture:
