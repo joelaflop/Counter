@@ -27,6 +27,6 @@ npm start
 - [ ] security
     - [x] seperate front- and back-end
 
-## DB architecture:<br/>
-Users: unique index ID, date created, email <br/>
+## DB architecture:
+Users: unique index ID, date created, email\
 Listens: unique index ID, artists set, album, title, timestamp
