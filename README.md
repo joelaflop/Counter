@@ -24,6 +24,6 @@ todo
     - [ ] Enter key to login
     - [ ] Save username/password locally
 
-DB architecture:
-Users: unique index ID, date created, email
-Listens: unique index ID, artists set, album, ritle, rimestamp
+DB architecture:<br/>
+    Users: unique index ID, date created, email<br/>
+    Listens: unique index ID, artists set, album, ritle, rimestamp
