@@ -25,7 +25,7 @@ npm start
     - [ ] Enter key to login
     - [ ] Save username/password locally
 - [ ] security
-    - [ ] seperate front- and back-end
+    - [x] seperate front- and back-end
 
 ## DB architecture:<br/>
 Users: unique index ID, date created, email <br/>
