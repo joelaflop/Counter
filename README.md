@@ -29,5 +29,5 @@ npm start
     - [x] seperate front- and back-end
 
 ## DB architecture:
-Users: unique index ID, date created, email\
-Listens: unique index ID, artists set, album, title, timestamp
+Users: unique index userID, date created, email\
+Listens: unique index listenID, userID, artists set, album, title, timestamp
