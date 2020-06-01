@@ -164,11 +164,16 @@ module.exports = {
       };
       request.get(nowplayingoptions, function(error, response, body) {
          if (!error && response.statusCode === 200) {
+            console.log('now playing success')
             callback(body);
 
-         } else {
+         }else if(response.statusCode === 401 && refresh_token){
+            console.log("attempting to fresh token")
+            refreshToken()
+         }  else {
+            console.log('error getting now playing:')
             console.log(error)
-            // console.log(response)
+            console.log(response.statusCode)
          }
       });
    },
@@ -184,11 +189,17 @@ module.exports = {
 
       request.get(recentlyplayedoptions, function(error, response, body) {
          if (!error && response.statusCode === 200) {
+            console.log('recently played success')
             callback(body);
 
-         } else {
+         } else if(response.statusCode === 401 && refresh_token){
+            console.log("attempting to fresh token")
+            refreshToken()
+         }
+         else {
+            console.log('error getting recently played:')
             console.log(error)
-            // console.log(response)
+            console.log(response.statusCode)
          }
       });
    },

@@ -19,14 +19,14 @@ var server = net.createServer(function(connection) {
       data = dat.toString()
       console.log("server recieved: " + data)
       split = data.split("\v");
-      if (data === 'nowplaying\r') {
+      if (split[0] === 'nowplaying\r') {
          spotify.nowPlaying(function(track) {
             if (track != 'undefined') {
                connection.write('nowplaying\v' + JSON.stringify(track.item))
             }
 
          });
-      } else if (data === 'recentlyplayed\r') {
+      } else if (split[0] === 'recentlyplayed\r') {
          spotify.recentlyPlayed(function(tracks) {
             if (tracks != 'undefined') {
                connection.write('recentlyplayed\v' + JSON.stringify(tracks.items))
@@ -34,7 +34,9 @@ var server = net.createServer(function(connection) {
          });
       } else if (split[0] == 'login') {
          console.log("login attempt")
-         auth.login(split[1], split[2].substring(0, split[2].length - 1), function(error) {
+         username = split[1]
+         password = split[2].substring(0, split[2].length - 1)
+         auth.login(username, password , function(error) {
             switch (error.code) {
                case "auth/invalid-email":
                   break;
@@ -51,10 +53,35 @@ var server = net.createServer(function(connection) {
             }
             connection.write('loginerror\v' + error.message);
          }, function(success) {
-            connection.write('loginsuccess')
+            connection.write('loginsuccess\v'+username+'\v'+password+'\r');
+         });
+      } else if (split[0] == 'autologin') {
+         console.log("autologin attempt")
+         username = split[1]
+         password = split[2].substring(0, split[2].length - 1)
+         auth.login(username, password , function(error) {
+            switch (error.code) {
+               case "auth/invalid-email":
+                  break;
+               case "auth/invalid-user-token":
+                  break;
+               case "auth/requires-recent-login":
+                  break;
+               case "auth/user-token-expired":
+                  break;
+               default:
+                  // console.log(error)
+                  console.log(error.code)
+                  console.log(error.message)
+            }
+            connection.write('autologinerror\v' + error.message);
+         }, function(success) {
+            connection.write('autologinsuccess');
          });
       } else if (split[0] == 'signup') {
-         auth.signup(split[1], split[2].substring(0, split[2].length - 1), function(error) {
+         username = split[1]
+         password = split[2].substring(0, split[2].length - 1)
+         auth.signup(username, password, function(error) {
             switch (error.code) {
                case "auth/invalid-email":
                   break;
@@ -69,7 +96,7 @@ var server = net.createServer(function(connection) {
             }
             connection.write('signuperror\v' + error.message);
          }, function(success) {
-            connection.write('signupsuccess')
+            connection.write('signupsuccess\v'+username+'\v'+password+'\r')
          });
       }
    });

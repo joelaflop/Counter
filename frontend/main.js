@@ -4,9 +4,12 @@ const {
    BrowserWindow,
    ipcMain
 } = require('electron')
+const keytar = require('keytar')
 const path = require('path')
 var net = require('net');
-var client = net.connect({port: 8080}, function() {
+var client = net.connect({
+   port: 8080
+}, function() {
    console.log('connected to server!');
 });
 
@@ -50,8 +53,8 @@ ipcMain.on("authbutton_click", function(event, arg) {
    })
    authWindow.loadURL('http://localhost:8888/login')
 
-   authWindow.webContents.on("will-redirect", function(event, url){
-      if(url.startsWith("https://spotify")){
+   authWindow.webContents.on("will-redirect", function(event, url) {
+      if (url.startsWith("https://spotify")) {
          authWindow.close();
       }
    })
@@ -84,27 +87,31 @@ ipcMain.on("signupbutton_click", function(event, arg) {
 client.on('data', function(dat) {
    data = dat.toString()
    split = data.split("\v");
-   if(split[0] == 'recentlyplayed'){
+   if (split[0] == 'recentlyplayed') {
       mainWindow.webContents.send("recentlyplayed-button-task-finished",
-                        JSON.parse(split[1]));
-   }
-   else if(split[0] == 'nowplaying'){
+         JSON.parse(split[1]));
+   } else if (split[0] == 'nowplaying') {
       mainWindow.webContents.send("nowplaying-button-task-finished", JSON.parse(split[1]));
-   }
-
-   else if(split[0] == 'loginerror'){
+   } else if (split[0] == 'loginerror') {
       loginWindow.webContents.send("login-error", split[1]);
-   }
-   else if(split[0] == 'loginsuccess'){
+   } else if (split[0] == 'loginsuccess') {
       createMainWindow()
       loginWindow.close()
-   }
-   else if(split[0] == 'signuperror'){
+      username = split[1]
+      password = split[2].substring(0, split[2].length - 1)
+      keytar.setPassword("Counter-app", username, password);
+   } else if (split[0] == 'autologinerror') {
+      createLoginWindow();
+   } else if (split[0] == 'autologinsuccess') {
+      createMainWindow();
+   } else if (split[0] == 'signuperror') {
       loginWindow.webContents.send("signup-error", split[1]);
-   }
-   else if(split[0] == 'signupsuccess'){
+   } else if (split[0] == 'signupsuccess') {
       createMainWindow()
       loginwindow.close()
+      username = split[1]
+      password = split[2].substring(0, split[2].length - 1)
+      keytar.setPassword("Counter-app", username, password);
    }
 
 });
@@ -112,7 +119,17 @@ client.on('data', function(dat) {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(createLoginWindow)
+app.whenReady().then(function() {
+   let secret = keytar.findCredentials('Counter-app')
+      .then(function(result) {
+         if (result[0]) {
+            client.write('autologin\v' + result[0].account + '\v' + result[0].password + '\r');
+         } else {
+            createLoginWindow()
+         }
+      });
+
+});
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
