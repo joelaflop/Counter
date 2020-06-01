@@ -5,7 +5,7 @@ Download and configure [Node.js](https://nodejs.org/en/download/), then from you
 # Install dependencies
 npm install
 # start the server
-node server.js
+npm start
 ```
 (in the frontend directory and a seperate console window):
 ```bash
