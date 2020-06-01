@@ -14,3 +14,16 @@ npm install
 # Run the app
 npm start
 ```
+
+todo
+- [ ] DB support
+    - [ ] Saving users
+    - [ ] Users info
+- [ ] UI design
+- [ ] Usability
+    - [ ] Enter key to login
+    - [ ] Save username/password locally
+
+DB architecture:
+Users: unique index ID, date created, email
+Listens: unique index ID, artists set, album, ritle, rimestamp
