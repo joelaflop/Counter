@@ -7,10 +7,13 @@ const {
 const keytar = require('keytar')
 const path = require('path')
 var net = require('net');
+
+let email;
+
 var client = net.connect({
    port: 8080
 }, function() {
-   console.log('connected to server!');
+   console.log('connected to server');
 });
 
 let loginWindow, mainWindow;
@@ -44,8 +47,18 @@ function createMainWindow() {
    mainWindow.webContents.openDevTools()
 }
 
-ipcMain.on("authbutton_click", function(event, arg) {
-   console.log("auth button clicked")
+// ipcMain.on("authbutton_click", function(event, arg) {
+//    console.log("auth button clicked")
+//
+//    authSpot();
+//
+//    // inform the render process that the assigned task finished. Show a message in html
+//    // event.sender.send in ipcMain will return the reply to renderprocess
+//    event.sender.send("auth-button-task-finished", "yes");
+// });
+
+function authSpot(){
+   client.write('authspotify\v'+email+'\v\r');
 
    const authWindow = new BrowserWindow({
       width: 600,
@@ -58,19 +71,16 @@ ipcMain.on("authbutton_click", function(event, arg) {
          authWindow.close();
       }
    })
-   // inform the render process that the assigned task finished. Show a message in html
-   // event.sender.send in ipcMain will return the reply to renderprocess
-   event.sender.send("auth-button-task-finished", "yes");
-});
+}
 
 ipcMain.on("nowplaying_click", function(event, arg) {
    console.log("nowplaying button clicked")
-   client.write('nowplaying\r');
+   client.write('nowplaying\v'+email+'\v\r');
 });
 
 ipcMain.on("recentlyplayed_click", function(event, arg) {
    console.log("recentplayed button clicked")
-   client.write('recentlyplayed\r');
+   client.write('recentlyplayed\v'+email+'\v\r');
 });
 
 ipcMain.on("loginbutton_click", function(event, arg) {
@@ -92,26 +102,22 @@ client.on('data', function(dat) {
          JSON.parse(split[1]));
    } else if (split[0] == 'nowplaying') {
       mainWindow.webContents.send("nowplaying-button-task-finished", JSON.parse(split[1]));
-   } else if (split[0] == 'loginerror') {
-      loginWindow.webContents.send("login-error", split[1]);
-   } else if (split[0] == 'loginsuccess') {
+   } else if (split[0] == 'loginsuccess' || split[0] == 'signupsuccess') {
       createMainWindow()
       loginWindow.close()
-      username = split[1]
+      email = split[1]
       password = split[2].substring(0, split[2].length - 1)
-      keytar.setPassword("Counter-app", username, password);
+      keytar.setPassword("Counter-app", email, password);
    } else if (split[0] == 'autologinerror') {
       createLoginWindow();
    } else if (split[0] == 'autologinsuccess') {
       createMainWindow();
    } else if (split[0] == 'signuperror') {
       loginWindow.webContents.send("signup-error", split[1]);
-   } else if (split[0] == 'signupsuccess') {
-      createMainWindow()
-      loginwindow.close()
-      username = split[1]
-      password = split[2].substring(0, split[2].length - 1)
-      keytar.setPassword("Counter-app", username, password);
+   } else if (split[0] == 'loginerror') {
+      loginWindow.webContents.send("login-error", split[1]);
+   } else if (split[0] == 'getAuth'){
+      authSpot();
    }
 
 });
@@ -123,12 +129,12 @@ app.whenReady().then(function() {
    let secret = keytar.findCredentials('Counter-app')
       .then(function(result) {
          if (result[0]) {
+            email = result[0].account
             client.write('autologin\v' + result[0].account + '\v' + result[0].password + '\r');
          } else {
             createLoginWindow()
          }
       });
-
 });
 
 // Quit when all windows are closed.
