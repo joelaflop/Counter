@@ -20,7 +20,7 @@ npm start
 - [ ] DB support
     - [ ] Saving users
     - [ ] Users info
-- [ ] UI design
+- [ ] Aesthetic
 - [ ] Usability
     - [ ] Enter key to login
     - [ ] Save username/password locally
