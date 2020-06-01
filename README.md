@@ -26,5 +26,5 @@ npm start
     - [ ] Save username/password locally
 
 ## DB architecture:<br/>
-Users: unique index ID, date created, email
-Listens: unique index ID, artists set, album, ritle, timestamp
+Users: unique index ID, date created, email <br/>
+Listens: unique index ID, artists set, album, title, timestamp
