@@ -22,7 +22,7 @@ var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
  * @param  {number} length The length of the string
  * @return {string} The generated string
  */
-var generateRandomString = function(length) {
+function generateRandomString(length) {
    var text = '';
    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -31,6 +31,26 @@ var generateRandomString = function(length) {
    }
    return text;
 };
+
+function generateRecentlyPlayedOtions(access){
+   return {
+      url: 'https://api.spotify.com/v1/me/player/recently-played?'+'limit='+'50',
+      headers: {
+         'Authorization': 'Bearer ' + access
+      },
+      json: true
+   };
+}
+
+function generateNowPlayingOptions(access){
+   return {
+      url: 'https://api.spotify.com/v1/me/player/currently-playing',
+      headers: {
+         'Authorization': 'Bearer ' + access
+      },
+      json: true
+   };
+}
 
 function refreshToken(email, refresh_token, use_token, other_callback) {
    var authOptions = {
@@ -58,13 +78,7 @@ function refreshToken(email, refresh_token, use_token, other_callback) {
 }
 
 function nowPlaying(access, callback) {
-   var nowplayingoptions = {
-      url: 'https://api.spotify.com/v1/me/player/currently-playing',
-      headers: {
-         'Authorization': 'Bearer ' + access
-      },
-      json: true
-   };
+   var nowplayingoptions = generateNowPlayingOptions(access);
    request.get(nowplayingoptions, function(error, response, body) {
       if (!error && response.statusCode === 200) {
          console.log('now playing success')
@@ -74,13 +88,7 @@ function nowPlaying(access, callback) {
 }
 
 function recentlyPlayed(access, callback) {
-   var recentlyplayedoptions = {
-      url: 'https://api.spotify.com/v1/me/player/recently-played',
-      headers: {
-         'Authorization': 'Bearer ' + access
-      },
-      json: true
-   };
+   var recentlyplayedoptions = generateRecentlyPlayedOtions(access);
    request.get(recentlyplayedoptions, function(error, response, body) {
       if (!error && response.statusCode === 200) {
          console.log('recently played success')
@@ -95,18 +103,11 @@ module.exports = {
          if (!access || !refresh) {
             callback('clientneedsauth');
          } else {
-            var nowplayingoptions = {
-               url: 'https://api.spotify.com/v1/me/player/currently-playing',
-               headers: {
-                  'Authorization': 'Bearer ' + access
-               },
-               json: true
-            };
+            var nowplayingoptions = generateNowPlayingOptions(access);
             request.get(nowplayingoptions, function(error, response, body) {
                if (!error && response.statusCode === 200) {
                   console.log('now playing success')
                   callback(body);
-
                } else if (response.statusCode === 401) {
                   console.log("attempting to refresh token")
                   console.log(error)
@@ -126,18 +127,11 @@ module.exports = {
          if (!access || !refresh) {
             callback('clientneedsauth');
          } else {
-            var recentlyplayedoptions = {
-               url: 'https://api.spotify.com/v1/me/player/recently-played',
-               headers: {
-                  'Authorization': 'Bearer ' + access
-               },
-               json: true
-            };
+            var recentlyplayedoptions = generateRecentlyPlayedOtions(access);
             request.get(recentlyplayedoptions, function(error, response, body) {
                if (!error && response.statusCode === 200) {
                   console.log('recently played success')
                   callback(body);
-
                } else if (response.statusCode === 401) {
                   console.log("attempting to refresh token")
                   console.log(error)

@@ -35,8 +35,8 @@ function createLoginWindow() {
 function createMainWindow() {
    // Create the browser window.
    mainWindow = new BrowserWindow({
-      width: 800,
-      height: 600,
+      width: 600,
+      height: 900,
       webPreferences: {
          preload: path.join(__dirname, 'app/js/preload/main.js'),
          nodeIntegration: true
@@ -74,6 +74,10 @@ function startup(){
       });
 }
 
+//
+//             IPC Incoming
+//
+
 ipcMain.on("nowplaying_click", function(event, arg) {
    console.log("nowplaying button clicked")
    client.write('nowplaying\v'+email+'\v\r');
@@ -94,6 +98,10 @@ ipcMain.on("signupbutton_click", function(event, arg) {
    console.log("signup button clicked")
    client.write('signup\v' + arg[0] + '\v' + arg[1] + '\r');
 });
+
+//
+//             Server Comm Incoming
+//
 
 client.on('data', function(dat) {
    data = dat.toString()

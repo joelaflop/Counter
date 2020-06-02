@@ -3,6 +3,7 @@ var net = require('net');
 const spotify = require('./js/spotify');
 const auth = require('./js/auth');
 const db = require('./js/db');
+const util = require('util');
 
 var server = net.createServer(function(connection) {
    console.log('client connected');
@@ -17,8 +18,8 @@ var server = net.createServer(function(connection) {
 
    connection.on('data', function(dat) {
       data = dat.toString()
-      console.log("server recieved: " + data)
       split = data.split("\v");
+      console.log("server recieved:" + data.replace(/\v/g,'\n')+'\n-----');
       if (split[0] == 'authspotify') {
          spotify.authSpot(function(refresh, access) {
             console.log(refresh);
@@ -41,7 +42,7 @@ var server = net.createServer(function(connection) {
             if (tracks == 'clientneedsauth') {
                connection.write('getAuth\v\r');
             } else if (tracks != 'undefined') {
-               connection.write('recentlyplayed\v' + JSON.stringify(tracks.items))
+               connection.write('recentlyplayed\v' + JSON.stringify(tracks.items.slice(0,10)))
             } else {
                console.log('tracks are undefined')
             }
@@ -86,10 +87,10 @@ var server = net.createServer(function(connection) {
                   break;
                default:
                   // console.log(error)
-                  console.log(error.code)
-                  console.log(error.message)
+                  console.log(error.code);
+                  console.log(error.message);
+                  connection.write('autologinerror\v' + error.message);
             }
-            connection.write('autologinerror\v' + error.message);
          }, function(success) {
             connection.write('autologinsuccess');
             db.login(email);

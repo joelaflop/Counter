@@ -15,6 +15,15 @@ loginButton.addEventListener('click', function() {
    ipcRenderer.send("loginbutton_click", info); // ipcRender.send will pass the information to main process
 });
 
+document.addEventListener("keydown", function(event) {
+   if (event.key == "Enter") {
+      info = [email.value, password.value];
+
+      //send the info to main process . we can pass any arguments as second param.
+      ipcRenderer.send("loginbutton_click", info); // ipcRender.send will pass the information to main process
+   }
+});
+
 const signupButton = document.getElementById("singup-button");
 
 signupButton.addEventListener('click', function() {
