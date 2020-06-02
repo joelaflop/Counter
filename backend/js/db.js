@@ -31,6 +31,10 @@ module.exports = {
       query = `UPDATE account SET refresh_token='${refresh}', access_token='${access}' WHERE email='${email}';`
       // console.log(query);
       client.query(query, function(err, res) {})
+   },
+   login: function(email){
+      query = `UPDATE account SET last_login=now() WHERE email='${email}';`
+      client.query(query, function(err, res) {})
    }
 
 };

@@ -89,7 +89,6 @@ function recentlyPlayed(access, callback) {
    });
 }
 
-
 module.exports = {
    nowPlaying: function(email, callback) {
       db.getTokens(email, function(access, refresh) {
@@ -121,9 +120,7 @@ module.exports = {
             });
          }
       })
-
    },
-
    recentlyPlayed: function(email, callback) {
       db.getTokens(email, function(access, refresh) {
          if (!access || !refresh) {
@@ -232,31 +229,6 @@ module.exports = {
             });
          }
       });
-
-      // app.get('/refresh_token', function(req, res) {
-      //    // requesting access token from refresh token
-      //    refresh_token = req.query.refresh_token;
-      //    var authOptions = {
-      //       url: 'https://accounts.spotify.com/api/token',
-      //       headers: {
-      //          'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64'))
-      //       },
-      //       form: {
-      //          grant_type: 'refresh_token',
-      //          refresh_token: refresh_token
-      //       },
-      //       json: true
-      //    };
-      //
-      //    request.post(authOptions, function(error, response, body) {
-      //       if (!error && response.statusCode === 200) {
-      //          access_token = body.access_token;
-      //          res.send({
-      //             'access_token': access_token
-      //          });
-      //       }
-      //    });
-      // });
       var spot = app.listen(8888).on('error', function(err) {
          console.log('spotify auth port listening error:')
          console.log(err);

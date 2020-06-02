@@ -47,16 +47,6 @@ function createMainWindow() {
    mainWindow.webContents.openDevTools()
 }
 
-// ipcMain.on("authbutton_click", function(event, arg) {
-//    console.log("auth button clicked")
-//
-//    authSpot();
-//
-//    // inform the render process that the assigned task finished. Show a message in html
-//    // event.sender.send in ipcMain will return the reply to renderprocess
-//    event.sender.send("auth-button-task-finished", "yes");
-// });
-
 function authSpot(){
    client.write('authspotify\v'+email+'\v\r');
 
@@ -71,6 +61,17 @@ function authSpot(){
          authWindow.close();
       }
    })
+}
+function startup(){
+   let secret = keytar.findCredentials('Counter-app')
+      .then(function(result) {
+         if (result[0]) {
+            email = result[0].account
+            client.write('autologin\v' + result[0].account + '\v' + result[0].password + '\r');
+         } else {
+            createLoginWindow()
+         }
+      });
 }
 
 ipcMain.on("nowplaying_click", function(event, arg) {
@@ -126,15 +127,7 @@ client.on('data', function(dat) {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(function() {
-   let secret = keytar.findCredentials('Counter-app')
-      .then(function(result) {
-         if (result[0]) {
-            email = result[0].account
-            client.write('autologin\v' + result[0].account + '\v' + result[0].password + '\r');
-         } else {
-            createLoginWindow()
-         }
-      });
+   startup();
 });
 
 // Quit when all windows are closed.
@@ -147,5 +140,7 @@ app.on('window-all-closed', function() {
 app.on('activate', function() {
    // On macOS it's common to re-create a window in the app when the
    // dock icon is clicked and there are no other windows open.
-   if (BrowserWindow.getAllWindows().length === 0) createMainWindow()
+   if (BrowserWindow.getAllWindows().length === 0) {
+      startup();
+   }
 })
