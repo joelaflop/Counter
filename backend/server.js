@@ -124,3 +124,16 @@ var server = net.createServer(function(connection) {
 server.listen(8080, function() {
    console.log('server is up');
 });
+
+
+//listen data recording
+function listen(email, items){
+   for(int i = 0; i < items.length; i++){
+      track = items[i]
+      artistString = 'placeholder';
+      for(int j = 0; j < track.artists.length; j++){
+
+      }
+      db.listen(email, artistString, track.album.name, track.name, track.album.release_date, 'spotify', track.id)
+   }
+}
