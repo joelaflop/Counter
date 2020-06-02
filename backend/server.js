@@ -124,9 +124,6 @@ var server = net.createServer(function(connection) {
 server.listen(8080, function() {
    console.log('server is up');
 });
-<<<<<<< Updated upstream
-=======
-
 
 //listen data recording
 // function listen(email, items){
@@ -139,4 +136,3 @@ server.listen(8080, function() {
 //       db.listen(email, artistString, track.album.name, track.name, track.album.release_date, 'spotify', track.id)
 //    }
 // }
->>>>>>> Stashed changes
