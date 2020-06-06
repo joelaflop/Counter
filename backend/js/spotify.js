@@ -32,9 +32,9 @@ function generateRandomString(length) {
    return text;
 };
 
-function generateRecentlyPlayedOtions(access){
+function generateRecentlyPlayedOtions(count, access){
    return {
-      url: 'https://api.spotify.com/v1/me/player/recently-played?'+'limit='+'50',
+      url: 'https://api.spotify.com/v1/me/player/recently-played?'+'limit='+count.toString(),
       headers: {
          'Authorization': 'Bearer ' + access
       },
@@ -122,12 +122,12 @@ module.exports = {
          }
       })
    },
-   recentlyPlayed: function(email, callback) {
+   recentlyPlayed: function(count, email, callback) {
       db.getTokens(email, function(access, refresh) {
          if (!access || !refresh) {
             callback('clientneedsauth');
          } else {
-            var recentlyplayedoptions = generateRecentlyPlayedOtions(access);
+            var recentlyplayedoptions = generateRecentlyPlayedOtions(count, access);
             request.get(recentlyplayedoptions, function(error, response, body) {
                if (!error && response.statusCode === 200) {
                   console.log('recently played success')

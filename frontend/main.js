@@ -9,6 +9,7 @@ const path = require('path')
 var net = require('net');
 
 let email;
+let authed = true;
 
 var client = net.connect({
    port: 8080
@@ -47,8 +48,8 @@ function createMainWindow() {
    mainWindow.webContents.openDevTools()
 }
 
-function authSpot(){
-   client.write('authspotify\v'+email+'\v\r');
+function authSpot() {
+   client.write('authspotify\v' + email + '\v\r');
 
    const authWindow = new BrowserWindow({
       width: 600,
@@ -62,7 +63,8 @@ function authSpot(){
       }
    })
 }
-function startup(){
+
+function startup() {
    let secret = keytar.findCredentials('Counter-app')
       .then(function(result) {
          if (result[0]) {
@@ -80,12 +82,12 @@ function startup(){
 
 ipcMain.on("nowplaying_click", function(event, arg) {
    console.log("nowplaying button clicked")
-   client.write('nowplaying\v'+email+'\v\r');
+   client.write('nowplaying\v' + email + '\v\r');
 });
 
 ipcMain.on("recentlyplayed_click", function(event, arg) {
    console.log("recentplayed button clicked")
-   client.write('recentlyplayed\v'+email+'\v\r');
+   client.write('recentlyplayed\v' + email + '\v\r');
 });
 
 ipcMain.on("loginbutton_click", function(event, arg) {
@@ -125,11 +127,20 @@ client.on('data', function(dat) {
       loginWindow.webContents.send("signup-error", split[1]);
    } else if (split[0] == 'loginerror') {
       loginWindow.webContents.send("login-error", split[1]);
-   } else if (split[0] == 'getAuth'){
+   } else if (split[0] == 'getAuth') {
+      console.log('client getting auth')
       authSpot();
    }
-
 });
+
+//
+//
+//
+setInterval(function() {
+   if (authed) {
+      client.write('updateListens\v' + email + '\v\r');
+   }
+}, 200000) //25*60k = 1500000
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
