@@ -17,7 +17,7 @@ var client = net.connect({
    console.log('connected to server');
 });
 
-let loginWindow, mainWindow;
+var loginWindow, mainWindow;
 
 function createLoginWindow() {
    loginWindow = new BrowserWindow({
@@ -143,7 +143,7 @@ setInterval(function() {
    if (authed) {
       client.write('updateListens\v' + email + '\v\r');
    }
-}, 2000) //25 m * 60000 ms/m = 1500000 ms
+}, 1500000) //25 m * 60000 ms/m = 1500000 ms
 
 
 //              Electron specifics

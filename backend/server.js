@@ -19,9 +19,10 @@ var server = net.createServer(function(connection) {
    connection.on('data', function(dat) {
       data = dat.toString()
       split = data.split("\v");
-      if(split[0] != 'updateListens')
-         console.log("server recieved:" + data.replace(/\v/g,'\n')+'\n-----');
-      if (split[0] == 'authspotify') {
+      code = split[0];
+      if(code != 'updateListens')
+         console.log("---------\nserver recieved:" + data.replace(/\v/g,'\n'));
+      if (code == 'authspotify') {
          spotify.authSpot(function(refresh, access) {
             console.log(refresh);
             console.log(access);
@@ -29,7 +30,7 @@ var server = net.createServer(function(connection) {
                //callback for if there is no such user to login
             });
          })
-      } else if (split[0] === 'nowplaying') {
+      } else if (code === 'nowplaying') {
          spotify.nowPlaying(split[1], function(track) {
             if (track == 'clientneedsauth') {
                console.log("GETTTTT")
@@ -40,7 +41,7 @@ var server = net.createServer(function(connection) {
                console.log('track is undefined')
             }
          });
-      } else if (split[0] === 'recentlyplayed') {
+      } else if (code === 'recentlyplayed') {
          spotify.recentlyPlayed(10, split[1], function(tracks) {
             if (tracks == 'clientneedsauth') {
                connection.write('getAuth\v\r');
@@ -50,7 +51,7 @@ var server = net.createServer(function(connection) {
                console.log('tracks are undefined')
             }
          });
-      } else if (split[0] == 'login') {
+      } else if (code == 'login') {
          console.log("login attempt")
          email = split[1]
          password = split[2]
@@ -76,7 +77,7 @@ var server = net.createServer(function(connection) {
                //callback for if there is no such user to login
             });
          });
-      } else if (split[0] == 'autologin') {
+      } else if (code == 'autologin') {
          console.log("autologin attempt")
          email = split[1]
          password = split[2]
@@ -102,7 +103,7 @@ var server = net.createServer(function(connection) {
                //callback for if there is no such user to login
             });
          });
-      } else if (split[0] == 'signup') {
+      } else if (code == 'signup') {
          email = split[1]
          password = split[2]
          auth.signup(email, password, function(error) {
@@ -123,7 +124,7 @@ var server = net.createServer(function(connection) {
             connection.write('signupsuccess\v' + email + '\v' + password + '\v\r')
             db.newUser(email, 'username', password, 'spotify');
          });
-      } else if (split[0] == 'updateListens'){
+      } else if (code == 'updateListens'){
          email = split[1]
          spotify.recentlyPlayed(50, email, function(tracks) {
             if (tracks == 'clientneedsauth') {
@@ -134,6 +135,9 @@ var server = net.createServer(function(connection) {
                console.log('tracks are undefined')
             }
          });
+
+      } else {
+         console.log('server code ^ unknown')
       }
    });
    //connection.pipe(connection);

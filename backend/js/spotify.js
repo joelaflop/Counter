@@ -52,7 +52,7 @@ function generateNowPlayingOptions(access){
    };
 }
 
-function refreshToken(email, refresh_token, use_token, other_callback) {
+function refreshToken(email, refresh_token, use_token, other_callback, count) {
    var authOptions = {
       url: 'https://accounts.spotify.com/api/token',
       headers: {
@@ -71,10 +71,9 @@ function refreshToken(email, refresh_token, use_token, other_callback) {
          db.setTokens(email, access_token, refresh_token, function(){
             //callback for if there is no such user to login
          });
-         use_token(access_token, other_callback)
-         // res.send({
-         //   'access_token': access_token
-         // });
+         use_token(access_token, other_callback, count)
+      } else {
+         other_callback('clientneedsauth');
       }
    });
 }
@@ -85,16 +84,20 @@ function nowPlaying(access, callback) {
       if (!error && response.statusCode === 200) {
          console.log('now playing success')
          callback(body);
+      } else {
+         console.log('error getting nowplaying - last resort');
       }
    });
 }
 
-function recentlyPlayed(access, callback) {
-   var recentlyplayedoptions = generateRecentlyPlayedOptions(access);
+function recentlyPlayed(access, callback, count) { //count has to be last argument
+   var recentlyplayedoptions = generateRecentlyPlayedOptions(count, access);
    request.get(recentlyplayedoptions, function(error, response, body) {
       if (!error && response.statusCode === 200) {
          console.log('recently played success')
          callback(body);
+      } else{
+         console.log('error getting recently played - last resort');
       }
    });
 }
@@ -102,7 +105,7 @@ function recentlyPlayed(access, callback) {
 module.exports = {
    nowPlaying: function(email, callback) {
       db.getTokens(email, function(access, refresh) {
-         if (!access || !refresh) {
+         if (!refresh) {
             callback('clientneedsauth');
          } else {
             var nowplayingoptions = generateNowPlayingOptions(access);
@@ -112,8 +115,6 @@ module.exports = {
                   callback(body);
                } else if (response.statusCode === 401) {
                   console.log("attempting to refresh token")
-                  console.log(error)
-                  console.log(response.statusCode)
                   refreshToken(email, refresh, nowPlaying, callback);
                } else {
                   console.log('error getting now playing:')
@@ -136,9 +137,7 @@ module.exports = {
                   callback(body);
                } else if (response.statusCode === 401) {
                   console.log("attempting to refresh token")
-                  console.log(error)
-                  console.log(response.statusCode)
-                  refreshToken(email, refresh, recentlyPlayed, callback);
+                  refreshToken(email, refresh, recentlyPlayed, callback, count);
                } else {
                   console.log('error getting recently played:')
                   console.log(error)
