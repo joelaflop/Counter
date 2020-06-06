@@ -51,7 +51,7 @@ var server = net.createServer(function(connection) {
       } else if (split[0] == 'login') {
          console.log("login attempt")
          email = split[1]
-         password = split[2].substring(0, split[2].length - 1)
+         password = split[2]
          auth.login(email, password, function(error) {
             switch (error.code) {
                case "auth/invalid-email":
@@ -69,13 +69,13 @@ var server = net.createServer(function(connection) {
             }
             connection.write('loginerror\v' + error.message);
          }, function(success) {
-            connection.write('loginsuccess\v' + email + '\v' + password + '\r');
+            connection.write('loginsuccess\v' + email + '\v' + password + '\v\r');
             db.login(email);
          });
       } else if (split[0] == 'autologin') {
          console.log("autologin attempt")
          email = split[1]
-         password = split[2].substring(0, split[2].length - 1)
+         password = split[2]
          auth.login(email, password, function(error) {
             switch (error.code) {
                case "auth/invalid-email":
@@ -98,7 +98,7 @@ var server = net.createServer(function(connection) {
          });
       } else if (split[0] == 'signup') {
          email = split[1]
-         password = split[2].substring(0, split[2].length - 1)
+         password = split[2]
          auth.signup(email, password, function(error) {
             switch (error.code) {
                case "auth/invalid-email":
@@ -114,8 +114,8 @@ var server = net.createServer(function(connection) {
             }
             connection.write('signuperror\v' + error.message);
          }, function(success) {
-            connection.write('signupsuccess\v' + email + '\v' + password + '\r')
-            db.newUser(email, 'username', password, 'spotify', 'refresh_token', 'created_on', 'last_login');
+            connection.write('signupsuccess\v' + email + '\v' + password + '\v\r')
+            db.newUser(email, 'username', password, 'spotify');
          });
       } else if (split[0] == 'updateListens'){
          email = split[1]

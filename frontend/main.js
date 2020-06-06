@@ -69,7 +69,7 @@ function startup() {
       .then(function(result) {
          if (result[0]) {
             email = result[0].account
-            client.write('autologin\v' + result[0].account + '\v' + result[0].password + '\r');
+            client.write('autologin\v' + result[0].account + '\v' + result[0].password + '\v\r');
          } else {
             createLoginWindow()
          }
@@ -77,28 +77,25 @@ function startup() {
 }
 
 //
-//             IPC Incoming
+//               IPC Incoming
 //
 
 ipcMain.on("nowplaying_click", function(event, arg) {
    console.log("nowplaying button clicked")
    client.write('nowplaying\v' + email + '\v\r');
 });
-
 ipcMain.on("recentlyplayed_click", function(event, arg) {
    console.log("recentplayed button clicked")
    client.write('recentlyplayed\v' + email + '\v\r');
 });
-
 ipcMain.on("loginbutton_click", function(event, arg) {
    console.log("login button clicked")
-   client.write('login\v' + arg[0] + '\v' + arg[1] + '\r');
+   client.write('login\v' + arg[0] + '\v' + arg[1] + '\v\r');
 
 });
-
 ipcMain.on("signupbutton_click", function(event, arg) {
    console.log("signup button clicked")
-   client.write('signup\v' + arg[0] + '\v' + arg[1] + '\r');
+   client.write('signup\v' + arg[0] + '\v' + arg[1] + '\v\r');
 });
 
 //
@@ -117,7 +114,7 @@ client.on('data', function(dat) {
       createMainWindow()
       loginWindow.close()
       email = split[1]
-      password = split[2].substring(0, split[2].length - 1)
+      password = split[2]
       keytar.setPassword("Counter-app", email, password);
    } else if (split[0] == 'autologinerror') {
       createLoginWindow();
@@ -134,14 +131,17 @@ client.on('data', function(dat) {
 });
 
 //
+//             Interval DB recording
 //
-//
+
 setInterval(function() {
    if (authed) {
       client.write('updateListens\v' + email + '\v\r');
    }
-}, 200000) //25*60k = 1500000
+}, 1500000) //25m*60000ms/m = 1500000ms
 
+
+//              Electron specifics
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.

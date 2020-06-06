@@ -13,7 +13,7 @@ client.connect()
 
 
 module.exports = {
-   newUser: function(email, username, password, platforms, created_on, last_login) {
+   newUser: function(email, username, password, platforms) {
       query = `INSERT INTO account (email, username, password, platforms, created_on, last_login)
                VALUES ('${email}', '${username}','${password}','${platforms}',now(),now())
                ON CONFLICT (email)
