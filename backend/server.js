@@ -25,7 +25,9 @@ var server = net.createServer(function(connection) {
          spotify.authSpot(function(refresh, access) {
             console.log(refresh);
             console.log(access);
-            db.setTokens(split[1], refresh, access);
+            db.setTokens(split[1], refresh, access, function(){
+               //callback for if there is no such user to login
+            });
          })
       } else if (split[0] === 'nowplaying') {
          spotify.nowPlaying(split[1], function(track) {
@@ -70,7 +72,9 @@ var server = net.createServer(function(connection) {
             connection.write('loginerror\v' + error.message);
          }, function(success) {
             connection.write('loginsuccess\v' + email + '\v' + password + '\v\r');
-            db.login(email);
+            db.login(email, function(){
+               //callback for if there is no such user to login
+            });
          });
       } else if (split[0] == 'autologin') {
          console.log("autologin attempt")
@@ -94,7 +98,9 @@ var server = net.createServer(function(connection) {
             }
          }, function(success) {
             connection.write('autologinsuccess');
-            db.login(email);
+            db.login(email, function(){
+               //callback for if there is no such user to login
+            });
          });
       } else if (split[0] == 'signup') {
          email = split[1]

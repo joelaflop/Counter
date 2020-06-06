@@ -56,13 +56,14 @@ module.exports = {
          }
       })
    },
-   setTokens: function(email, access, refresh) {
+   setTokens: function(email, access, refresh, noUserCallback) {
       query = `UPDATE account SET refresh_token= $1, access_token= $2 WHERE email= $3;`
       values = [refresh, access, email]
       // console.log(query);
       client.query(query, values, function(err, res) {
          if(res.rowCount == 0){
             console.log('setting coins for user not in DB')
+            noUserCallback();
             //should consider removing user from auth to force resignup
          }
          if (err) {
@@ -72,12 +73,13 @@ module.exports = {
          }
       })
    },
-   login: function(email) {
+   login: function(email, noUserCallback) {
       query = `UPDATE account SET last_login=now() WHERE email= $1;`
       values = [email]
       client.query(query, values, function(err, res) {
          if(res.rowCount == 0){
             console.log('setting coins for user not in DB')
+            noUserCallback();
             //should consider removing user from auth to force resignup
          }
          if (err) {
@@ -135,6 +137,12 @@ module.exports = {
    }
 };
 
-function handleSpotifyTimestamps(txt) {
-   return txt.replace(/'/g, '');
+function handleSpotifyTimestamps(txt, precision) {
+   if(precision == 'year'){
+      return txt+'-01-01'
+   }else if (precision == 'month'){
+      return txt+'-01'
+   }else{
+      return txt;
+   }
 }

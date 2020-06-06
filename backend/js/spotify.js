@@ -68,7 +68,9 @@ function refreshToken(email, refresh_token, use_token, other_callback) {
    request.post(authOptions, function(error, response, body) {
       if (!error && response.statusCode === 200) {
          access_token = body.access_token;
-         db.setTokens(email, access_token, refresh_token);
+         db.setTokens(email, access_token, refresh_token, function(){
+            //callback for if there is no such user to login
+         });
          use_token(access_token, other_callback)
          // res.send({
          //   'access_token': access_token
