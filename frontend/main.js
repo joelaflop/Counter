@@ -9,7 +9,7 @@ const path = require('path')
 var net = require('net');
 
 let email;
-let authed = true;
+let authed = false;
 
 var client = net.connect({
    port: 8080
@@ -60,6 +60,7 @@ function authSpot() {
    authWindow.webContents.on("will-redirect", function(event, url) {
       if (url.startsWith("https://spotify")) {
          authWindow.close();
+         authed = true;
       }
    })
 }
@@ -105,26 +106,30 @@ ipcMain.on("signupbutton_click", function(event, arg) {
 client.on('data', function(dat) {
    data = dat.toString()
    split = data.split("\v");
-   if (split[0] == 'recentlyplayed') {
-      mainWindow.webContents.send("recentlyplayed-button-task-finished",
-         JSON.parse(split[1]));
-   } else if (split[0] == 'nowplaying') {
-      mainWindow.webContents.send("nowplaying-button-task-finished", JSON.parse(split[1]));
-   } else if (split[0] == 'loginsuccess' || split[0] == 'signupsuccess') {
+   code = split[0];
+   if (code == 'recentlyplayed') {
+      mainWindow.webContents.send("recentlyplayed-button-task-finished"
+                                 , JSON.parse(split[1]));
+      authed = true;
+   } else if (code == 'nowplaying') {
+      mainWindow.webContents.send("nowplaying-button-task-finished"
+                                 , JSON.parse(split[1]));
+      authed = true;
+   } else if (code == 'loginsuccess' || code == 'signupsuccess') {
       createMainWindow()
       loginWindow.close()
       email = split[1]
       password = split[2]
       keytar.setPassword("Counter-app", email, password);
-   } else if (split[0] == 'autologinerror') {
+   } else if (code == 'autologinerror') {
       createLoginWindow();
-   } else if (split[0] == 'autologinsuccess') {
+   } else if (code == 'autologinsuccess') {
       createMainWindow();
-   } else if (split[0] == 'signuperror') {
+   } else if (code == 'signuperror') {
       loginWindow.webContents.send("signup-error", split[1]);
-   } else if (split[0] == 'loginerror') {
+   } else if (code == 'loginerror') {
       loginWindow.webContents.send("login-error", split[1]);
-   } else if (split[0] == 'getAuth') {
+   } else if (code == 'getAuth') {
       console.log('client getting auth')
       authSpot();
    }
@@ -138,7 +143,7 @@ setInterval(function() {
    if (authed) {
       client.write('updateListens\v' + email + '\v\r');
    }
-}, 1500000) //25m*60000ms/m = 1500000ms
+}, 2000) //25 m * 60000 ms/m = 1500000 ms
 
 
 //              Electron specifics

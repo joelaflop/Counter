@@ -13,9 +13,9 @@ var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 const db = require('./db');
 
-var client_id = '13aaf88d6e5144d19ae63969c976c861'; // Your client id
-var client_secret = '263f372ce07c4da281f59335e104cb7c'; // Your secret
-var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
+var client_id = '13aaf88d6e5144d19ae63969c976c861';
+var client_secret = '263f372ce07c4da281f59335e104cb7c';
+var redirect_uri = 'http://localhost:8888/callback';
 
 /**
  * Generates a random string containing numbers and letters
@@ -32,7 +32,7 @@ function generateRandomString(length) {
    return text;
 };
 
-function generateRecentlyPlayedOtions(count, access){
+function generateRecentlyPlayedOptions(count, access){
    return {
       url: 'https://api.spotify.com/v1/me/player/recently-played?'+'limit='+count.toString(),
       headers: {
@@ -88,7 +88,7 @@ function nowPlaying(access, callback) {
 }
 
 function recentlyPlayed(access, callback) {
-   var recentlyplayedoptions = generateRecentlyPlayedOtions(access);
+   var recentlyplayedoptions = generateRecentlyPlayedOptions(access);
    request.get(recentlyplayedoptions, function(error, response, body) {
       if (!error && response.statusCode === 200) {
          console.log('recently played success')
@@ -127,7 +127,7 @@ module.exports = {
          if (!access || !refresh) {
             callback('clientneedsauth');
          } else {
-            var recentlyplayedoptions = generateRecentlyPlayedOtions(count, access);
+            var recentlyplayedoptions = generateRecentlyPlayedOptions(count, access);
             request.get(recentlyplayedoptions, function(error, response, body) {
                if (!error && response.statusCode === 200) {
                   console.log('recently played success')
