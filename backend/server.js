@@ -19,7 +19,8 @@ var server = net.createServer(function(connection) {
    connection.on('data', function(dat) {
       data = dat.toString()
       split = data.split("\v");
-      console.log("server recieved:" + data.replace(/\v/g,'\n')+'\n-----');
+      if(split[0] != 'updateListens')
+         console.log("server recieved:" + data.replace(/\v/g,'\n')+'\n-----');
       if (split[0] == 'authspotify') {
          spotify.authSpot(function(refresh, access) {
             console.log(refresh);
@@ -38,11 +39,11 @@ var server = net.createServer(function(connection) {
             }
          });
       } else if (split[0] === 'recentlyplayed') {
-         spotify.recentlyPlayed(split[1], function(tracks) {
+         spotify.recentlyPlayed(10, split[1], function(tracks) {
             if (tracks == 'clientneedsauth') {
                connection.write('getAuth\v\r');
             } else if (tracks != 'undefined') {
-               connection.write('recentlyplayed\v' + JSON.stringify(tracks.items.slice(0,10)))
+               connection.write('recentlyplayed\v' + JSON.stringify(tracks.items))
             } else {
                console.log('tracks are undefined')
             }
@@ -116,6 +117,17 @@ var server = net.createServer(function(connection) {
             connection.write('signupsuccess\v' + email + '\v' + password + '\r')
             db.newUser(email, 'username', password, 'spotify', 'refresh_token', 'created_on', 'last_login');
          });
+      } else if (split[0] == 'updateListens'){
+         email = split[1]
+         spotify.recentlyPlayed(50, email, function(tracks) {
+            if (tracks == 'clientneedsauth') {
+               connection.write('getAuth\v\r'); //maybe use a different flow here
+            } else if (tracks != 'undefined') {
+               db.listen(email, tracks)
+            } else {
+               console.log('tracks are undefined')
+            }
+         });
       }
    });
    //connection.pipe(connection);
@@ -124,15 +136,3 @@ var server = net.createServer(function(connection) {
 server.listen(8080, function() {
    console.log('server is up');
 });
-
-//listen data recording
-// function listen(email, items){
-//    for(int i = 0; i < items.length; i++){
-//       track = items[i]
-//       artistString = 'placeholder';
-//       for(int j = 0; j < track.artists.length; j++){
-//
-//       }
-//       db.listen(email, artistString, track.album.name, track.name, track.album.release_date, 'spotify', track.id)
-//    }
-// }

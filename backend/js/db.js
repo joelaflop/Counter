@@ -57,10 +57,26 @@ module.exports = {
          }
       })
    },
-   listen: function(email, artists, album, title, year, platform, platform_trackID) {
-      query = `INSERT INTO listen (listen_id, email, artists, album, title, year, platform, platform_trackID, listened_on)
-               VALUES (DEFAULT,'${email}','${artists}','${album}','${title}','${year}','${platform}','${platform_trackID}',now())
-      on conflict (title, listened_on) do nothing;`
+   listen: function(email, tracks) {
+      innerquery = ''
+      for(i = 0; i < tracks.items.length; i++){
+         curr = tracks.items[i]
+         track = curr.track;
+         artists = ''
+         for(j = 0; j < track.artists.length; j++){
+            artists += track.artists[j].name;
+         }
+         console.log(JSON.stringify(track.name))
+         //curr.played_at
+         if(i == 0){
+            innerquery = `(DEFAULT,'${email}','${prep(artists)}','${prep(track.album.name)}','${prep(track.name)}','${trep(track.album.release_date)}','spotify','${track.id}','${curr.played_at}')`
+         } else {
+            innerquery += `, (DEFAULT,'${email}','${prep(artists)}','${prep(track.album.name)}','${prep(track.name)}','${trep(track.album.release_date)}','spotify','${track.id}','${curr.played_at}')`
+         }
+      }
+      query = `INSERT INTO listen (listen_id, email, artists, album, title, released_on, platform, platform_trackID, listened_on)
+               VALUES ${innerquery}
+               on conflict (email, listened_on) do nothing;`
       // console.log(query);
       client.query(query, function(err, res) {
          if (err) {
@@ -69,5 +85,16 @@ module.exports = {
          }
       })
    }
-
 };
+
+function prep(txt){
+   return txt.replace(/'/g, '');
+}
+
+function trep(txt){
+   if(txt.length == 4){
+      return txt+'-12-12'
+   }else{
+      return txt;
+   }
+}
