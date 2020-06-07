@@ -134,6 +134,21 @@ module.exports = {
             console.log(query)
          }
       })
+   },
+   getEmail: function(username, callback){
+      query = `SELECT email from account where username = $1;`
+      // console.log(query);
+      values = [username]
+      client.query(query, values, function(err, res) {
+         if (!err && res.rows[0]) {
+            callback(res.rows[0].email);
+         } else if (!err && !res.rows[0]) {
+            callback(null)
+         } else {
+            console.log('DB: error getting tokens');
+            console.log(err)
+         }
+      })
    }
 };
 

@@ -20,13 +20,13 @@ var server = net.createServer(function(connection) {
       data = dat.toString()
       split = data.split("\v");
       code = split[0];
-      if(code != 'updateListens')
-         console.log("---------\nserver recieved:" + data.replace(/\v/g,'\n'));
+      if (code != 'updateListens')
+         console.log("---------\nserver recieved:" + data.replace(/\v/g, '\n'));
       if (code == 'authspotify') {
          spotify.authSpot(function(refresh, access) {
             console.log(refresh);
             console.log(access);
-            db.setTokens(split[1], refresh, access, function(){
+            db.setTokens(split[1], refresh, access, function() {
                //callback for if there is no such user to login
             });
          })
@@ -55,28 +55,18 @@ var server = net.createServer(function(connection) {
          console.log("login attempt")
          email = split[1]
          password = split[2]
-         auth.login(email, password, function(error) {
-            switch (error.code) {
-               case "auth/invalid-email":
-                  break;
-               case "auth/invalid-user-token":
-                  break;
-               case "auth/requires-recent-login":
-                  break;
-               case "auth/user-token-expired":
-                  break;
-               default:
-                  // console.log(error)
-                  console.log(error.code)
-                  console.log(error.message)
-            }
-            connection.write('loginerror\v' + error.message);
-         }, function(success) {
-            connection.write('loginsuccess\v' + email + '\v' + password + '\v\r');
-            db.login(email, function(){
-               //callback for if there is no such user to login
-            });
-         });
+         username = split[3]
+         if (!email) {
+            db.getEmail(username, function(email) {
+               if (!email) {
+                  connection.write('loginerror\v' + 'This username was not found\v\r');
+               } else {
+                  login(email, password, connection);
+               }
+            })
+         } else {
+            login(email, password, connection)
+         }
       } else if (code == 'autologin') {
          console.log("autologin attempt")
          email = split[1]
@@ -99,32 +89,24 @@ var server = net.createServer(function(connection) {
             }
          }, function(success) {
             connection.write('autologinsuccess');
-            db.login(email, function(){
+            db.login(email, function() {
                //callback for if there is no such user to login
             });
          });
       } else if (code == 'signup') {
          email = split[1]
          password = split[2]
-         auth.signup(email, password, function(error) {
-            switch (error.code) {
-               case "auth/invalid-email":
-                  break;
-               case "auth/invalid-user-token":
-                  break;
-               case "auth/email-already-in-use":
-                  break;
-               default:
-                  // console.log(error)
-                  console.log(error.code)
-                  console.log(error.message)
+         username = split[3]
+         db.getEmail(username, function(returnedEmail) {
+            if(!returnedEmail && username){
+               signup(email, password, username, connection)
+            } if (!username){
+               connection.write('signuperror\v' + 'Please enter a username\v\r');
+            } else {
+               connection.write('signuperror\v' + 'This username is taken\v\r');
             }
-            connection.write('signuperror\v' + error.message);
-         }, function(success) {
-            connection.write('signupsuccess\v' + email + '\v' + password + '\v\r')
-            db.newUser(email, 'username', password, 'spotify');
          });
-      } else if (code == 'updateListens'){
+      } else if (code == 'updateListens') {
          email = split[1]
          spotify.recentlyPlayed(50, email, function(tracks) {
             if (tracks == 'clientneedsauth') {
@@ -142,6 +124,52 @@ var server = net.createServer(function(connection) {
    });
    //connection.pipe(connection);
 });
+
+function signup(email, password, username, connection){
+   auth.signup(email, password, function(error) {
+      switch (error.code) {
+         case "auth/invalid-email":
+            break;
+         case "auth/invalid-user-token":
+            break;
+         case "auth/email-already-in-use":
+            break;
+         default:
+            // console.log(error)
+            console.log(error.code)
+            console.log(error.message)
+      }
+      connection.write('signuperror\v' + error.message +'\v\r');
+   }, function(success) {
+      connection.write('signupsuccess\v' + email + '\v' + password + '\v' + username + '\v\r')
+      db.newUser(email, username, password, 'spotify');
+   });
+}
+
+function login(email, password, connection) {
+   auth.login(email, password, function(error) {
+      switch (error.code) {
+         case "auth/invalid-email":
+            break;
+         case "auth/invalid-user-token":
+            break;
+         case "auth/requires-recent-login":
+            break;
+         case "auth/user-token-expired":
+            break;
+         default:
+            // console.log(error)
+            console.log(error.code)
+            console.log(error.message)
+      }
+      connection.write('loginerror\v' + error.message);
+   }, function(success) {
+      connection.write('loginsuccess\v' + email + '\v' + password + '\v\r');
+      db.login(email, function() {
+         //callback for if there is no such user to login
+      });
+   });
+}
 
 server.listen(8080, function() {
    console.log('server is up');

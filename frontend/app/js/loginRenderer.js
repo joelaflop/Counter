@@ -3,13 +3,14 @@ const {
 } = require("electron");
 
 var email = document.getElementById("email")
+var username = document.getElementById("username")
 var password = document.getElementById("password")
 
 const loginButton = document.getElementById("login button");
 
 loginButton.addEventListener('click', function() {
 
-   info = [email.value, password.value];
+   info = [email.value, password.value, username.value];
 
    //send the info to main process . we can pass any arguments as second param.
    ipcRenderer.send("loginbutton_click", info); // ipcRender.send will pass the information to main process
@@ -17,7 +18,7 @@ loginButton.addEventListener('click', function() {
 
 document.addEventListener("keydown", function(event) {
    if (event.key == "Enter") {
-      info = [email.value, password.value];
+      info = [email.value, password.value, username.value];
 
       //send the info to main process . we can pass any arguments as second param.
       ipcRenderer.send("loginbutton_click", info); // ipcRender.send will pass the information to main process
@@ -27,7 +28,7 @@ document.addEventListener("keydown", function(event) {
 const signupButton = document.getElementById("singup-button");
 
 signupButton.addEventListener('click', function() {
-   info = [email.value, password.value];
+   info = [email.value, password.value, username.value];
 
    //send the info to main process . we can pass any arguments as second param.
    ipcRenderer.send("signupbutton_click", info); // ipcRender.send will pass the information to main process

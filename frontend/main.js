@@ -91,12 +91,12 @@ ipcMain.on("recentlyplayed_click", function(event, arg) {
 });
 ipcMain.on("loginbutton_click", function(event, arg) {
    console.log("login button clicked")
-   client.write('login\v' + arg[0] + '\v' + arg[1] + '\v\r');
+   client.write('login\v' + arg[0] + '\v' + arg[1] + '\v' + arg[2] + '\v\r');
 
 });
 ipcMain.on("signupbutton_click", function(event, arg) {
    console.log("signup button clicked")
-   client.write('signup\v' + arg[0] + '\v' + arg[1] + '\v\r');
+   client.write('signup\v' + arg[0] + '\v' + arg[1] + '\v' + arg[2] + '\v\r');
 });
 
 //
@@ -118,7 +118,12 @@ client.on('data', function(dat) {
    } else if (code == 'loginsuccess' || code == 'signupsuccess') {
       createMainWindow()
       loginWindow.close()
-      email = split[1]
+
+      if(email){
+         email = split[1]
+      } else{
+         email = split[3]
+      }
       password = split[2]
       keytar.setPassword("Counter-app", email, password);
    } else if (code == 'autologinerror') {
@@ -132,6 +137,7 @@ client.on('data', function(dat) {
    } else if (code == 'getAuth') {
       console.log('client getting auth')
       authSpot();
+
    }
 });
 
