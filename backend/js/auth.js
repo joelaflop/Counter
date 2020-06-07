@@ -16,6 +16,7 @@ firebase.initializeApp(firebaseConfig);
 
 module.exports = {
    signup: function(email, password, errorcallback, successcallback) {
+      
       firebase.auth().createUserWithEmailAndPassword(email, password).then(function(thing) {
          successcallback(thing);
       }).catch(function(error) {

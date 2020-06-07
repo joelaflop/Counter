@@ -119,11 +119,7 @@ client.on('data', function(dat) {
       createMainWindow()
       loginWindow.close()
 
-      if(email){
-         email = split[1]
-      } else{
-         email = split[3]
-      }
+      email = split[1]
       password = split[2]
       keytar.setPassword("Counter-app", email, password);
    } else if (code == 'autologinerror') {
@@ -134,10 +130,9 @@ client.on('data', function(dat) {
       loginWindow.webContents.send("signup-error", split[1]);
    } else if (code == 'loginerror') {
       loginWindow.webContents.send("login-error", split[1]);
-   } else if (code == 'getAuth') {
+   } else if (code == 'getauth') {
       console.log('client getting auth')
       authSpot();
-
    }
 });
 
@@ -149,7 +144,7 @@ setInterval(function() {
    if (authed) {
       client.write('updateListens\v' + email + '\v\r');
    }
-}, 1500000) //25 m * 60000 ms/m = 1500000 ms
+}, 1500000) //25 min * 60000 ms/min = 1500000 ms
 
 
 //              Electron specifics

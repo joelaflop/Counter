@@ -80,7 +80,7 @@ module.exports = {
          if(res.rowCount == 0){
             console.log('setting coins for user not in DB')
             noUserCallback();
-            //should consider removing user from auth to force resignup
+            //consider removing user from auth to force resignup
          }
          if (err) {
             console.log('DB: error updating login time');

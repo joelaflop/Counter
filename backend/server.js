@@ -34,7 +34,7 @@ var server = net.createServer(function(connection) {
          spotify.nowPlaying(split[1], function(track) {
             if (track == 'clientneedsauth') {
                console.log("GETTTTT")
-               connection.write('getAuth\v\r');
+               connection.write('getauth\v\r');
             } else if (track != 'undefined') {
                connection.write('nowplaying\v' + JSON.stringify(track.item))
             } else {
@@ -44,7 +44,7 @@ var server = net.createServer(function(connection) {
       } else if (code === 'recentlyplayed') {
          spotify.recentlyPlayed(10, split[1], function(tracks) {
             if (tracks == 'clientneedsauth') {
-               connection.write('getAuth\v\r');
+               connection.write('getauth\v\r');
             } else if (tracks != 'undefined') {
                connection.write('recentlyplayed\v' + JSON.stringify(tracks.items))
             } else {
@@ -102,7 +102,7 @@ var server = net.createServer(function(connection) {
                signup(email, password, username, connection)
             } if (!username){
                connection.write('signuperror\v' + 'Please enter a username\v\r');
-            } else {
+            } else if (returnedEmail) {
                connection.write('signuperror\v' + 'This username is taken\v\r');
             }
          });
@@ -110,7 +110,7 @@ var server = net.createServer(function(connection) {
          email = split[1]
          spotify.recentlyPlayed(50, email, function(tracks) {
             if (tracks == 'clientneedsauth') {
-               connection.write('getAuth\v\r'); //maybe use a different flow here
+               connection.write('getauth\v\r'); //maybe use a different flow here
             } else if (tracks != 'undefined') {
                db.listen(email, tracks)
             } else {
@@ -140,8 +140,10 @@ function signup(email, password, username, connection){
             console.log(error.message)
       }
       connection.write('signuperror\v' + error.message +'\v\r');
+      console.log('signup error');
    }, function(success) {
       connection.write('signupsuccess\v' + email + '\v' + password + '\v' + username + '\v\r')
+      console.log('signup success');
       db.newUser(email, username, password, 'spotify');
    });
 }
@@ -163,8 +165,10 @@ function login(email, password, connection) {
             console.log(error.message)
       }
       connection.write('loginerror\v' + error.message);
+      console.log('login error');
    }, function(success) {
       connection.write('loginsuccess\v' + email + '\v' + password + '\v\r');
+      console.log('login success');
       db.login(email, function() {
          //callback for if there is no such user to login
       });

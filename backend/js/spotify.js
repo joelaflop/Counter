@@ -127,6 +127,7 @@ module.exports = {
    },
    recentlyPlayed: function(count, email, callback) {
       db.getTokens(email, function(access, refresh) {
+         console.log(email)
          if (!access || !refresh) {
             callback('clientneedsauth');
          } else {
