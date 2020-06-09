@@ -33,7 +33,7 @@ var server = net.createServer(function(connection) {
       } else if (code === 'nowplaying') {
          spotify.nowPlaying(split[1], function(track) {
             if (track == 'clientneedsauth') {
-               console.log("GETTTTT")
+               console.log("Client request requires authentification")
                connection.write('getauth\v\r');
             } else if (track != 'undefined') {
                connection.write('nowplaying\v' + JSON.stringify(track.item))
@@ -44,6 +44,7 @@ var server = net.createServer(function(connection) {
       } else if (code === 'recentlyplayed') {
          spotify.recentlyPlayed(10, split[1], function(tracks) {
             if (tracks == 'clientneedsauth') {
+               console.log("Client request requires authentification")
                connection.write('getauth\v\r');
             } else if (tracks != 'undefined') {
                connection.write('recentlyplayed\v' + JSON.stringify(tracks.items))
@@ -62,10 +63,12 @@ var server = net.createServer(function(connection) {
                   connection.write('loginerror\v' + 'This username was not found\v\r');
                } else {
                   login(email, password, connection);
+                  updateListens(email, connection);
                }
             })
          } else {
-            login(email, password, connection)
+            login(email, password, connection);
+            updateListens(email, connection);
          }
       } else if (code == 'autologin') {
          console.log("autologin attempt")
@@ -92,6 +95,7 @@ var server = net.createServer(function(connection) {
             db.login(email, function() {
                //callback for if there is no such user to login
             });
+            updateListens(email, connection);
          });
       } else if (code == 'signup') {
          email = split[1]
@@ -108,15 +112,7 @@ var server = net.createServer(function(connection) {
          });
       } else if (code == 'updateListens') {
          email = split[1]
-         spotify.recentlyPlayed(50, email, function(tracks) {
-            if (tracks == 'clientneedsauth') {
-               connection.write('getauth\v\r'); //maybe use a different flow here
-            } else if (tracks != 'undefined') {
-               db.listen(email, tracks)
-            } else {
-               console.log('tracks are undefined')
-            }
-         });
+         updateListens(email, connection);
 
       } else {
          console.log('server code ^ unknown')
@@ -124,6 +120,19 @@ var server = net.createServer(function(connection) {
    });
    //connection.pipe(connection);
 });
+
+function updateListens(email, connection){
+   spotify.recentlyPlayed(50, email, function(tracks) {
+      if (tracks == 'clientneedsauth') {
+         connection.write('getauth\v\r'); //maybe use a different flow here
+      } else if (tracks != 'undefined') {
+         console.log(`autoupdating ${email} listens`)
+         db.listen(email, tracks)
+      } else {
+         console.log('tracks are undefined')
+      }
+   });
+}
 
 function signup(email, password, username, connection){
    auth.signup(email, password, function(error) {
