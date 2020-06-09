@@ -13,8 +13,10 @@ let authed = false;
 
 var client = net.connect({
    port: 8080
+   , host:'192.168.1.57'
 }, function() {
    console.log('connected to server');
+   client.write('lmao we got in')
 });
 
 var loginWindow, mainWindow;
