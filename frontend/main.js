@@ -2,7 +2,8 @@
 const {
    app,
    BrowserWindow,
-   ipcMain
+   ipcMain,
+   shell
 } = require('electron')
 const keytar = require('keytar')
 const path = require('path')
@@ -10,6 +11,8 @@ var net = require('net');
 
 let email;
 let authed = false;
+
+app.allowRendererProcessReuse = true;
 
 var client = net.connect({
    port: 8080
@@ -32,7 +35,7 @@ function createLoginWindow() {
    })
    loginWindow.loadFile('app/login.html')
 
-   loginWindow.webContents.openDevTools()
+   // loginWindow.webContents.openDevTools()
 }
 
 function createMainWindow() {
@@ -53,18 +56,19 @@ function createMainWindow() {
 function authSpot() {
    client.write('authspotify\v' + email + '\v\r');
 
-   const authWindow = new BrowserWindow({
-      width: 600,
-      height: 800,
-   })
-   authWindow.loadURL('http://localhost:8888/login')
+   // const authWindow = new BrowserWindow({
+   //    width: 600,
+   //    height: 800,
+   // })
+   // authWindow.loadURL('http://192.168.1.57:8888/login')
+   shell.openExternal('http:192.168.1.57:8888/login').then(function(){console.log('opened external browser to get auth')})
 
-   authWindow.webContents.on("will-redirect", function(event, url) {
-      if (url.startsWith("https://spotify")) {
-         authWindow.close();
-         authed = true;
-      }
-   })
+   // authWindow.webContents.on("will-redirect", function(event, url) {
+   //    if (url.startsWith("https://spotify")) {
+   //       authWindow.close();
+   //       authed = true;
+   //    }
+   // })
 }
 
 function startup() {
