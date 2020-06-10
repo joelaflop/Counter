@@ -117,7 +117,7 @@ client.on('data', function(dat) {
    if (code == 'recentlyplayed') {
       try{
          tracks = JSON.parse(split[1])
-         mainWindow.webContents.send("nowplaying-button-task-finished", tracks);
+         mainWindow.webContents.send("recentlyplayed-button-task-finished", tracks);
       }catch(e){
          console.log(e)
          console.log(split[i])
