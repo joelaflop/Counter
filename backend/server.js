@@ -36,7 +36,9 @@ var server = net.createServer(function(connection) {
                console.log("Client request requires authentification")
                connection.write('getauth\v\r');
             } else if (track != 'undefined') {
-               connection.write('nowplaying\v' + JSON.stringify(track.item))
+               // console.log(buildTrackJSON(track))
+               // connection.write('nowplaying\v' + JSON.stringify(track.item))
+               connection.write('nowplaying\v' + JSON.stringify(buildTrackJSON(track.item)))
             } else {
                console.log('track is undefined')
             }
@@ -47,7 +49,11 @@ var server = net.createServer(function(connection) {
                console.log("Client request requires authentification")
                connection.write('getauth\v\r');
             } else if (tracks != 'undefined') {
-               connection.write('recentlyplayed\v' + JSON.stringify(tracks.items))
+               var trackList = []
+               for(let j=0; j<tracks.items.length; j++){
+                  trackList.push(buildTrackJSON(tracks.items[j].track))
+               }
+               connection.write('recentlyplayed\v' + JSON.stringify(trackList))
             } else {
                console.log('tracks are undefined')
             }
@@ -182,6 +188,24 @@ function login(email, password, connection) {
          //callback for if there is no such user to login
       });
    });
+}
+
+function buildTrackJSON(track){
+   artistNames = []
+   for(let i=0; i<track.artists.length; i++){
+      artistNames.push(track.artists[i].name)
+   }
+   json =
+   {
+      name:track.name,
+      album:
+      {
+         name:track.album.name,
+         imageURL:track.album.images[0].url
+      },
+      artists:artistNames
+   }
+   return json;
 }
 
 server.listen(8080, function() {

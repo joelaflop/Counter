@@ -12,10 +12,16 @@ var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 const db = require('./db');
+const config = require('../../config')
 
 var client_id = '13aaf88d6e5144d19ae63969c976c861';
 var client_secret = '263f372ce07c4da281f59335e104cb7c';
-var redirect_uri = 'http://localhost:8888/callback';
+var redirect_uri = `http://${config.serverIP}:8888/callback`;
+
+var app = express();
+
+app.use(cors()) //.use(express.static(__dirname))
+   .use(cookieParser());
 
 /**
  * Generates a random string containing numbers and letters
@@ -154,11 +160,6 @@ module.exports = {
 
       var stateKey = 'spotify_auth_state';
 
-      var app = express();
-
-      app.use(cors()) //.use(express.static(__dirname))
-         .use(cookieParser());
-
       app.get('/login', function(req, res) {
 
          var state = generateRandomString(16);
@@ -214,7 +215,7 @@ module.exports = {
                   callback(access_token, refresh_token)
 
                   res.redirect("https://spotify.com/")
-                  spot.close()
+                  // spot.close()
 
                } else {
                   res.redirect('/#' +
@@ -225,7 +226,9 @@ module.exports = {
             });
          }
       });
-      var spot = app.listen(8888).on('error', function(err) {
+      var spot = app.listen(8888
+         // ,'192.168.1.133',
+      ).on('error', function(err) {
          console.log('spotify auth port listening error:')
          console.log(err);
       });

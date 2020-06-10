@@ -40,11 +40,11 @@
       ipcRenderer.on("recentlyplayed-button-task-finished", function(event, tracks) {
          parent = document.getElementById('recentlyplaying')
          parent.innerHTML = ""
-         for (i = 0; i < tracks.length; i++) {
+         for (let i = 0; i < tracks.length; i++) {
             console.log(tracks[i])
             child = document.createElement('div');
             appendChild = parent.appendChild(child)
-            appendChild.innerHTML = full_track_template(tracks[i].track);
+            appendChild.innerHTML = full_track_template(tracks[i]);
             console.log(1)
          }
       });

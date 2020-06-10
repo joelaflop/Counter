@@ -2,18 +2,22 @@
 const {
    app,
    BrowserWindow,
-   ipcMain
+   ipcMain,
+   shell
 } = require('electron')
 const keytar = require('keytar')
 const path = require('path')
 var net = require('net');
+const config = require('../config')
 
 let email;
 let authed = false;
 
+app.allowRendererProcessReuse = true;
+
 var client = net.connect({
    port: 8080
-   , host:'192.168.1.57'
+   , host:config.serverIP
 }, function() {
    console.log('connected to server');
    client.write('lmao we got in')
@@ -32,7 +36,7 @@ function createLoginWindow() {
    })
    loginWindow.loadFile('app/login.html')
 
-   loginWindow.webContents.openDevTools()
+   // loginWindow.webContents.openDevTools()
 }
 
 function createMainWindow() {
@@ -53,18 +57,19 @@ function createMainWindow() {
 function authSpot() {
    client.write('authspotify\v' + email + '\v\r');
 
-   const authWindow = new BrowserWindow({
-      width: 600,
-      height: 800,
-   })
-   authWindow.loadURL('http://localhost:8888/login')
+   // const authWindow = new BrowserWindow({
+   //    width: 600,
+   //    height: 800,
+   // })
+   // authWindow.loadURL('http://192.168.1.57:8888/login')
+   shell.openExternal(`http:${config.serverIP}:8888/login`).then(function(){console.log('opened external browser to get auth')})
 
-   authWindow.webContents.on("will-redirect", function(event, url) {
-      if (url.startsWith("https://spotify")) {
-         authWindow.close();
-         authed = true;
-      }
-   })
+   // authWindow.webContents.on("will-redirect", function(event, url) {
+   //    if (url.startsWith("https://spotify")) {
+   //       authWindow.close();
+   //       authed = true;
+   //    }
+   // })
 }
 
 function startup() {
@@ -110,12 +115,22 @@ client.on('data', function(dat) {
    split = data.split("\v");
    code = split[0];
    if (code == 'recentlyplayed') {
-      mainWindow.webContents.send("recentlyplayed-button-task-finished"
-                                 , JSON.parse(split[1]));
+      try{
+         tracks = JSON.parse(split[1])
+         mainWindow.webContents.send("recentlyplayed-button-task-finished", tracks);
+      }catch(e){
+         console.log(e)
+         console.log(split[1])
+      }
       authed = true;
    } else if (code == 'nowplaying') {
-      mainWindow.webContents.send("nowplaying-button-task-finished"
-                                 , JSON.parse(split[1]));
+      try{
+         track = JSON.parse(split[1])
+         mainWindow.webContents.send("nowplaying-button-task-finished", track);
+      }catch(e){
+         console.log(e)
+         console.log(split[1])
+      }
       authed = true;
    } else if (code == 'loginsuccess' || code == 'signupsuccess') {
       createMainWindow()
