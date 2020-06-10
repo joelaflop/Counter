@@ -8,6 +8,7 @@ const {
 const keytar = require('keytar')
 const path = require('path')
 var net = require('net');
+const config = require('../config')
 
 let email;
 let authed = false;
@@ -16,7 +17,7 @@ app.allowRendererProcessReuse = true;
 
 var client = net.connect({
    port: 8080
-   , host:'192.168.1.57'
+   , host:config.serverIP
 }, function() {
    console.log('connected to server');
    client.write('lmao we got in')
@@ -61,7 +62,7 @@ function authSpot() {
    //    height: 800,
    // })
    // authWindow.loadURL('http://192.168.1.57:8888/login')
-   shell.openExternal('http:192.168.1.57:8888/login').then(function(){console.log('opened external browser to get auth')})
+   shell.openExternal(`http:${config.serverIP}:8888/login`).then(function(){console.log('opened external browser to get auth')})
 
    // authWindow.webContents.on("will-redirect", function(event, url) {
    //    if (url.startsWith("https://spotify")) {
