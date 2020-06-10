@@ -25,9 +25,11 @@ var server = net.createServer(function(connection) {
          spotify.authSpot(function(refresh, access) {
             console.log(refresh);
             console.log(access);
-            db.setTokens(split[1], refresh, access, function() {
+            email = split[1]
+            db.setTokens(email, refresh, access, function() {
                //callback for if there is no such user to login
             });
+            updateListens(email, connection);
          })
       } else if (code === 'nowplaying') {
          spotify.nowPlaying(split[1], function(track) {

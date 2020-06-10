@@ -64,10 +64,6 @@ function authSpot() {
    // authWindow.loadURL('http://192.168.1.57:8888/login')
    shell.openExternal(`http:${config.serverIP}:8888/login`).then(function(){console.log('opened external browser to get auth')})
 
-   setTimerout(function() {
-          client.write('updateListens\v' + email + '\v\r');
-   }, 180000) //update listens 3 minutes after authorizing spotify
-
    // authWindow.webContents.on("will-redirect", function(event, url) {
    //    if (url.startsWith("https://spotify")) {
    //       authWindow.close();
