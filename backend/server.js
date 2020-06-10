@@ -99,7 +99,7 @@ var server = net.createServer(function(connection) {
          }, function(success) {
             connection.write('autologinsuccess');
             db.login(email, function() {
-               //callback for if there is no such user to login
+               console.log('this user is not in the DB')
             });
             updateListens(email, connection);
          });
@@ -130,7 +130,8 @@ var server = net.createServer(function(connection) {
 function updateListens(email, connection){
    spotify.recentlyPlayed(50, email, function(tracks) {
       if (tracks == 'clientneedsauth') {
-         connection.write('getauth\v\r'); //maybe use a different flow here
+         // connection.write('getauth\v\r'); //maybe use a different flow here
+         // i think we ignore this case, or tell the user to authorize again in the future
       } else if (tracks != 'undefined') {
          console.log(`autoupdating ${email} listens`)
          db.listen(email, tracks)
@@ -185,7 +186,7 @@ function login(email, password, connection) {
       connection.write('loginsuccess\v' + email + '\v' + password + '\v\r');
       console.log('login success');
       db.login(email, function() {
-         //callback for if there is no such user to login
+         console.log('this user is not in the DB')
       });
    });
 }

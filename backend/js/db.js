@@ -136,7 +136,7 @@ module.exports = {
       })
    },
    getEmail: function(username, callback){
-      query = `SELECT email from account where username = $1;`
+      query = `SELECT email FROM account WHERE username = $1;`
       // console.log(query);
       values = [username]
       client.query(query, values, function(err, res) {
@@ -149,6 +149,20 @@ module.exports = {
             console.log(err)
          }
       })
+   },
+   checkAuth: function(email, callback){
+      query = `SELECT refresh_token, access_token FROM account WHERE email = $1`
+      values = [email]
+      client.query(query, values, function(err, res) {
+         if (!err && res.rows[0]) {
+            callback(true);
+         } else if (!err && !res.rows[0]) {
+            callback(false)
+         } else {
+            console.log('DB: error checking auth');
+            console.log(err)
+         }
+      });
    }
 };
 
