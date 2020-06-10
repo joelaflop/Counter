@@ -120,7 +120,7 @@ client.on('data', function(dat) {
          mainWindow.webContents.send("recentlyplayed-button-task-finished", tracks);
       }catch(e){
          console.log(e)
-         console.log(split[i])
+         console.log(split[1])
       }
       authed = true;
    } else if (code == 'nowplaying') {
@@ -129,7 +129,7 @@ client.on('data', function(dat) {
          mainWindow.webContents.send("nowplaying-button-task-finished", track);
       }catch(e){
          console.log(e)
-         console.log(split[i])
+         console.log(split[1])
       }
       authed = true;
    } else if (code == 'loginsuccess' || code == 'signupsuccess') {
