@@ -20,8 +20,7 @@ var server = net.createServer(function(connection) {
       data = dat.toString()
       split = data.split("\v");
       code = split[0];
-      if (code != 'updateListens')
-         console.log("---------\nserver recieved:" + data.replace(/\v/g, '\n'));
+      console.log("---------\nserver recieved:" + data.replace(/\v/g, '\n'));
       if (code == 'authspotify') {
          spotify.authSpot(function(refresh, access) {
             console.log(refresh);
