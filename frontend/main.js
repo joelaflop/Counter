@@ -115,12 +115,22 @@ client.on('data', function(dat) {
    split = data.split("\v");
    code = split[0];
    if (code == 'recentlyplayed') {
-      mainWindow.webContents.send("recentlyplayed-button-task-finished"
-                                 , JSON.parse(split[1]));
+      try{
+         tracks = JSON.parse(split[1])
+         mainWindow.webContents.send("nowplaying-button-task-finished", tracks);
+      }catch(e){
+         console.log(e)
+         console.log(split[i])
+      }
       authed = true;
    } else if (code == 'nowplaying') {
-      mainWindow.webContents.send("nowplaying-button-task-finished"
-                                 , JSON.parse(split[1]));
+      try{
+         track = JSON.parse(split[1])
+         mainWindow.webContents.send("nowplaying-button-task-finished", track);
+      }catch(e){
+         console.log(e)
+         console.log(split[i])
+      }
       authed = true;
    } else if (code == 'loginsuccess' || code == 'signupsuccess') {
       createMainWindow()
