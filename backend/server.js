@@ -20,8 +20,7 @@ var server = net.createServer(function(connection) {
       data = dat.toString()
       split = data.split("\v");
       code = split[0];
-      if (code != 'updateListens')
-         console.log("---------\nserver recieved:" + data.replace(/\v/g, '\n'));
+      console.log("---------\nserver recieved:" + data.replace(/\v/g, '\n'));
       if (code == 'authspotify') {
          spotify.authSpot(function(refresh, access) {
             console.log(refresh);
@@ -38,7 +37,7 @@ var server = net.createServer(function(connection) {
             } else if (track != 'undefined') {
                // console.log(buildTrackJSON(track))
                // connection.write('nowplaying\v' + JSON.stringify(track.item))
-               connection.write('nowplaying\v' + JSON.stringify(buildTrackJSON(track.item)))
+               connection.write('nowplaying\v' + JSON.stringify(buildTrackJSON(track.item)) + '\v\r')
             } else {
                console.log('track is undefined')
             }
@@ -53,7 +52,8 @@ var server = net.createServer(function(connection) {
                for(let j=0; j<tracks.items.length; j++){
                   trackList.push(buildTrackJSON(tracks.items[j].track))
                }
-               connection.write('recentlyplayed\v' + JSON.stringify(trackList))
+               console.log('recently played data writing:')
+               console.log(connection.write('recentlyplayed\v' + JSON.stringify(trackList) + '\v\r'))
             } else {
                console.log('tracks are undefined')
             }
@@ -124,7 +124,7 @@ var server = net.createServer(function(connection) {
          console.log('server code ^ unknown')
       }
    });
-   //connection.pipe(connection);
+   // connection.pipe(connection);
 });
 
 function updateListens(email, connection){
