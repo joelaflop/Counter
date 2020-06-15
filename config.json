@@ -1,3 +1,4 @@
 {
-    "serverIP":"192.168.1.57"
+    "serverIP":"192.168.1.57",
+    "serverURL":"https://localhost:8443"
 }
