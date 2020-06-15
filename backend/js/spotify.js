@@ -223,7 +223,8 @@ module.exports = {
 
                   callback(access_token, refresh_token)
 
-                  res.redirect("https://spotify.com/")
+                  res.redirect("https://spotify.com/");
+                  serverS.close();
                   // spot.close()
 
                } else {
