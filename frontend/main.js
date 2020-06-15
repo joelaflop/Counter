@@ -52,8 +52,8 @@ function createMainWindow() {
 function authSpot() {
    // client.write('authspotify\v' + email + '\v\r');
 
-   const clientS = http2.connect(config.serverURL, {
-      ca: fs.readFileSync('localhost--cert.pem')
+   const clientS = http2.connect(config.joesmac, {
+      ca: fs.readFileSync('joesmac-cert.pem')
    }, function() {
       console.log('connected to https server');
    });
@@ -80,7 +80,7 @@ function authSpot() {
    req.end();
 
 
-   shell.openExternal(`http:${config.serverIP}:8888/login`).then(function() {
+   shell.openExternal(`http://${config.joesmacIP}:8888/login`).then(function() {
       console.log('opened external browser to get auth')
    })
 
@@ -92,7 +92,7 @@ function startup() {
          if (result[0]) {
             email = result[0].account
             // client.write('autologin\v' + result[0].account + '\v' + result[0].password + '\v\r');
-            const clientS = http2.connect(config.serverURL, {
+            const clientS = http2.connect(config.joesmac, {
                ca: fs.readFileSync('localhost--cert.pem')
             }, function() {
                console.log('connected to https server');
@@ -138,7 +138,7 @@ ipcMain.on("nowplaying_click", function(event, arg) {
    console.log("nowplaying button clicked")
    // client.write('nowplaying\v' + email + '\v\r');
 
-   const clientS = http2.connect(config.serverURL, {
+   const clientS = http2.connect(config.joesmac, {
       ca: fs.readFileSync('localhost--cert.pem')
    }, function() {
       console.log('connected to https server');
@@ -175,7 +175,7 @@ ipcMain.on("nowplaying_click", function(event, arg) {
 ipcMain.on("recentlyplayed_click", function(event, arg) {
    console.log("recentplayed button clicked")
    // client.write('recentlyplayed\v' + email + '\v\r');
-   const clientS = http2.connect(config.serverURL, {
+   const clientS = http2.connect(config.joesmac, {
       ca: fs.readFileSync('localhost--cert.pem')
    }, function() {
       console.log('connected to https server');
@@ -213,7 +213,7 @@ ipcMain.on("loginbutton_click", function(event, arg) {
    console.log("login button clicked")
    // client.write('login\v' + arg[0] + '\v' + arg[1] + '\v' + arg[2] + '\v\r');
 
-   const clientS = http2.connect(config.serverURL, {
+   const clientS = http2.connect(config.joesmac, {
       ca: fs.readFileSync('localhost--cert.pem')
    }, function() {
       console.log('connected to https server');
@@ -256,7 +256,7 @@ ipcMain.on("loginbutton_click", function(event, arg) {
 ipcMain.on("signupbutton_click", function(event, arg) {
    console.log("signup button clicked")
    // client.write('signup\v' + arg[0] + '\v' + arg[1] + '\v' + arg[2] + '\v\r');
-   const clientS = http2.connect(config.serverURL, {
+   const clientS = http2.connect(config.joesmac, {
       ca: fs.readFileSync('localhost--cert.pem')
    }, function() {
       console.log('connected to https server');
@@ -304,7 +304,7 @@ setInterval(function() {
       // client.write('updateListens\v' + email + '\v\r');
       // client.write('nowplaying\v' + email + '\v\r');
 
-      const clientS = http2.connect(config.serverURL, {
+      const clientS = http2.connect(config.joesmac, {
          ca: fs.readFileSync('localhost--cert.pem')
       }, function() {
          console.log('connected to https server');
