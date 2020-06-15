@@ -82,7 +82,7 @@ function authSpot() {
    req.end();
 
 
-   shell.openExternal(`http://${config.IP}:8888/login`).then(function() {
+   shell.openExternal(`https://${config.IP}:8888/login`).then(function() {
       console.log('opened external browser to get auth')
    })
 

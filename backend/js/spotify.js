@@ -7,6 +7,8 @@
  * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
  */
 var express = require('express'); // Express web server framework
+var https = require('https');
+const fs = require('fs');
 var request = require('request'); // "Request" library
 var cors = require('cors');
 var querystring = require('querystring');
@@ -15,12 +17,6 @@ const db = require('./db');
 
 var client_id = '13aaf88d6e5144d19ae63969c976c861';
 var client_secret = '263f372ce07c4da281f59335e104cb7c';
-
-
-var app = express();
-
-app.use(cors()) //.use(express.static(__dirname))
-   .use(cookieParser());
 
 /**
  * Generates a random string containing numbers and letters
@@ -153,13 +149,27 @@ module.exports = {
          }
       })
    },
-   authSpot: function(IP, callback) {
+   authSpot: function(name, IP, callback) {
       let access_token;
       let refresh_token;
 
       var stateKey = 'spotify_auth_state';
 
-      app.get('/login', function(req, res) {
+      var app = express();
+
+      app.use(cors()) //.use(express.static(__dirname))
+         .use(cookieParser());
+
+      const serverS = https.createServer({
+         key: fs.readFileSync(`certs/${name}-privkey.pem`),
+         cert: fs.readFileSync(`certs/${name}-cert.pem`)
+      }, app);
+
+      process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+
+      serverS.listen(8888)
+
+      app.get(`/login`, function(req, res) {
 
          var state = generateRandomString(16);
          res.cookie(stateKey, state);
@@ -171,7 +181,7 @@ module.exports = {
                response_type: 'code',
                client_id: client_id,
                scope: scope,
-               redirect_uri: `http://${IP}:8888/callback`,
+               redirect_uri: `https://${IP}:8888/callback`,
                state: state
             }));
       });
@@ -196,7 +206,7 @@ module.exports = {
                url: 'https://accounts.spotify.com/api/token',
                form: {
                   code: code,
-                  redirect_uri: `http://${IP}:8888/callback`,
+                  redirect_uri: `https://${IP}:8888/callback`,
                   grant_type: 'authorization_code'
                },
                headers: {
@@ -225,11 +235,10 @@ module.exports = {
             });
          }
       });
-      var spot = app.listen(8888
-         // ,'192.168.1.133',
-      ).on('error', function(err) {
-         console.log('spotify auth port listening error:')
-         console.log(err);
-      });
+      // var spot = app.listen(8888).on('error', function(err) {
+      //    console.log('spotify auth port listening error:')
+      //    console.log(err);
+      // });
+
    }
 };

@@ -138,7 +138,7 @@ serverS.on('stream', (stream, headers) => {
          }
       });
    } else if (headers[':path'] === '/authspotify') {
-      spotify.authSpot(config.IP, function(refresh, access) {
+      spotify.authSpot(config.name, config.IP, function(refresh, access) {
          console.log(refresh);
          console.log(access);
          email = headers.email
