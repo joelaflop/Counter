@@ -8,9 +8,10 @@ const util = require('util');
 const http2 = require('http2');
 const fs = require('fs');
 
+const config = require('../config')
 const serverS = http2.createSecureServer({
-   key: fs.readFileSync('joesmac-privkey.pem'),
-   cert: fs.readFileSync('joesmac-cert.pem')
+   key: fs.readFileSync(`${config.name}-privkey.pem`),
+   cert: fs.readFileSync(`${config.name}-cert.pem`)
 });
 // SSL command for certificates
 // openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost--privkey.pem -out localhost--cert.pem

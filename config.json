@@ -1,5 +1,5 @@
 {
-    "localhost":"https://localhost:8443",
-    "joesmac":"https://192.168.1.57:8443",
-    "joesmacIP":"192.168.1.57"
+    "name":"localhost-",
+    "IP":"localhost",
+    "URL":"https://localhost:8443"
 }
