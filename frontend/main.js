@@ -8,9 +8,11 @@ const {
 const keytar = require('keytar')
 const path = require('path')
 // var net = require('net');
-const config = require('../config')
+const configFile = require('../config')
+const config = configFile[1]
 
 const http2 = require('http2');
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 const fs = require('fs');
 
 let email;

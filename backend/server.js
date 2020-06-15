@@ -8,13 +8,15 @@ const util = require('util');
 const http2 = require('http2');
 const fs = require('fs');
 
-const config = require('../config')
+const configFile = require('../config')
+const config = configFile[1]
 const serverS = http2.createSecureServer({
    key: fs.readFileSync(`${config.name}-privkey.pem`),
    cert: fs.readFileSync(`${config.name}-cert.pem`)
 });
 // SSL command for certificates
 // openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost--privkey.pem -out localhost--cert.pem
+// openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=192.168.1.57' -keyout joesmac-privkey.pem -out joesmac-cert.pem
 
 serverS.on('error', (err) => console.error(err));
 
@@ -29,7 +31,7 @@ serverS.on('stream', (stream, headers) => {
          'content-type': 'text',
          ':status': 200
       });
-      spotify.recentlyPlayed(20, headers.email, function(tracks) {
+      spotify.recentlyPlayed(50, headers.email, function(tracks) {
          if (tracks == 'clientneedsauth') {
             console.log("Client request requires authentification")
             // connection.write('getauth\v\r');
@@ -41,10 +43,9 @@ serverS.on('stream', (stream, headers) => {
             for (let j = 0; j < tracks.items.length; j++) {
                trackList.push(buildTrackJSON(tracks.items[j].track))
             }
-            console.log('recently played data writing:')
-            console.log(stream.write(JSON.stringify(trackList), function() {
+            stream.write(JSON.stringify(trackList), function() {
                stream.end('');
-            }))
+            });
 
          } else {
             console.log('tracks are undefined')
@@ -91,7 +92,7 @@ serverS.on('stream', (stream, headers) => {
                   ':status': 200
                });
                stream.write('loginerror\n', function() {
-                  stream.end('This username was now found.')
+                  stream.end('This username was not found.')
                })
             } else {
                login(email, password, stream);
@@ -137,7 +138,7 @@ serverS.on('stream', (stream, headers) => {
          }
       });
    } else if (headers[':path'] === '/authspotify') {
-      spotify.authSpot(function(refresh, access) {
+      spotify.authSpot(config.IP, function(refresh, access) {
          console.log(refresh);
          console.log(access);
          email = headers.email

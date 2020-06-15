@@ -12,11 +12,10 @@ var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 const db = require('./db');
-const config = require('../../config')
 
 var client_id = '13aaf88d6e5144d19ae63969c976c861';
 var client_secret = '263f372ce07c4da281f59335e104cb7c';
-var redirect_uri = `http://${config.serverIP}:8888/callback`;
+
 
 var app = express();
 
@@ -154,7 +153,7 @@ module.exports = {
          }
       })
    },
-   authSpot: function(callback) {
+   authSpot: function(IP, callback) {
       let access_token;
       let refresh_token;
 
@@ -172,7 +171,7 @@ module.exports = {
                response_type: 'code',
                client_id: client_id,
                scope: scope,
-               redirect_uri: redirect_uri,
+               redirect_uri: `http://${IP}:8888/callback`,
                state: state
             }));
       });
@@ -197,7 +196,7 @@ module.exports = {
                url: 'https://accounts.spotify.com/api/token',
                form: {
                   code: code,
-                  redirect_uri: redirect_uri,
+                  redirect_uri: `http://${IP}:8888/callback`,
                   grant_type: 'authorization_code'
                },
                headers: {
