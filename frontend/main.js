@@ -135,7 +135,6 @@ function startup() {
 //
 //               IPC Incoming
 //
-
 ipcMain.on("nowplaying_click", function(event, arg) {
    console.log("nowplaying button clicked")
    // client.write('nowplaying\v' + email + '\v\r');
@@ -255,6 +254,7 @@ ipcMain.on("loginbutton_click", function(event, arg) {
    req.end();
 
 });
+
 ipcMain.on("signupbutton_click", function(event, arg) {
    console.log("signup button clicked")
    // client.write('signup\v' + arg[0] + '\v' + arg[1] + '\v' + arg[2] + '\v\r');

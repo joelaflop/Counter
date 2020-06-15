@@ -67,9 +67,7 @@ serverS.on('stream', (stream, headers) => {
             // console.log(buildTrackJSON(track))
             // connection.write('nowplaying\v' + JSON.stringify(track.item))
             // connection.write('nowplaying\v' + JSON.stringify(buildTrackJSON(track.item)) + '\v\r')
-            console.log(stream.write(JSON.stringify(buildTrackJSON(track.item)), function() {
-               stream.end('');
-            }))
+            stream.write(JSON.stringify(buildTrackJSON(track.item)), function() {stream.end();});
          } else {
             console.log('track is undefined')
          }
