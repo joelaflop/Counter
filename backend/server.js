@@ -5,131 +5,186 @@ const auth = require('./js/auth');
 const db = require('./js/db');
 const util = require('util');
 
-var server = net.createServer(function(connection) {
-   console.log('client connected');
+const http2 = require('http2');
+const fs = require('fs');
 
-   connection.on('end', function() {
-      console.log('client disconnected');
-   });
+const configFile = require('../config')
+const config = configFile[1]
+const serverS = http2.createSecureServer({
+   key: fs.readFileSync(`./certs/${config.name}-privkey.pem`),
+   cert: fs.readFileSync(`./certs/${config.name}-cert.pem`)
+});
+// SSL command for certificates
+// openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost--privkey.pem -out localhost--cert.pem
+// openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=192.168.1.57' -keyout joesmac-privkey.pem -out joesmac-cert.pem
 
-   connection.on('error', function(err) {
-      console.log(err)
-   });
+serverS.on('error', (err) => console.error(err));
 
-   connection.on('data', function(dat) {
-      data = dat.toString()
-      split = data.split("\v");
-      code = split[0];
-      console.log("---------\nserver recieved:" + data.replace(/\v/g, '\n'));
-      if (code == 'authspotify') {
-         spotify.authSpot(function(refresh, access) {
-            console.log(refresh);
-            console.log(access);
-            email = split[1]
-            db.setTokens(email, refresh, access, function() {
-               //callback for if there is no such user to login
-            });
-            updateListens(email, connection);
-         })
-      } else if (code === 'nowplaying') {
-         spotify.nowPlaying(split[1], function(track) {
-            if (track == 'clientneedsauth') {
-               console.log("Client request requires authentification")
-               connection.write('getauth\v\r');
-            } else if (track != 'undefined') {
-               // console.log(buildTrackJSON(track))
-               // connection.write('nowplaying\v' + JSON.stringify(track.item))
-               connection.write('nowplaying\v' + JSON.stringify(buildTrackJSON(track.item)) + '\v\r')
-            } else {
-               console.log('track is undefined')
-            }
-         });
-      } else if (code === 'recentlyplayed') {
-         spotify.recentlyPlayed(10, split[1], function(tracks) {
-            if (tracks == 'clientneedsauth') {
-               console.log("Client request requires authentification")
-               connection.write('getauth\v\r');
-            } else if (tracks != 'undefined') {
-               var trackList = []
-               for(let j=0; j<tracks.items.length; j++){
-                  trackList.push(buildTrackJSON(tracks.items[j].track))
-               }
-               console.log('recently played data writing:')
-               console.log(connection.write('recentlyplayed\v' + JSON.stringify(trackList) + '\v\r'))
-            } else {
-               console.log('tracks are undefined')
-            }
-         });
-      } else if (code == 'login') {
-         console.log("login attempt")
-         email = split[1]
-         password = split[2]
-         username = split[3]
-         if (!email) {
-            db.getEmail(username, function(email) {
-               if (!email) {
-                  connection.write('loginerror\v' + 'This username was not found\v\r');
-               } else {
-                  login(email, password, connection);
-                  updateListens(email, connection);
-               }
+serverS.on('stream', (stream, headers) => {
+   // stream is a Duplex
+   // console.log('stream:')
+   // console.log(stream)
+   console.log('header:')
+   console.log(headers)
+   if (headers[':path'] === '/recentlyplayed') {
+      stream.respond({
+         'content-type': 'text',
+         ':status': 200
+      });
+      spotify.recentlyPlayed(50, headers.email, function(tracks) {
+         if (tracks == 'clientneedsauth') {
+            console.log("Client request requires authentification")
+            // connection.write('getauth\v\r');
+            stream.write('getauth', function() {
+               stream.end('');
             })
-         } else {
-            login(email, password, connection);
-            updateListens(email, connection);
-         }
-      } else if (code == 'autologin') {
-         console.log("autologin attempt")
-         email = split[1]
-         password = split[2]
-         auth.login(email, password, function(error) {
-            switch (error.code) {
-               case "auth/invalid-email":
-                  break;
-               case "auth/invalid-user-token":
-                  break;
-               case "auth/requires-recent-login":
-                  break;
-               case "auth/user-token-expired":
-                  break;
-               default:
-                  // console.log(error)
-                  console.log(error.code);
-                  console.log(error.message);
-                  connection.write('autologinerror\v' + error.message);
+         } else if (tracks != 'undefined') {
+            var trackList = []
+            for (let j = 0; j < tracks.items.length; j++) {
+               trackList.push(buildTrackJSON(tracks.items[j].track))
             }
-         }, function(success) {
-            connection.write('autologinsuccess');
-            db.login(email, function() {
-               console.log('this user is not in the DB')
+            stream.write(JSON.stringify(trackList), function() {
+               stream.end('');
             });
-            updateListens(email, connection);
-         });
-      } else if (code == 'signup') {
-         email = split[1]
-         password = split[2]
-         username = split[3]
-         db.getEmail(username, function(returnedEmail) {
-            if(!returnedEmail && username){
-               signup(email, password, username, connection)
-            } if (!username){
-               connection.write('signuperror\v' + 'Please enter a username\v\r');
-            } else if (returnedEmail) {
-               connection.write('signuperror\v' + 'This username is taken\v\r');
-            }
-         });
-      } else if (code == 'updateListens') {
-         email = split[1]
-         updateListens(email, connection);
 
+         } else {
+            console.log('tracks are undefined')
+         }
+      });
+
+   } else if (headers[':path'] === '/nowplaying') {
+      stream.respond({
+         'content-type': 'text',
+         ':status': 200
+      });
+      spotify.nowPlaying(headers.email, function(track) {
+         if (track == 'clientneedsauth') {
+            console.log("Client request requires authentification")
+            stream.write('getauth', function() {
+               stream.end('');
+            })
+         } else if (track != 'undefined') {
+            // console.log(buildTrackJSON(track))
+            // connection.write('nowplaying\v' + JSON.stringify(track.item))
+            // connection.write('nowplaying\v' + JSON.stringify(buildTrackJSON(track.item)) + '\v\r')
+            console.log(stream.write(JSON.stringify(buildTrackJSON(track.item)), function() {
+               stream.end('');
+            }))
+         } else {
+            console.log('track is undefined')
+         }
+      });
+   } else if (headers[':path'] === '/login') {
+      console.log("login attempt")
+      // email = split[1]
+      // password = split[2]
+      // username = split[3]
+
+      email = headers.email
+      password = headers.password
+      username = headers.username
+      if (!email) {
+         db.getEmail(username, function(email) {
+            if (!email) {
+               // connection.write('loginerror\v' + 'This username was not found\v\r');
+               stream.respond({
+                  'content-type': 'text',
+                  ':status': 200
+               });
+               stream.write('loginerror\n', function() {
+                  stream.end('This username was not found.')
+               })
+            } else {
+               login(email, password, stream);
+               updateListens(email);
+            }
+         })
       } else {
-         console.log('server code ^ unknown')
+         login(email, password, stream);
+         updateListens(email);
       }
-   });
-   // connection.pipe(connection);
+   } else if (headers[':path'] === '/signup') {
+      console.log("signup attempt")
+      // email = split[1]
+      // password = split[2]
+      // username = split[3]
+
+      email = headers.email
+      password = headers.password
+      username = headers.username
+      console.log(`email: ${email}`)
+      console.log(`password: ${password}`)
+      console.log(`username: ${username}`)
+      db.getEmail(username, function(returnedEmail) {
+         if (!returnedEmail && username) {
+            signup(email, password, username, stream)
+         }
+         if (!username) {
+            stream.respond({
+               'content-type': 'text',
+               ':status': 200
+            });
+            stream.write('signuperror\n', function() {
+               stream.end('Please enter a username.')
+            })
+         } else if (returnedEmail) {
+            stream.respond({
+               'content-type': 'text',
+               ':status': 200
+            });
+            stream.write('signuperror\n', function() {
+               stream.end('This username is taken.')
+            })
+         }
+      });
+   } else if (headers[':path'] === '/authspotify') {
+      spotify.authSpot(config.name, config.IP, function(refresh, access) {
+         console.log(refresh);
+         console.log(access);
+         email = headers.email
+         db.setTokens(email, refresh, access, function() {
+            //callback for if there is no such user to login
+         });
+         updateListens(email);
+         stream.end()
+      })
+   } else if (headers[':path'] === '/autologin') {
+      console.log("autologin attempt")
+      email = headers.email
+      password = headers.password
+      auth.login(email, password, function(error) {
+         switch (error.code) {
+            case "auth/invalid-email":
+               break;
+            case "auth/invalid-user-token":
+               break;
+            case "auth/requires-recent-login":
+               break;
+            case "auth/user-token-expired":
+               break;
+            default:
+               // console.log(error)
+               console.log(error.code);
+               console.log(error.message);
+               stream.write('autologinerror\n' + error.message, function(){stream.end()});
+         }
+      }, function(success) {
+         stream.write('autologinsuccess', function(){stream.end()});
+         db.login(email, function() {
+            console.log('this user is not in the DB')
+         });
+         updateListens(email);
+      });
+   } else if (headers[':path'] === '/updatelistens'){
+      updateListens(headers.email);
+      stream.end()
+   } else {
+      console.log('unknown header')
+   }
+
 });
 
-function updateListens(email, connection){
+function updateListens(email) {
    spotify.recentlyPlayed(50, email, function(tracks) {
       if (tracks == 'clientneedsauth') {
          // connection.write('getauth\v\r'); //maybe use a different flow here
@@ -143,30 +198,7 @@ function updateListens(email, connection){
    });
 }
 
-function signup(email, password, username, connection){
-   auth.signup(email, password, function(error) {
-      switch (error.code) {
-         case "auth/invalid-email":
-            break;
-         case "auth/invalid-user-token":
-            break;
-         case "auth/email-already-in-use":
-            break;
-         default:
-            // console.log(error)
-            console.log(error.code)
-            console.log(error.message)
-      }
-      connection.write('signuperror\v' + error.message +'\v\r');
-      console.log('signup error');
-   }, function(success) {
-      connection.write('signupsuccess\v' + email + '\v' + password + '\v' + username + '\v\r')
-      console.log('signup success');
-      db.newUser(email, username, password, 'spotify');
-   });
-}
-
-function login(email, password, connection) {
+function login(email, password, stream) {
    auth.login(email, password, function(error) {
       switch (error.code) {
          case "auth/invalid-email":
@@ -182,10 +214,23 @@ function login(email, password, connection) {
             console.log(error.code)
             console.log(error.message)
       }
-      connection.write('loginerror\v' + error.message);
+      stream.respond({
+         'content-type': 'text',
+         ':status': 200
+      });
+      stream.write('loginerror\n', function() {
+         stream.end(error.message)
+      })
       console.log('login error');
    }, function(success) {
-      connection.write('loginsuccess\v' + email + '\v' + password + '\v\r');
+      // connection.write('loginsuccess\v' + email + '\v' + password + '\v\r');
+      stream.respond({
+         'content-type': 'text',
+         ':status': 200
+      });
+      stream.write(`loginsuccess\n${email}\n${password}`, function() {
+         stream.end('')
+      })
       console.log('login success');
       db.login(email, function() {
          console.log('this user is not in the DB')
@@ -193,24 +238,58 @@ function login(email, password, connection) {
    });
 }
 
-function buildTrackJSON(track){
+function signup(email, password, username, stream) {
+   auth.signup(email, password, function(error) {
+      switch (error.code) {
+         case "auth/invalid-email":
+            break;
+         case "auth/invalid-user-token":
+            break;
+         case "auth/email-already-in-use":
+            break;
+         default:
+            // console.log(error)
+            console.log(error.code)
+            console.log(error.message)
+      }
+      stream.respond({
+         'content-type': 'text',
+         ':status': 200
+      });
+      stream.write('signuperror\n', function() {
+         stream.end(error.message)
+      })
+      console.log('signup error');
+   }, function(success) {
+      stream.respond({
+         'content-type': 'text',
+         ':status': 200
+      });
+      stream.write(`signupsucess\n${email}\n${password}\n${username}`, function() {
+         stream.end('')
+      })
+      console.log('signup success');
+      db.newUser(email, username, password, 'spotify');
+   });
+}
+
+function buildTrackJSON(track) {
    artistNames = []
-   for(let i=0; i<track.artists.length; i++){
+   for (let i = 0; i < track.artists.length; i++) {
       artistNames.push(track.artists[i].name)
    }
-   json =
-   {
-      name:track.name,
-      album:
-      {
-         name:track.album.name,
-         imageURL:track.album.images[0].url
+   json = {
+      name: track.name,
+      album: {
+         name: track.album.name,
+         imageURL: track.album.images[0].url
       },
-      artists:artistNames
+      artists: artistNames
    }
    return json;
 }
 
-server.listen(8080, function() {
-   console.log('server is up');
+
+serverS.listen(8443, function() {
+   console.log('https server is up');
 });
