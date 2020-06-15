@@ -11,8 +11,8 @@ const fs = require('fs');
 const configFile = require('../config')
 const config = configFile[1]
 const serverS = http2.createSecureServer({
-   key: fs.readFileSync(`${config.name}-privkey.pem`),
-   cert: fs.readFileSync(`${config.name}-cert.pem`)
+   key: fs.readFileSync(`./certs/${config.name}-privkey.pem`),
+   cert: fs.readFileSync(`./certs/${config.name}-cert.pem`)
 });
 // SSL command for certificates
 // openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost--privkey.pem -out localhost--cert.pem

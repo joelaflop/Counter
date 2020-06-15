@@ -55,7 +55,7 @@ function authSpot() {
    // client.write('authspotify\v' + email + '\v\r');
 
    const clientS = http2.connect(config.URL, {
-      ca: fs.readFileSync('joesmac-cert.pem')
+      ca: fs.readFileSync(`./certs/${config.name}-cert.pem`)
    }, function() {
       console.log('connected to https server');
    });
@@ -95,7 +95,7 @@ function startup() {
             email = result[0].account
             // client.write('autologin\v' + result[0].account + '\v' + result[0].password + '\v\r');
             const clientS = http2.connect(config.URL, {
-               ca: fs.readFileSync('localhost--cert.pem')
+               ca: fs.readFileSync(`./certs/${config.name}-cert.pem`)
             }, function() {
                console.log('connected to https server');
             });
@@ -141,7 +141,7 @@ ipcMain.on("nowplaying_click", function(event, arg) {
    // client.write('nowplaying\v' + email + '\v\r');
 
    const clientS = http2.connect(config.URL, {
-      ca: fs.readFileSync('localhost--cert.pem')
+      ca: fs.readFileSync(`./certs/${config.name}-cert.pem`)
    }, function() {
       console.log('connected to https server');
    });
@@ -178,7 +178,7 @@ ipcMain.on("recentlyplayed_click", function(event, arg) {
    console.log("recentplayed button clicked")
    // client.write('recentlyplayed\v' + email + '\v\r');
    const clientS = http2.connect(config.URL, {
-      ca: fs.readFileSync('localhost--cert.pem')
+      ca: fs.readFileSync(`./certs/${config.name}-cert.pem`)
    }, function() {
       console.log('connected to https server');
    });
@@ -216,7 +216,7 @@ ipcMain.on("loginbutton_click", function(event, arg) {
    // client.write('login\v' + arg[0] + '\v' + arg[1] + '\v' + arg[2] + '\v\r');
 
    const clientS = http2.connect(config.URL, {
-      ca: fs.readFileSync('localhost--cert.pem')
+      ca: fs.readFileSync(`./certs/${config.name}-cert.pem`)
    }, function() {
       console.log('connected to https server');
    });
@@ -259,7 +259,7 @@ ipcMain.on("signupbutton_click", function(event, arg) {
    console.log("signup button clicked")
    // client.write('signup\v' + arg[0] + '\v' + arg[1] + '\v' + arg[2] + '\v\r');
    const clientS = http2.connect(config.URL, {
-      ca: fs.readFileSync('localhost--cert.pem')
+      ca: fs.readFileSync(`./certs/${config.name}-cert.pem`)
    }, function() {
       console.log('connected to https server');
    });
@@ -307,7 +307,7 @@ setInterval(function() {
       // client.write('nowplaying\v' + email + '\v\r');
 
       const clientS = http2.connect(config.URL, {
-         ca: fs.readFileSync('localhost--cert.pem')
+         ca: fs.readFileSync(`./certs/${config.name}-cert.pem`)
       }, function() {
          console.log('connected to https server');
       });
