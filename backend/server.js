@@ -74,9 +74,6 @@ serverS.on('stream', (stream, headers) => {
       });
    } else if (headers[':path'] === '/login') {
       console.log("login attempt")
-      // email = split[1]
-      // password = split[2]
-      // username = split[3]
 
       email = headers.email
       password = headers.password
@@ -103,9 +100,6 @@ serverS.on('stream', (stream, headers) => {
       }
    } else if (headers[':path'] === '/signup') {
       console.log("signup attempt")
-      // email = split[1]
-      // password = split[2]
-      // username = split[3]
 
       email = headers.email
       password = headers.password

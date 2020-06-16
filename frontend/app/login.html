@@ -10,15 +10,29 @@
 
 <body>
    <h1>Counter alphalphalphalpha login screen</h1>
-   <h6>Enter email and password or username and password to login or all three to sign up</h6>
-   <label for="email">Email:</label>
-   <input type="text" id="email" name="email"><br><br>
-   <label for="username">Username:</label>
-   <input type="text" id="username" name="username"><br><br>
-   <label for="password">Password:</label>
-   <input type="text" id="password" name="password"><br><br>
-   <button id="login button" type="button">login</button>
-   <button id="singup-button" type="button">signup</button>
+   <h6>Enter login info or click signup to signup</h6>
+   <div class="container">
+      <div id="signup-page">
+         <label for="email">Email:</label>
+         <input type="text" id="email" name="email"><br><br>
+         <label for="username">Username:</label>
+         <input type="text" id="username" name="username"><br><br>
+         <label for="password">Password:</label>
+         <input type="text" id="password-signup" name="password"><br><br>
+         <button id="signup-button" type="button">signup</button>
+      </div>
+      <div id="login-page">
+         <label for="email">Email or Username:</label>
+         <input type="text" id="id" name="email"><br><br>
+         <label for="password">Password:</label>
+         <input type="text" id="password-login" name="password"><br><br>
+         <button id="login-button" type="button">login</button>
+         <button id="signup-page-button" type="button">signup</button>
+      </div>
+   </div>
+
+
+
    <div id="errorDiv"> </div>
    <script src="js/loginRenderer.js"></script>
 </body>

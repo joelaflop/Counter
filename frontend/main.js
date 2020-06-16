@@ -33,7 +33,7 @@ function createLoginWindow() {
    })
    loginWindow.loadFile('app/login.html')
 
-   // loginWindow.webContents.openDevTools()
+   loginWindow.webContents.openDevTools()
 }
 
 function createMainWindow() {
