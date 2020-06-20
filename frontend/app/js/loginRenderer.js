@@ -16,9 +16,6 @@ const loginButton = document.getElementById("login-button");
 
 loginButton.addEventListener('click', function() {
 
-   // id.value
-   // password.value
-
    if (/.*@.*\..*/.test(id.value)) {
       //got an email probably
       info = [id.value, '', loginPassword.value];
@@ -45,6 +42,17 @@ document.addEventListener("keydown", function(event) {
       //send the info to main process . we can pass any arguments as second param.
       ipcRenderer.send("loginbutton_click", info); // ipcRender.send will pass the information to main process
    }
+});
+
+const loginPageButton = document.getElementById("login-page-button");
+
+loginPageButton.addEventListener('click', function() {
+   console.log('setting up login page')
+
+   loginPage.style.visibility = 'visible';
+   loginPage.style.display = 'block';
+   signupPage.style.visibility = 'hidden';
+   signupPage.style.display = 'none';
 });
 
 const signupPageButton = document.getElementById("signup-page-button");
