@@ -2,30 +2,35 @@ const {
    ipcRenderer
 } = require("electron");
 
-var email = document.getElementById("email")
-var username = document.getElementById("username")
-var signupPassword = document.getElementById("password-signup")
-var loginPassword = document.getElementById("password-login")
+var signupInputEmail = document.getElementById("signupInputEmail")
+var loginInputID = document.getElementById("loginInputID")
+var signupInputUsername = document.getElementById("signupInputUsername")
+var signupInputPassword = document.getElementById("signupInputPassword")
+var loginPassword = document.getElementById("loginInputPassword")
 
 var signupPage = document.getElementById("signup-page");
 var loginPage = document.getElementById("login-page");
 signupPage.style.visibility = 'hidden';
 signupPage.style.display = 'none';
 
+let errorDiv = document.getElementById('errorDiv')
+errorDiv.style.visibility = 'hidden';
+errorDiv.style.display = 'none';
+
 const loginButton = document.getElementById("login-button");
 
 loginButton.addEventListener('click', function() {
 
-   if (/.*@.*\..*/.test(id.value)) {
+   if (/.*@.*\..*/.test(loginInputID.value)) {
       //got an email probably
-      info = [id.value, '', loginPassword.value];
+      info = [loginInputID.value, '', loginPassword.value];
       ipcRenderer.send("loginbutton_click", info);
    } else {
       //got a username probably
-      if (id.value.includes('@')) {
+      if (loginInputID.value.includes('@')) {
          document.getElementById('errorDiv').innerHTML = 'get rid of the @ character'
       } else {
-         info = ['', id.value, loginPassword.value];
+         info = ['', loginInputID.value, loginPassword.value];
          console.log(info)
          ipcRenderer.send("loginbutton_click", info);
       }
@@ -37,10 +42,20 @@ loginButton.addEventListener('click', function() {
 
 document.addEventListener("keydown", function(event) {
    if (event.key == "Enter") {
-      info = [email.value, username.value, password.value];
-
-      //send the info to main process . we can pass any arguments as second param.
-      ipcRenderer.send("loginbutton_click", info); // ipcRender.send will pass the information to main process
+      if (/.*@.*\..*/.test(loginInputID.value)) {
+         //got an email probably
+         info = [loginInputID.value, '', loginPassword.value];
+         ipcRenderer.send("loginbutton_click", info);
+      } else {
+         //got a username probably
+         if (loginInputID.value.includes('@')) {
+            document.getElementById('errorDiv').innerHTML = 'get rid of the @ character'
+         } else {
+            info = ['', loginInputID.value, loginPassword.value];
+            console.log(info)
+            ipcRenderer.send("loginbutton_click", info);
+         }
+      }
    }
 });
 
@@ -53,6 +68,8 @@ loginPageButton.addEventListener('click', function() {
    loginPage.style.display = 'block';
    signupPage.style.visibility = 'hidden';
    signupPage.style.display = 'none';
+   errorDiv.style.visibility = 'hidden';
+   errorDiv.style.display = 'none';
 });
 
 const signupPageButton = document.getElementById("signup-page-button");
@@ -64,21 +81,27 @@ signupPageButton.addEventListener('click', function() {
    loginPage.style.display = 'none';
    signupPage.style.visibility = 'visible';
    signupPage.style.display = 'block';
+   errorDiv.style.visibility = 'hidden';
+   errorDiv.style.display = 'none';
 });
 
 const signupButton = document.getElementById("signup-button");
 
 signupButton.addEventListener('click', function() {
 
-   info = [email.value, username.value, signupPassword.value];
+   info = [signupInputEmail.value, signupInputUsername.value, signupInputPassword.value];
 
    //send the info to main process . we can pass any arguments as second param.
    ipcRenderer.send("signupbutton_click", info); // ipcRender.send will pass the information to main process
 });
 
 ipcRenderer.on("login-error", function(event, errorMessage) {
-   document.getElementById('errorDiv').innerHTML = errorMessage
+   errorDiv.style.visibility = 'visible';
+   errorDiv.style.display = 'block';
+   errorDiv.innerHTML = errorMessage
 });
 ipcRenderer.on("signup-error", function(event, errorMessage) {
-   document.getElementById('errorDiv').innerHTML = errorMessage
+   errorDiv.style.visibility = 'visible';
+   errorDiv.style.display = 'block';
+   errorDiv.innerHTML = errorMessage
 });

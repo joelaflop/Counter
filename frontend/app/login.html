@@ -5,39 +5,62 @@
    <meta charset="UTF-8">
    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
    <!-- Bootstrap CSS -->
-    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous"> -->
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   <link href="css/login.css" rel="stylesheet" type="text/css" />
    <title>Counter alphalphalphalpha</title>
 </head>
 
 <body>
-   <h1>Counter alphalphalphalpha login screen</h1>
-   <h6>Enter login info or click signup to signup</h6>
-   <div class="container">
-      <div id="signup-page">
-         <label for="email">Email:</label>
-         <input type="text" id="email" name="email"><br><br>
-         <label for="username">Username:</label>
-         <input type="text" id="username" name="username"><br><br>
-         <label for="password">Password:</label>
-         <input type="text" id="password-signup" name="password"><br><br>
-         <button id="signup-button" type="button">signup</button>
-         <button id="login-page-button" type="button">login page</button>
-      </div>
-      <div id="login-page">
-         <label for="email">Email or Username:</label>
-         <input type="text" id="id" name="email"><br><br>
-         <label for="password">Password:</label>
-         <input type="text" id="password-login" name="password"><br><br>
-         <button id="login-button" type="button">login</button>
-         <button id="signup-page-button" type="button">signup page</button>
-      </div>
+   <!-- <h1>Counter alphalphalphalpha login screen</h1> -->
+   <div class="d-flex justify-content-center">
+      <!-- <img src="img/InstagramHeader.png" alt="Instagram Header"> -->
+      <h1 class="h1-font">Counter</h1>
    </div>
 
+   <!-- <div class="alert alert-primary" role="alert">
+      A simple primary alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.
+   </div> -->
 
 
-   <div id="errorDiv"> </div>
+   <div id="login-page" class="container">
+      <div class="col">
+         <div class="row pt-2">
+            <input type="text" class="form-control" id="loginInputID" placeholder="email or username">
+         </div>
+         <div class="row pt-2">
+            <input type="password" class="form-control" id="loginInputPassword" placeholder="password">
+         </div>
+         <div class="row pt-2">
+            <button id="login-button" type="button" class="btn btn-primary btn-block">Log In</button>
+         </div>
+         <div class="row d-flex justify-content-center">
+            <p class="p-m-t">Don't have an account yet?</p>
+            <button id="signup-page-button" type="button" class="btn btn-link">Sign up</button>
+         </div>
+      </div>
+   </div>
+   <div id="signup-page" class="container">
+      <div class="col">
+         <div class="row pt-2">
+            <input type="text" class="form-control" id="signupInputEmail" placeholder="email">
+         </div>
+         <div class="row pt-2">
+            <input type="text" class="form-control" id="signupInputUsername" placeholder="username">
+         </div>
+         <div class="row pt-2">
+            <input type="text" class="form-control" id="signupInputPassword" placeholder="password">
+         </div>
+         <div class="row pt-2">
+            <button id="signup-button" type="button" class="btn btn-primary btn-block">Sign up</button>
+         </div>
+         <div class="row d-flex justify-content-center">
+            <p class="p-m-t">or go back to</p>
+            <button id="login-page-button" type="button" class="btn btn-link">Log In</button>
+         </div>
+      </div>
+   </div>
+   <div class="d-flex justify-content-center alert alert-danger" id="errorDiv"> </div>
    <script src="js/loginRenderer.js"></script>
 </body>
 
