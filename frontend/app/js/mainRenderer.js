@@ -9,8 +9,22 @@ const {
    ipcRenderer
 } = require("electron");
 
+let mainPageDiv = document.getElementById('mainpage');
+
+let countsPageDiv = document.getElementById('countsPage');
+countsPageDiv.style.visibility = 'hidden';
+countsPageDiv.style.display = 'none';
+let userPageDiv = document.getElementById('userPage');
+userPageDiv.style.visibility = 'hidden';
+userPageDiv.style.display = 'none';
+let dataPageDiv = document.getElementById('dataPage');
+dataPageDiv.style.visibility = 'hidden';
+dataPageDiv.style.display = 'none';
+
+
 const nowplayingbutton = document.getElementById("now playing button");
 nowplayingbutton.addEventListener('click', function() {
+   mainPageDiv.innerHTML = countsPageDiv.innerHTML;
    var arg = "secondparam";
 
    //send the info to main process . we can pass any arguments as second param.
@@ -19,8 +33,21 @@ nowplayingbutton.addEventListener('click', function() {
 
 const recentlyplayedbutton = document.getElementById("recently played button");
 recentlyplayedbutton.addEventListener('click', function() {
+   mainPageDiv.innerHTML = countsPageDiv.innerHTML;
    var arg = "secondparam";
 
    //send the info to main process . we can pass any arguments as second param.
    ipcRenderer.send("recentlyplayed_click", arg); // ipcRender.send will pass the information to main process
+});
+
+const userButton = document.getElementById("user page button");
+userButton.addEventListener('click', function() {
+   mainPageDiv.innerHTML = userPageDiv.innerHTML;
+
+});
+
+const dataButton = document.getElementById("data page button");
+dataButton.addEventListener('click', function() {
+   mainPageDiv.innerHTML = dataPageDiv.innerHTML;
+
 });

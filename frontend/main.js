@@ -24,8 +24,8 @@ var loginWindow, mainWindow;
 
 function createLoginWindow() {
    loginWindow = new BrowserWindow({
-      width: 500,
-      height: 500,
+      width: 325,
+      height: 400,
       webPreferences: {
          preload: path.join(__dirname, 'app/js/preload/login.js'),
          nodeIntegration: true
@@ -41,6 +41,7 @@ function createMainWindow() {
    mainWindow = new BrowserWindow({
       width: 600,
       height: 900,
+      resizeable: true,
       webPreferences: {
          preload: path.join(__dirname, 'app/js/preload/main.js'),
          nodeIntegration: true
@@ -101,8 +102,8 @@ function startup() {
             });
             const req = clientS.request({
                ':path': '/autologin',
-               'email':result[0].account,
-               'password':result[0].password
+               'email': result[0].account,
+               'password': result[0].password
             });
             req.on('response', (headers, flags) => {
                console.log('responses (headers):')
@@ -146,7 +147,7 @@ ipcMain.on("nowplaying_click", function(event, arg) {
    });
    const req = clientS.request({
       ':path': '/nowplaying',
-      'email':email
+      'email': email
    });
    req.on('response', (headers, flags) => {
       console.log('responses (headers):')
@@ -163,9 +164,15 @@ ipcMain.on("nowplaying_click", function(event, arg) {
    req.on('end', () => {
       if (data === 'getauth') {
          authSpot();
+      } else if (data === 'nothingplaying'){
+         event.reply("nowplaying-button-task-finished", data);
       } else {
-         track = JSON.parse(data)
-         event.reply("nowplaying-button-task-finished", track)
+         try {
+            track = JSON.parse(data)
+            event.reply("nowplaying-button-task-finished", track);
+         } catch (e){
+            console.log(`error parsing now-playing json: ${data}`);
+         }
       }
       clientS.close();
    });
@@ -224,7 +231,7 @@ ipcMain.on("loginbutton_click", function(event, arg) {
       ':path': '/login',
       'email': arg[0],
       'username': arg[1],
-      'password':arg[2]
+      'password': arg[2]
    });
    req.on('response', (headers, flags) => {
       console.log('responses (headers):')
@@ -268,7 +275,7 @@ ipcMain.on("signupbutton_click", function(event, arg) {
       ':path': '/signup',
       'email': arg[0],
       'username': arg[1],
-      'password':arg[2]
+      'password': arg[2]
    });
    req.on('response', (headers, flags) => {
       console.log('responses (headers):')
@@ -313,7 +320,7 @@ setInterval(function() {
       });
       const req = clientS.request({
          ':path': '/updatelistens',
-         'email':email
+         'email': email
       });
       req.on('response', (headers, flags) => {
          console.log('responses (headers):')

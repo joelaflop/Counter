@@ -33,9 +33,9 @@ function generateRandomString(length) {
    return text;
 };
 
-function generateRecentlyPlayedOptions(count, access){
+function generateRecentlyPlayedOptions(count, access) {
    return {
-      url: 'https://api.spotify.com/v1/me/player/recently-played?'+'limit='+count.toString(),
+      url: 'https://api.spotify.com/v1/me/player/recently-played?' + 'limit=' + count.toString(),
       headers: {
          'Authorization': 'Bearer ' + access
       },
@@ -43,7 +43,7 @@ function generateRecentlyPlayedOptions(count, access){
    };
 }
 
-function generateNowPlayingOptions(access){
+function generateNowPlayingOptions(access) {
    return {
       url: 'https://api.spotify.com/v1/me/player/currently-playing',
       headers: {
@@ -69,7 +69,7 @@ function refreshToken(email, refresh_token, use_token, other_callback, count) {
    request.post(authOptions, function(error, response, body) {
       if (!error && response.statusCode === 200) {
          access_token = body.access_token;
-         db.setTokens(email, access_token, refresh_token, function(){
+         db.setTokens(email, access_token, refresh_token, function() {
             //callback for if there is no such user to login
          });
          use_token(access_token, other_callback, count)
@@ -97,7 +97,7 @@ function recentlyPlayed(access, callback, count) { //count has to be last argume
       if (!error && response.statusCode === 200) {
          console.log('recently played success')
          callback(body);
-      } else{
+      } else {
          console.log('error getting recently played - last resort');
       }
    });
@@ -117,6 +117,9 @@ module.exports = {
                } else if (response.statusCode === 401) {
                   console.log("attempting to refresh token")
                   refreshToken(email, refresh, nowPlaying, callback);
+               } else if (response.statusCode === 204) {
+                  console.log("user is not playing anything")
+                  callback("nothingplaying")
                } else {
                   console.log('error getting now playing:')
                   console.log(error)

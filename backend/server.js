@@ -63,6 +63,10 @@ serverS.on('stream', (stream, headers) => {
             stream.write('getauth', function() {
                stream.end('');
             })
+         } else if (track === "nothingplaying"){
+            stream.write('nothingplaying', function() {
+               stream.end('');
+            })
          } else if (track != 'undefined') {
             // console.log(buildTrackJSON(track))
             // connection.write('nowplaying\v' + JSON.stringify(track.item))
@@ -177,17 +181,17 @@ serverS.on('stream', (stream, headers) => {
 });
 
 function updateListens(email) {
-   spotify.recentlyPlayed(50, email, function(tracks) {
-      if (tracks == 'clientneedsauth') {
-         // connection.write('getauth\v\r'); //maybe use a different flow here
-         // i think we ignore this case, or tell the user to authorize again in the future
-      } else if (tracks != 'undefined') {
-         console.log(`autoupdating ${email} listens`)
-         db.listen(email, tracks)
-      } else {
-         console.log('tracks are undefined')
-      }
-   });
+   // spotify.recentlyPlayed(50, email, function(tracks) {
+   //    if (tracks == 'clientneedsauth') {
+   //       // connection.write('getauth\v\r'); //maybe use a different flow here
+   //       // i think we ignore this case, or tell the user to authorize again in the future
+   //    } else if (tracks != 'undefined') {
+   //       console.log(`autoupdating ${email} listens`)
+   //       db.listen(email, tracks)
+   //    } else {
+   //       console.log('tracks are undefined')
+   //    }
+   // });
 }
 
 function login(email, password, stream) {

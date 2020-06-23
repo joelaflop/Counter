@@ -1,0 +1,49 @@
+@import "../../node_modules/bootstrap/scss/bootstrap";
+
+@font-face {
+  font-family: EBGaramond;
+  src: url(../resources/fonts/EB_Garamond/static/EBGaramond-Regular.ttf);
+}
+
+.garamond-font{
+   font-family: "EBGaramond";
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding-top: 45px;
+}
+
+.main-offset{
+   margin-top:0px;
+   margin-right:0px;
+   margin-right:0px;
+   padding-top:120px;
+   width:100%;
+}
+
+.menu{
+  margin-top:50px;
+  background:#b3b3b3;
+  // overflow-x: hidden; /* Disable horizontal scroll */
+  z-index: 1;
+}
+
+.h3-offset{
+   margin-top:30px;
+}
+
+.fixed{
+   position:fixed;
+}
+
+.nowplaying{
+  position: fixed;
+  bottom:0;
+  width:100%;
+  z-index:2;
+  background:#e6e6e6;
+}
