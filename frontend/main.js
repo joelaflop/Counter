@@ -49,7 +49,80 @@ function createMainWindow() {
    })
    mainWindow.loadFile('index.html')
 
+   mainWindow.webContents.on('dom-ready', function(){
+      console.log(`mainwindow dom is ready`);
+      updateNowPlaying(mainWindow)
+   })
+
+   var nowplayingIntervalID;
+
+   mainWindow.on('focus', function() {
+      console.log(`mainwindow has focus `);
+      updateNowPlaying(mainWindow)
+      nowplayingIntervalID = setInterval(function() { //TODO remove this interval on event blur
+         console.log(`nowplaying interval HIT`)
+         if (authed) {
+            if(mainWindow.isFocused()){
+               console.log(`mainwindow has focus - autoupdating nowplaying`);
+               updateNowPlaying(mainWindow)
+            }
+         }
+      }, 5000) //25 min * 60000 ms/min = 1500000 ms
+   })
+
+   mainWindow.on('blur', function(){
+      console.log(`main window blured, intID: ${nowplayingIntervalID}`)
+      clearInterval(nowplayingIntervalID);
+   })
+
+
+
    mainWindow.webContents.openDevTools()
+}
+
+function updateNowPlaying(win){
+   const clientS = http2.connect(config.URL, {
+      ca: fs.readFileSync(`./certs/${config.name}-cert.pem`)
+   }, function() {
+      console.log('connected to https server');
+   });
+   const req = clientS.request({
+      ':path': '/nowplaying',
+      'email': email
+   });
+   req.on('response', (headers, flags) => {
+      console.log('responses (headers):')
+      for (const name in headers) {
+         console.log(`${name}: ${headers[name]}`);
+      }
+      console.log('---------')
+   });
+   req.setEncoding('utf8');
+   let data = '';
+   req.on('data', (chunk) => {
+      data += chunk;
+   });
+   req.on('end', () => {
+      if (data === 'getauth') {
+         authSpot();
+      } else if (data === 'nothingplaying') {
+         authed = true;
+         event.reply("nowplaying-button-task-finished", data);
+         win.webContents.send("nowplaying-button-task-finished", data);
+      } else {
+         try {
+            authed = true;
+            track = JSON.parse(data)
+            // event.reply("nowplaying-button-task-finished", track);
+            win.webContents.send("nowplaying-button-task-finished", track);
+         } catch (e) {
+            console.log(`error parsing now-playing json: ${data}`);
+
+         }
+      }
+      clientS.close();
+   });
+   req.end();
 }
 
 function authSpot() {
@@ -164,13 +237,13 @@ ipcMain.on("nowplaying_click", function(event, arg) {
    req.on('end', () => {
       if (data === 'getauth') {
          authSpot();
-      } else if (data === 'nothingplaying'){
+      } else if (data === 'nothingplaying') {
          event.reply("nowplaying-button-task-finished", data);
       } else {
          try {
             track = JSON.parse(data)
             event.reply("nowplaying-button-task-finished", track);
-         } catch (e){
+         } catch (e) {
             console.log(`error parsing now-playing json: ${data}`);
          }
       }
@@ -208,8 +281,12 @@ ipcMain.on("recentlyplayed_click", function(event, arg) {
       if (data === 'getauth') {
          authSpot();
       } else {
-         tracks = JSON.parse(data)
-         event.reply("recentlyplayed-button-task-finished", tracks)
+         try {
+            tracks = JSON.parse(data)
+            event.reply("recentlyplayed-button-task-finished", tracks)
+         } catch (e) {
+            console.log(`error parsing recently-played json: ${data}`);
+         }
 
       }
       clientS.close();

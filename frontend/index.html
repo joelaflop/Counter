@@ -60,6 +60,7 @@
          console.log("renderer got confirmation of authbutton click")
       });
       ipcRenderer.on("nowplaying-button-task-finished", function(event, track) {
+         console.log('got a nowplaying finish')
          if (track === "nothingplaying") {
             let nothingplayingdiv = document.createElement('div');
             document.getElementById('nowplaying').innerHTML = 'were not playing nothing'
