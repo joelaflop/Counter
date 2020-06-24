@@ -39,9 +39,12 @@ function createLoginWindow() {
 function createMainWindow() {
    // Create the browser window.
    mainWindow = new BrowserWindow({
-      width: 600,
+      width: 900,
       height: 900,
+      // frame: false,
+      titleBarStyle: 'hidden',
       resizeable: true,
+      backgroundColor:'#262626',
       webPreferences: {
          preload: path.join(__dirname, 'app/js/preload/main.js'),
          nodeIntegration: true
@@ -67,7 +70,7 @@ function createMainWindow() {
                updateNowPlaying(mainWindow)
             }
          }
-      }, 5000) //25 min * 60000 ms/min = 1500000 ms
+      }, 50000) //25 min * 60000 ms/min = 1500000 ms
    })
 
    mainWindow.on('blur', function(){
@@ -78,132 +81,6 @@ function createMainWindow() {
 
 
    mainWindow.webContents.openDevTools()
-}
-
-function updateNowPlaying(win){
-   const clientS = http2.connect(config.URL, {
-      ca: fs.readFileSync(`./certs/${config.name}-cert.pem`)
-   }, function() {
-      console.log('connected to https server');
-   });
-   const req = clientS.request({
-      ':path': '/nowplaying',
-      'email': email
-   });
-   req.on('response', (headers, flags) => {
-      console.log('responses (headers):')
-      for (const name in headers) {
-         console.log(`${name}: ${headers[name]}`);
-      }
-      console.log('---------')
-   });
-   req.setEncoding('utf8');
-   let data = '';
-   req.on('data', (chunk) => {
-      data += chunk;
-   });
-   req.on('end', () => {
-      if (data === 'getauth') {
-         authSpot();
-      } else if (data === 'nothingplaying') {
-         authed = true;
-         event.reply("nowplaying-button-task-finished", data);
-         win.webContents.send("nowplaying-button-task-finished", data);
-      } else {
-         try {
-            authed = true;
-            track = JSON.parse(data)
-            // event.reply("nowplaying-button-task-finished", track);
-            win.webContents.send("nowplaying-button-task-finished", track);
-         } catch (e) {
-            console.log(`error parsing now-playing json: ${data}`);
-
-         }
-      }
-      clientS.close();
-   });
-   req.end();
-}
-
-function authSpot() {
-   // client.write('authspotify\v' + email + '\v\r');
-
-   const clientS = http2.connect(config.URL, {
-      ca: fs.readFileSync(`./certs/${config.name}-cert.pem`)
-   }, function() {
-      console.log('connected to https server');
-   });
-   //email password username
-   const req = clientS.request({
-      ':path': '/authspotify',
-      'email': email
-   });
-   req.on('response', (headers, flags) => {
-      console.log('responses (headers):')
-      for (const name in headers) {
-         console.log(`${name}: ${headers[name]}`);
-      }
-      console.log('---------')
-   });
-   req.setEncoding('utf8');
-   // let data = '';
-   // req.on('data', (chunk) => {
-   //    data += chunk;
-   // });
-   req.on('end', () => {
-      clientS.close();
-   });
-   req.end();
-
-
-   shell.openExternal(`https://${config.IP}:8888/login`).then(function() {
-      console.log('opened external browser to get auth')
-   })
-
-}
-
-function startup() {
-   let secret = keytar.findCredentials('Counter-app')
-      .then(function(result) {
-         if (result[0]) {
-            email = result[0].account
-            // client.write('autologin\v' + result[0].account + '\v' + result[0].password + '\v\r');
-            const clientS = http2.connect(config.URL, {
-               ca: fs.readFileSync(`./certs/${config.name}-cert.pem`)
-            }, function() {
-               console.log('connected to https server');
-            });
-            const req = clientS.request({
-               ':path': '/autologin',
-               'email': result[0].account,
-               'password': result[0].password
-            });
-            req.on('response', (headers, flags) => {
-               console.log('responses (headers):')
-               for (const name in headers) {
-                  console.log(`${name}: ${headers[name]}`);
-               }
-               console.log('---------')
-            });
-            req.setEncoding('utf8');
-            let data = '';
-            req.on('data', (chunk) => {
-               data += chunk;
-            });
-            req.on('end', () => {
-               if (data === 'autologinerror') {
-                  createLoginWindow();
-               } else {
-                  createMainWindow();
-               }
-               clientS.close();
-            });
-            req.end();
-
-         } else {
-            createLoginWindow()
-         }
-      });
 }
 
 //
@@ -326,7 +203,7 @@ ipcMain.on("loginbutton_click", function(event, arg) {
       splits = data.split('\n');
       console.log(splits)
       if (splits[0] === 'loginerror') {
-         event.reply("signup-error", splits[1]);
+         event.reply("login-error", splits[1]);
       } else {
          createMainWindow()
          loginWindow.close()
@@ -442,3 +319,129 @@ app.on('activate', function() {
       startup();
    }
 })
+
+//              helper functions
+
+function authSpot() {
+   const clientS = http2.connect(config.URL, {
+      ca: fs.readFileSync(`./certs/${config.name}-cert.pem`)
+   }, function() {
+      console.log('connected to https server');
+   });
+   //email password username
+   const req = clientS.request({
+      ':path': '/authspotify',
+      'email': email
+   });
+   req.on('response', (headers, flags) => {
+      console.log('responses (headers):')
+      for (const name in headers) {
+         console.log(`${name}: ${headers[name]}`);
+      }
+      console.log('---------')
+   });
+   req.setEncoding('utf8');
+   // let data = '';
+   // req.on('data', (chunk) => {
+   //    data += chunk;
+   // });
+   req.on('end', () => {
+      clientS.close();
+   });
+   req.end();
+
+
+   shell.openExternal(`https://${config.IP}:8888/login`).then(function() {
+      console.log('opened external browser to get auth')
+   })
+
+}
+
+function startup() {
+   let secret = keytar.findCredentials('Counter-app')
+      .then(function(result) {
+         if (result[0]) {
+            email = result[0].account
+            // client.write('autologin\v' + result[0].account + '\v' + result[0].password + '\v\r');
+            const clientS = http2.connect(config.URL, {
+               ca: fs.readFileSync(`./certs/${config.name}-cert.pem`)
+            }, function() {
+               console.log('connected to https server');
+            });
+            const req = clientS.request({
+               ':path': '/autologin',
+               'email': result[0].account,
+               'password': result[0].password
+            });
+            req.on('response', (headers, flags) => {
+               console.log('responses (headers):')
+               for (const name in headers) {
+                  console.log(`${name}: ${headers[name]}`);
+               }
+               console.log('---------')
+            });
+            req.setEncoding('utf8');
+            let data = '';
+            req.on('data', (chunk) => {
+               data += chunk;
+            });
+            req.on('end', () => {
+               if (data === 'autologinerror') {
+                  createLoginWindow();
+               } else {
+                  createMainWindow();
+               }
+               clientS.close();
+            });
+            req.end();
+
+         } else {
+            createLoginWindow()
+         }
+      });
+}
+
+function updateNowPlaying(win){
+   const clientS = http2.connect(config.URL, {
+      ca: fs.readFileSync(`./certs/${config.name}-cert.pem`)
+   }, function() {
+      console.log('connected to https server');
+   });
+   const req = clientS.request({
+      ':path': '/nowplaying',
+      'email': email
+   });
+   req.on('response', (headers, flags) => {
+      console.log('responses (headers):')
+      for (const name in headers) {
+         console.log(`${name}: ${headers[name]}`);
+      }
+      console.log('---------')
+   });
+   req.setEncoding('utf8');
+   let data = '';
+   req.on('data', (chunk) => {
+      data += chunk;
+   });
+   req.on('end', () => {
+      if (data === 'getauth') {
+         authSpot();
+      } else if (data === 'nothingplaying') {
+         authed = true;
+         win.webContents.send("nowplaying-button-task-finished", data);
+         win.webContents.send("nowplaying-button-task-finished", data);
+      } else {
+         try {
+            authed = true;
+            track = JSON.parse(data)
+            // event.reply("nowplaying-button-task-finished", track);
+            win.webContents.send("nowplaying-button-task-finished", track);
+         } catch (e) {
+            console.log(`error parsing now-playing json: ${data}`);
+
+         }
+      }
+      clientS.close();
+   });
+   req.end();
+}

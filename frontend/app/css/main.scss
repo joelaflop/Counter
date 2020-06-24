@@ -1,49 +1,152 @@
 @import "../../node_modules/bootstrap/scss/bootstrap";
-
 @font-face {
-  font-family: EBGaramond;
-  src: url(../resources/fonts/EB_Garamond/static/EBGaramond-Regular.ttf);
+   font-family: EBGaramond;
+   src: url("../resources/fonts/EB_Garamond/static/EBGaramond-Regular.ttf");
 }
 
-.garamond-font{
-   font-family: "EBGaramond";
+.garamond-font {
+   // font-family: "EBGaramond";
 }
 
-html,
-body {
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    padding-top: 45px;
+body,
+html {
+   height: 100%;
+   width: 100%;
+   margin: 0;
+   padding-top: 0; //40px or 28px if including title navbar
 }
 
-.main-offset{
-   margin-top:0px;
-   margin-right:0px;
-   margin-right:0px;
-   padding-top:120px;
-   width:100%;
+.maincontainer {
+   //
+   overflow: hidden;
+   text-overflow: ellipsis;
+   padding: 0;
 }
 
-.menu{
-  margin-top:50px;
-  background:#b3b3b3;
-  // overflow-x: hidden; /* Disable horizontal scroll */
-  z-index: 1;
+.main-page {
+   margin-bottom: 130px;
+   height: 100%;
+   min-height: 100vh;
 }
 
-.h3-offset{
-   margin-top:30px;
+.pagetitlebox {
+   padding-left: 10px;
+   margin: 0;
+   width: 100%;
+   position: fixed;
+   -webkit-user-select: none;
+   -webkit-app-region: drag;
 }
 
-.fixed{
-   position:fixed;
+.pagetitle {
+   white-space: nowrap;
+   // max-width: 100%;
+   padding-top:2px;
+   padding-bottom:2px;
+   margin:0px;
 }
 
-.nowplaying{
-  position: fixed;
-  bottom:0;
-  width:100%;
-  z-index:2;
-  background:#e6e6e6;
+.leftbar {
+   width: 100px;
+   vertical-align: top;
+   position: fixed;
+   height: 100%;
+   min-height: 100vh;
+   -webkit-user-select: none;
 }
+
+.leftbarmovementfix{
+   min-width: 100px;
+}
+
+.avoidleftbar {
+   padding-left: 100px;
+   white-space: nowrap;
+}
+
+.mainpagedrop {
+   padding-top: 30px;
+}
+//
+// handlebars template css
+//
+
+.songholder {
+   display: table;
+   width: 100%;
+   margin-top: 10px;
+   padding-left: 25px;
+}
+
+.albumcover {
+   display: table-cell;
+   width: 100px;
+}
+
+.songinfo {
+   display: table-cell;
+   vertical-align: top;
+   padding-left: 10px;
+   max-width: 100%;
+}
+
+.songtitle {
+   // background:#104040;
+   margin: 0;
+   padding-top: 4px;
+   max-width: 100%;
+}
+
+.songalbum {
+   // background:#804040;
+   margin: 0;
+   padding-top: 10px;
+   max-width: 100%;
+}
+
+.songartist {
+   // background:#404040;
+   padding-top: 10px;
+   padding-bottom: 4px;
+   margin: 0;
+   max-width: 100%;
+}
+
+//
+// table helpers
+//
+.maintable {
+   display: table;
+   width: 100%;
+}
+
+.tablecell {
+   display: table-cell;
+   vertical-align: top;
+   max-width: 100%;
+}
+
+//
+// colors
+//
+.bg-black {
+   background: #000000;
+}
+
+.bg-darkgray {
+   background: #262626;
+}
+
+.bg-gray {
+   background: #404040;
+}
+//menubar
+.saturate { filter: saturate(3); }
+.grayscale { filter: grayscale(100%); }
+.contrast { filter: contrast(160%); }
+.brightness { filter: brightness(0.25); }
+.blur { filter: blur(3px); }
+.invert { filter: invert(100%); }
+.sepia { filter: sepia(100%); }
+.huerotate { filter: hue-rotate(180deg); }
+.rss.opacity { filter: opacity(50%); }

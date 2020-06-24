@@ -10,6 +10,7 @@ const {
 } = require("electron");
 
 let mainPageDiv = document.getElementById('mainpage');
+let titleBar = document.getElementById('titleofnavbar');
 
 let countsPageDiv = document.getElementById('countsPage');
 countsPageDiv.style.visibility = 'hidden';
@@ -22,32 +23,30 @@ dataPageDiv.style.visibility = 'hidden';
 dataPageDiv.style.display = 'none';
 
 
-const nowplayingbutton = document.getElementById("now playing button");
-nowplayingbutton.addEventListener('click', function() {
-   mainPageDiv.innerHTML = countsPageDiv.innerHTML;
-   var arg = "secondparam";
-
-   //send the info to main process . we can pass any arguments as second param.
-   ipcRenderer.send("nowplaying_click", arg); // ipcRender.send will pass the information to main process
-});
+// const nowplayingbutton = document.getElementById("now playing button");
+// nowplayingbutton.addEventListener('click', function() {
+//    mainPageDiv.innerHTML = countsPageDiv.innerHTML;
+//    var arg = "secondparam";
+//
+//    //send the info to main process . we can pass any arguments as second param.
+//    ipcRenderer.send("nowplaying_click", arg); // ipcRender.send will pass the information to main process
+// });
 
 const recentlyplayedbutton = document.getElementById("recently played button");
 recentlyplayedbutton.addEventListener('click', function() {
    mainPageDiv.innerHTML = countsPageDiv.innerHTML;
+   // titleBar.innerHTML = 'history';
    var arg = "secondparam";
-
-   //send the info to main process . we can pass any arguments as second param.
    ipcRenderer.send("recentlyplayed_click", arg); // ipcRender.send will pass the information to main process
 });
 
 const userButton = document.getElementById("user page button");
 userButton.addEventListener('click', function() {
    mainPageDiv.innerHTML = userPageDiv.innerHTML;
-
+   ipcRenderer.send("userprofile_click", arg); // ipcRender.send will pass the information to main process
 });
 
 const dataButton = document.getElementById("data page button");
 dataButton.addEventListener('click', function() {
    mainPageDiv.innerHTML = dataPageDiv.innerHTML;
-
 });

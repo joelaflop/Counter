@@ -9911,48 +9911,161 @@ h3 {
 }
 @font-face {
   font-family: EBGaramond;
-  src: url(../resources/fonts/EB_Garamond/static/EBGaramond-Regular.ttf);
+  src: url("../resources/fonts/EB_Garamond/static/EBGaramond-Regular.ttf");
 }
-.garamond-font {
-  font-family: "EBGaramond";
-}
-
-html,
-body {
+body,
+html {
   height: 100%;
   width: 100%;
   margin: 0;
-  padding-top: 45px;
+  padding-top: 0;
 }
 
-.main-offset {
-  margin-top: 0px;
-  margin-right: 0px;
-  margin-right: 0px;
-  padding-top: 120px;
+.maincontainer {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0;
+}
+
+.main-page {
+  margin-bottom: 130px;
+  height: 100%;
+  min-height: 100vh;
+}
+
+.pagetitlebox {
+  padding-left: 10px;
+  margin: 0;
+  width: 100%;
+  position: fixed;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.pagetitle {
+  white-space: nowrap;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  margin: 0px;
+}
+
+.leftbar {
+  width: 100px;
+  vertical-align: top;
+  position: fixed;
+  height: 100%;
+  min-height: 100vh;
+  -webkit-user-select: none;
+}
+
+.leftbarmovementfix {
+  min-width: 100px;
+}
+
+.avoidleftbar {
+  padding-left: 100px;
+  white-space: nowrap;
+}
+
+.mainpagedrop {
+  padding-top: 30px;
+}
+
+.songholder {
+  display: table;
+  width: 100%;
+  margin-top: 10px;
+  padding-left: 25px;
+}
+
+.albumcover {
+  display: table-cell;
+  width: 100px;
+}
+
+.songinfo {
+  display: table-cell;
+  vertical-align: top;
+  padding-left: 10px;
+  max-width: 100%;
+}
+
+.songtitle {
+  margin: 0;
+  padding-top: 4px;
+  max-width: 100%;
+}
+
+.songalbum {
+  margin: 0;
+  padding-top: 10px;
+  max-width: 100%;
+}
+
+.songartist {
+  padding-top: 10px;
+  padding-bottom: 4px;
+  margin: 0;
+  max-width: 100%;
+}
+
+.maintable {
+  display: table;
   width: 100%;
 }
 
-.menu {
-  margin-top: 50px;
-  background: #b3b3b3;
-  z-index: 1;
+.tablecell {
+  display: table-cell;
+  vertical-align: top;
+  max-width: 100%;
 }
 
-.h3-offset {
-  margin-top: 30px;
+.bg-black {
+  background: #000000;
 }
 
-.fixed {
-  position: fixed;
+.bg-darkgray {
+  background: #262626;
 }
 
-.nowplaying {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  z-index: 2;
-  background: #e6e6e6;
+.bg-gray {
+  background: #404040;
+}
+
+.saturate {
+  filter: saturate(3);
+}
+
+.grayscale {
+  filter: grayscale(100%);
+}
+
+.contrast {
+  filter: contrast(160%);
+}
+
+.brightness {
+  filter: brightness(0.25);
+}
+
+.blur {
+  filter: blur(3px);
+}
+
+.invert {
+  filter: invert(100%);
+}
+
+.sepia {
+  filter: sepia(100%);
+}
+
+.huerotate {
+  filter: hue-rotate(180deg);
+}
+
+.rss.opacity {
+  filter: opacity(50%);
 }
 
 /*# sourceMappingURL=main.css.map */

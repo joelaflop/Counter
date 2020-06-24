@@ -7,44 +7,69 @@
    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'"> -->
    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
    <link href="app/css/main.css" rel="stylesheet" type="text/css" />
-   <title class="garamond-font">Counter alphalphalphalpha</title>
-   <nav class="navbar fixed-top navbar-light bg-light">
-      <a class="navbar-brand garamond-font" href="#">Counter alpha</a>
-      <div class="container-fluid garamond-font">
-         We are using Node.js <span id="node-version"></span>,
-         Chromium <span id="chrome-version"></span>,
-         and Electron <span id="electron-version"></span>.
-      </div>
-   </nav>
 </head>
 
 <body>
-   <div class="container-fluid">
-      <div class="row">
-         <div class="col-2 position-fixed garamond-font">
-            <h4>Menu:</h4>
-            <button id="now playing button" type="button">now</button>
-            <button id="recently played button" type="button">recent</button>
-            <button id="user page button" type="button">user</button>
-            <button id="data page button" type="button">data</button>
+   <div class="container-fluid maincontainer bg-darkgray">
+      <div class="maintable main-page">
+         <div class="tablecell leftbar bg-black garamond-font pt-3 pl-2 pr-0">
+            <nav class="navbar navbar-nav navbar-expand-lg navbar-dark px-0">
+               <ul class="navbar-nav flex-column leftbarmovementfix">
+                  <a class="navbar-brand pl-0" href="#">Counter</a>
+                  <li class="nav-item">
+
+                     <a id="recently played button" class="nav-link py-1 pl-1 pr-0" href="#">
+                        <img src="app/img/icons/clock-history.svg" class="invert pb-1 pr-1" alt="" width="25" height="25" title="Bootstrap">history</a>
+                  </li>
+                  <li class="nav-item">
+                     <a id="user page button" class="nav-link py-1 pl-1 pr-0" href="#">
+                        <img src="app/img/icons/person-square.svg" class="invert pb-1 pr-1" alt="" width="25" height="25" title="Bootstrap">user</a>
+                  </li>
+                  <li class="nav-item">
+                     <a id="data page button" class="nav-link py-1 pl-1 pr-0" href="#">
+                        <img src="app/img/icons/clipboard-data.svg" class="invert pb-1 pr-1" alt="" width="25" height="25" title="Bootstrap">data</a>
+                  </li>
+               </ul>
+            </nav>
          </div>
-         <div id="mainpage" class="col-10 offset-2  garamond-font"></div>
+         <div id="mainpage" class="tablecell avoidleftbar garamond-font">
+            <div class="pagetitlebox bg-gray">
+               <h4 class="pagetitle text-white">welcome</h4>
+            </div>
+         </div>
       </div>
-   </div>
-   <div class="nowplaying garamond-font">
-      <div id="nowplaying"></div>
+      <nav class="navbar fixed-bottom garamond-font bg-gray text-white pt-0 pl-0">
+         <div class="maintable">
+            <div class="tablecell leftbar">
+               <h4 class="p-1 pt-3">now playing</h4>
+            </div>
+            <div class="tablecell avoidleftbar">
+               <div id="nowplaying"></div>
+            </div>
+         </div>
+      </nav>
    </div>
 
+
    <div id="countsPage">
-      <div id="recentlyplaying"></div>
+      <div class="pagetitlebox bg-gray">
+         <h4 class="pagetitle text-white">history</h4>
+      </div>
+      <div id="recentlyplaying" class="mainpagedrop"></div>
    </div>
 
    <div id="userPage">
-      <h1>user profile</h1>
+      <div class="pagetitlebox bg-gray">
+         <h4 class="pagetitle text-white">user profile</h4>
+      </div>
+      <div id="usermainpage" class="mainpagedrop"></div>
    </div>
 
    <div id="dataPage">
-      <h1>data insights</h1>
+      <div class="pagetitlebox bg-gray">
+         <h4 class="pagetitle text-white">data insights</h4>
+      </div>
+      <div id="datamainpage" class="mainpagedrop"></div>
    </div>
 
    <!-- You can also require other files to run in this process -->
@@ -74,9 +99,10 @@
          for (let i = 0; i < tracks.length; i++) {
             console.log(tracks[i])
             child = document.createElement('div');
+            child.className = "text-white";
             appendChild = parent.appendChild(child)
             appendChild.innerHTML = full_track_template(tracks[i]);
-            console.log(1)
+            // console.log(1)
          }
       });
    </script>

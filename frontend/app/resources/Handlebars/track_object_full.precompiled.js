@@ -12,14 +12,14 @@ templates['track_object_full'] = template({"1":function(container,depth0,helpers
         return undefined
     };
 
-  return "<p>\n   <img class=\"someClass\" src=\""
+  return "<div class=\"songholder\">\n   <div class=\"albumcover\">\n      <img class=\"someClass\" src=\""
     + alias2(alias1(((stack1 = (depth0 != null ? lookupProperty(depth0,"album") : depth0)) != null ? lookupProperty(stack1,"imageURL") : stack1), depth0))
-    + "\" width=\"100\" height=\"100\">\n   Title: "
-    + alias2(((helper = (helper = lookupProperty(helpers,"name") || (depth0 != null ? lookupProperty(depth0,"name") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(alias3,{"name":"name","hash":{},"data":data,"loc":{"start":{"line":3,"column":10},"end":{"line":3,"column":18}}}) : helper)))
-    + " -\n   Artist(s):"
-    + ((stack1 = lookupProperty(helpers,"each").call(alias3,(depth0 != null ? lookupProperty(depth0,"artists") : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":4,"column":13},"end":{"line":4,"column":49}}})) != null ? stack1 : "")
-    + " -\n   Album: "
+    + "\" width=\"100\" height=\"100\">\n   </div>\n   <div class=\"songinfo\">\n      <div class=\"songtitle\">\n         <h4 class=\"m-0\">"
+    + alias2(((helper = (helper = lookupProperty(helpers,"name") || (depth0 != null ? lookupProperty(depth0,"name") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(alias3,{"name":"name","hash":{},"data":data,"loc":{"start":{"line":7,"column":25},"end":{"line":7,"column":33}}}) : helper)))
+    + "</h4>\n      </div>\n      <div class=\"songalbum\">\n         <h6 class=\"m-0\">"
     + alias2(alias1(((stack1 = (depth0 != null ? lookupProperty(depth0,"album") : depth0)) != null ? lookupProperty(stack1,"name") : stack1), depth0))
-    + "\n</p>\n";
+    + "</h6>\n      </div>\n      <div class=\"songartist\">\n         <h5 class=\"m-0\">"
+    + ((stack1 = lookupProperty(helpers,"each").call(alias3,(depth0 != null ? lookupProperty(depth0,"artists") : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":13,"column":25},"end":{"line":13,"column":61}}})) != null ? stack1 : "")
+    + "</h5>\n      </div>\n   </div>\n</div>\n";
 },"useData":true});
 })();
