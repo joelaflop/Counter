@@ -9,10 +9,10 @@ const http2 = require('http2');
 const fs = require('fs');
 
 const configFile = require('../config')
-const config = configFile[1]
+const httpConfig = configFile.httpInfo[1]
 const serverS = http2.createSecureServer({
-   key: fs.readFileSync(`./certs/${config.name}-privkey.pem`),
-   cert: fs.readFileSync(`./certs/${config.name}-cert.pem`)
+   key: fs.readFileSync(`./certs/${httpConfig.name}-privkey.pem`),
+   cert: fs.readFileSync(`./certs/${httpConfig.name}-cert.pem`)
 });
 // SSL command for certificates
 // openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost--privkey.pem -out localhost--cert.pem
@@ -21,6 +21,7 @@ const serverS = http2.createSecureServer({
 serverS.on('error', (err) => console.error(err));
 
 serverS.on('stream', (stream, headers) => {
+
    // stream is a Duplex
    // console.log('stream:')
    // console.log(stream)
@@ -63,7 +64,7 @@ serverS.on('stream', (stream, headers) => {
             stream.write('getauth', function() {
                stream.end('');
             })
-         } else if (track === "nothingplaying"){
+         } else if (track === "nothingplaying") {
             stream.write('nothingplaying', function() {
                stream.end('');
             })
@@ -71,7 +72,9 @@ serverS.on('stream', (stream, headers) => {
             // console.log(buildTrackJSON(track))
             // connection.write('nowplaying\v' + JSON.stringify(track.item))
             // connection.write('nowplaying\v' + JSON.stringify(buildTrackJSON(track.item)) + '\v\r')
-            stream.write(JSON.stringify(buildTrackJSON(track.item)), function() {stream.end();});
+            stream.write(JSON.stringify(buildTrackJSON(track.item)), function() {
+               stream.end();
+            });
          } else {
             console.log('track is undefined')
          }
@@ -134,7 +137,7 @@ serverS.on('stream', (stream, headers) => {
          }
       });
    } else if (headers[':path'] === '/authspotify') {
-      spotify.authSpot(config.name, config.IP, function(refresh, access) {
+      spotify.authSpot(httpConfig.name, httpConfig.IP, function(refresh, access) {
          console.log(refresh);
          console.log(access);
          email = headers.email
@@ -148,37 +151,50 @@ serverS.on('stream', (stream, headers) => {
       console.log("autologin attempt")
       email = headers.email
       password = headers.password
-      auth.login(email, password, function(error) {
-         switch (error.code) {
-            case "auth/invalid-email":
-               break;
-            case "auth/invalid-user-token":
-               break;
-            case "auth/requires-recent-login":
-               break;
-            case "auth/user-token-expired":
-               break;
-            default:
-               // console.log(error)
-               console.log(error.code);
-               console.log(error.message);
-               stream.write('autologinerror\n' + error.message, function(){stream.end()});
-         }
-      }, function(success) {
-         stream.write('autologinsuccess', function(){stream.end()});
-         db.login(email, function() {
-            console.log('this user is not in the DB')
+      auth.login(email, password,
+         function(error) {
+            switch (error.code) {
+               case "auth/invalid-email":
+                  break;
+               case "auth/invalid-user-token":
+                  break;
+               case "auth/requires-recent-login":
+                  break;
+               case "auth/user-token-expired":
+                  break;
+               default:
+                  // console.log(error)
+                  console.log(error.code);
+                  console.log(error.message);
+                  try {
+                     stream.write('autologinerror\n' + error.message, function() {
+                        stream.end('\n')
+                     });
+                  } catch (error) {
+                     console.log(error)
+                  }
+
+            }
+         },
+         function(success) {
+            stream.write('autologinsuccess', function() {
+               stream.end()
+            });
+            db.login(email, function() {
+               console.log('this user is not in the DB')
+            });
+            updateListens(email);
          });
-         updateListens(email);
-      });
-   } else if (headers[':path'] === '/updatelistens'){
+   } else if (headers[':path'] === '/updatelistens') {
       updateListens(headers.email);
       stream.end()
    } else {
       console.log('unknown header')
    }
 
+
 });
+
 
 function updateListens(email) {
    // spotify.recentlyPlayed(50, email, function(tracks) {
