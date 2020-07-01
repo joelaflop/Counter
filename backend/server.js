@@ -21,81 +21,51 @@ const serverS = http2.createSecureServer({
 serverS.on('error', (err) => console.error(err));
 
 serverS.on('stream', (stream, headers) => {
-
-   // stream is a Duplex
-   // console.log('stream:')
-   // console.log(stream)
    console.log('header:')
    console.log(headers)
    if (headers[':path'] === '/recentlyplayed') {
-      stream.respond({
-         'content-type': 'text',
-         ':status': 200
-      });
-      spotify.recentlyPlayed(50, headers.email, function(tracks) {
+      spotify.recentlyPlayed(50, headers.email, function (tracks) {
          if (tracks == 'clientneedsauth') {
             console.log("Client request requires authentification")
             // connection.write('getauth\v\r');
-            stream.write('getauth', function() {
-               stream.end('');
-            })
+            streamRespond(stream, 'getauth')
          } else if (tracks != 'undefined') {
             var trackList = []
             for (let j = 0; j < tracks.items.length; j++) {
                trackList.push(buildTrackJSON(tracks.items[j].track))
             }
-            stream.write(JSON.stringify(trackList), function() {
-               stream.end('');
-            });
-
+            streamRespond(stream, JSON.stringify(trackList))
          } else {
             console.log('tracks are undefined')
          }
       });
 
    } else if (headers[':path'] === '/nowplaying') {
-      stream.respond({
-         'content-type': 'text',
-         ':status': 200
-      });
-      spotify.nowPlaying(headers.email, function(track) {
+      spotify.nowPlaying(headers.email, function (track) {
          if (track == 'clientneedsauth') {
             console.log("Client request requires authentification")
-            stream.write('getauth', function() {
-               stream.end('');
-            })
+            streamRespond(stream, 'getauth')
          } else if (track === "nothingplaying") {
-            stream.write('nothingplaying', function() {
-               stream.end('');
-            })
+            streamRespond(stream, 'nothingplaying')
          } else if (track != 'undefined') {
             // console.log(buildTrackJSON(track))
             // connection.write('nowplaying\v' + JSON.stringify(track.item))
             // connection.write('nowplaying\v' + JSON.stringify(buildTrackJSON(track.item)) + '\v\r')
-            stream.write(JSON.stringify(buildTrackJSON(track.item)), function() {
-               stream.end();
-            });
+            streamRespond(stream, JSON.stringify(buildTrackJSON(track.item)))
          } else {
             console.log('track is undefined')
          }
       });
    } else if (headers[':path'] === '/login') {
       console.log("login attempt")
-
       email = headers.email
       password = headers.password
       username = headers.username
       if (!email) {
-         db.getEmail(username, function(email) {
+         db.getEmail(username, function (email) {
             if (!email) {
                // connection.write('loginerror\v' + 'This username was not found\v\r');
-               stream.respond({
-                  'content-type': 'text',
-                  ':status': 200
-               });
-               stream.write('loginerror\n', function() {
-                  stream.end('This username was not found.')
-               })
+               streamRespond(stream, 'loginerror\nThis username was not found.')
             } else {
                login(email, password, stream);
                updateListens(email);
@@ -114,34 +84,22 @@ serverS.on('stream', (stream, headers) => {
       console.log(`email: ${email}`)
       console.log(`password: ${password}`)
       console.log(`username: ${username}`)
-      db.getEmail(username, function(returnedEmail) {
+      db.getEmail(username, function (returnedEmail) {
          if (!returnedEmail && username) {
             signup(email, password, username, stream)
          }
          if (!username) {
-            stream.respond({
-               'content-type': 'text',
-               ':status': 200
-            });
-            stream.write('signuperror\n', function() {
-               stream.end('Please enter a username.')
-            })
+            streamRespond(stream, 'signuperror\nPlease enter a username.')
          } else if (returnedEmail) {
-            stream.respond({
-               'content-type': 'text',
-               ':status': 200
-            });
-            stream.write('signuperror\n', function() {
-               stream.end('This username is taken.')
-            })
+            streamRespond(stream, 'signuperror\nThis username is taken.')
          }
       });
    } else if (headers[':path'] === '/authspotify') {
-      spotify.authSpot(httpConfig.name, httpConfig.IP, function(refresh, access) {
-         console.log(refresh);
-         console.log(access);
+      spotify.authSpot(httpConfig.name, httpConfig.IP, function (refresh, access) {
+         // console.log(refresh);
+         // console.log(access);
          email = headers.email
-         db.setTokens(email, refresh, access, function() {
+         db.setTokens(email, refresh, access, function () {
             //callback for if there is no such user to login
          });
          updateListens(email);
@@ -152,7 +110,7 @@ serverS.on('stream', (stream, headers) => {
       email = headers.email
       password = headers.password
       auth.login(email, password,
-         function(error) {
+         function (error) {
             switch (error.code) {
                case "auth/invalid-email":
                   break;
@@ -166,28 +124,29 @@ serverS.on('stream', (stream, headers) => {
                   // console.log(error)
                   console.log(error.code);
                   console.log(error.message);
-                  try {
-                     stream.write('autologinerror\n' + error.message, function() {
-                        stream.end('\n')
-                     });
-                  } catch (error) {
-                     console.log(error)
-                  }
-
+                  streamRespond(stream, 'autologinerror\n' + error.message)
             }
          },
-         function(success) {
-            stream.write('autologinsuccess', function() {
-               stream.end()
-            });
-            db.login(email, function() {
-               console.log('this user is not in the DB')
+         function (success) {
+            streamRespond(stream, 'autologinsuccess')
+            db.login(email, function () {
+               console.log('this user is not in the DB, but was in auth!')
             });
             updateListens(email);
          });
    } else if (headers[':path'] === '/updatelistens') {
       updateListens(headers.email);
       stream.end()
+   } else if (headers[':path'] === '/userprofile') {
+      console.log("get user profile attempt")
+      email = headers.email
+      db.getUserInfo(email, function (res) {
+         if (res) {
+            streamRespond(stream, res.email + '\n' + res.username + '\n' + res.platforms + '\n' + res.created_on)
+         } else {
+            streamRespond(stream, userProfileError)
+         }
+      })
    } else {
       console.log('unknown header')
    }
@@ -197,21 +156,21 @@ serverS.on('stream', (stream, headers) => {
 
 
 function updateListens(email) {
-   // spotify.recentlyPlayed(50, email, function(tracks) {
-   //    if (tracks == 'clientneedsauth') {
-   //       // connection.write('getauth\v\r'); //maybe use a different flow here
-   //       // i think we ignore this case, or tell the user to authorize again in the future
-   //    } else if (tracks != 'undefined') {
-   //       console.log(`autoupdating ${email} listens`)
-   //       db.listen(email, tracks)
-   //    } else {
-   //       console.log('tracks are undefined')
-   //    }
-   // });
+   spotify.recentlyPlayed(50, email, function (tracks) {
+      if (tracks == 'clientneedsauth') {
+         // connection.write('getauth\v\r'); //maybe use a different flow here
+         // i think we ignore this case, or tell the user to authorize again in the future
+      } else if (tracks != 'undefined') {
+         console.log(`autoupdating ${email} listens`)
+         db.listen(email, tracks)
+      } else {
+         console.log('tracks are undefined')
+      }
+   });
 }
 
 function login(email, password, stream) {
-   auth.login(email, password, function(error) {
+   auth.login(email, password, function (error) {
       switch (error.code) {
          case "auth/invalid-email":
             break;
@@ -226,32 +185,20 @@ function login(email, password, stream) {
             console.log(error.code)
             console.log(error.message)
       }
-      stream.respond({
-         'content-type': 'text',
-         ':status': 200
-      });
-      stream.write('loginerror\n', function() {
-         stream.end(error.message)
-      })
+      streamRespond(stream, `loginerror\n${error.message}`)
       console.log('login error');
-   }, function(success) {
+   }, function (success) {
       // connection.write('loginsuccess\v' + email + '\v' + password + '\v\r');
-      stream.respond({
-         'content-type': 'text',
-         ':status': 200
-      });
-      stream.write(`loginsuccess\n${email}\n${password}`, function() {
-         stream.end('')
-      })
+      streamRespond(stream, `loginsuccess\n${email}\n${password}`)
       console.log('login success');
-      db.login(email, function() {
+      db.login(email, function () {
          console.log('this user is not in the DB')
       });
    });
 }
 
 function signup(email, password, username, stream) {
-   auth.signup(email, password, function(error) {
+   auth.signup(email, password, function (error) {
       switch (error.code) {
          case "auth/invalid-email":
             break;
@@ -264,25 +211,27 @@ function signup(email, password, username, stream) {
             console.log(error.code)
             console.log(error.message)
       }
-      stream.respond({
-         'content-type': 'text',
-         ':status': 200
-      });
-      stream.write('signuperror\n', function() {
-         stream.end(error.message)
-      })
+      streamRespond(stream, `signuperror\n${error.message}`)
       console.log('signup error');
-   }, function(success) {
-      stream.respond({
-         'content-type': 'text',
-         ':status': 200
-      });
-      stream.write(`signupsucess\n${email}\n${password}\n${username}`, function() {
-         stream.end('')
-      })
+   }, function (success) {
+      streamRespond(stream, `signupsucess\n${email}\n${password}`)
       console.log('signup success');
       db.newUser(email, username, password, 'spotify');
    });
+}
+
+function streamRespond(stream, t) {
+   try {
+      stream.respond({
+         'content-type': 'text',
+         ':status': 200
+      });
+      stream.write(t, function () {
+         stream.end()
+      });
+   } catch (streamerr) {
+      console.log(streamerr)
+   }
 }
 
 function buildTrackJSON(track) {
@@ -301,7 +250,6 @@ function buildTrackJSON(track) {
    return json;
 }
 
-
-serverS.listen(8443, function() {
+serverS.listen(8443, function () {
    console.log('https server is up');
 });

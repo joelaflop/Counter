@@ -43,10 +43,13 @@ recentlyplayedbutton.addEventListener('click', function() {
 const userButton = document.getElementById("user page button");
 userButton.addEventListener('click', function() {
    mainPageDiv.innerHTML = userPageDiv.innerHTML;
+   var arg = "secondparam";
    ipcRenderer.send("userprofile_click", arg); // ipcRender.send will pass the information to main process
 });
 
 const dataButton = document.getElementById("data page button");
 dataButton.addEventListener('click', function() {
    mainPageDiv.innerHTML = dataPageDiv.innerHTML;
+   var arg = "secondparam";
+   ipcRenderer.send("dataprofile_click", arg);
 });

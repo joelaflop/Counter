@@ -13,7 +13,7 @@ client.connect()
 
 
 module.exports = {
-   newUser: function(email, username, password, platforms) {
+   newUser: function (email, username, password, platforms) {
       query = `INSERT INTO account (email
                                   , username
                                   , password
@@ -34,34 +34,34 @@ module.exports = {
                            , created_on=now()
                            , last_login=now();`
       values = [email, username, password, platforms]
-      client.query(query, values, function(err, res) {
+      client.query(query, values, function (err, res) {
          if (err) {
             console.log('DB: error adding user');
             console.log(err)
          }
       })
    },
-   getTokens: function(email, callback) {
+   getTokens: function (email, callback) {
       query = `SELECT refresh_token, access_token from account where email = $1;`
       // console.log(query);
       values = [email]
-      client.query(query, values, function(err, res) {
+      client.query(query, values, function (err, res) {
          if (!err && res.rows[0]) {
             callback(res.rows[0].access_token, res.rows[0].refresh_token);
          } else if (!err && !res.rows[0]) {
-            callback(null,null)
+            callback(null, null)
          } else {
             console.log('DB: error getting tokens');
             console.log(err)
          }
       })
    },
-   setTokens: function(email, access, refresh, noUserCallback) {
+   setTokens: function (email, access, refresh, noUserCallback) {
       query = `UPDATE account SET refresh_token= $1, access_token= $2 WHERE email= $3;`
       values = [refresh, access, email]
       // console.log(query);
-      client.query(query, values, function(err, res) {
-         if(res.rowCount == 0){
+      client.query(query, values, function (err, res) {
+         if (res.rowCount == 0) {
             console.log('setting coins for user not in DB')
             noUserCallback();
             //should consider removing user from auth to force resignup
@@ -73,11 +73,11 @@ module.exports = {
          }
       })
    },
-   login: function(email, noUserCallback) {
+   login: function (email, noUserCallback) {
       query = `UPDATE account SET last_login=now() WHERE email= $1;`
       values = [email]
-      client.query(query, values, function(err, res) {
-         if(res.rowCount == 0){
+      client.query(query, values, function (err, res) {
+         if (res.rowCount == 0) {
             console.log('setting coins for user not in DB')
             noUserCallback();
             //consider removing user from auth to force resignup
@@ -88,90 +88,121 @@ module.exports = {
          }
       })
    },
-   listen: function(email, tracks) {
+   listen: function (email, tracks) {
       innerquery = ''
       values = []
       for (i = 0; i < tracks.items.length; i++) {
          curr = tracks.items[i]
          track = curr.track;
+         artists_count = track.artists.length;
          artists = ''
+         artistsids = ''
          for (j = 0; j < track.artists.length; j++) {
-            artists += track.artists[j].name;
+            if (j === 0) {
+               artists += (track.artists[j].name);
+               artistsids += (track.artists[j].id);
+            } else {
+               artists += ('\n' + track.artists[j].name);
+               artistsids += ('\n' + track.artists[j].id);
+            }
+
          }
          // console.log(JSON.stringify(track.name))
          if (i == 0) {
-            innerquery = `(DEFAULT, $${i*8+1}, $${i*8+2}, $${i*8+3}, $${i*8+4}, $${i*8+5}, $${i*8+6}, $${i*8+7}, $${i*8+8}) \n`
+            innerquery = `(DEFAULT, $${i * 11 + 1}, $${i * 11 + 2}, $${i * 11 + 3}, $${i * 11 + 4}, $${i * 11 + 5}, $${i * 11 + 6}, $${i * 11 + 7}, $${i * 11 + 8}, $${i * 11 + 9}, $${i *11 + 10}, $${i * 11 + 11}) \n`
          } else {
-            innerquery += `, (DEFAULT, $${i*8+1}, $${i*8+2}, $${i*8+3}, $${i*8+4}, $${i*8+5}, $${i*8+6}, $${i*8+7}, $${i*8+8}) \n`
+            innerquery += `, (DEFAULT, $${i * 11 + 1}, $${i * 11 + 2}, $${i * 11 + 3}, $${i * 11 + 4}, $${i * 11 + 5}, $${i * 11 + 6}, $${i * 11 + 7}, $${i * 11 + 8}, $${i * 11 + 9}, $${i * 11 + 10}, $${i * 11 + 11}) \n`
          }
 
          values.push(email
-                   , artists
-                   , track.album.name
-                   , track.name
-                   , handleSpotifyTimestamps(track.album.release_date, track.album.release_date_precision)
-                   , 'spotify'
-                   , track.id
-                   , curr.played_at);
+            , artists_count
+            , artists
+            , artistsids
+            , track.album.name
+            , track.album.id
+            , track.name
+            , track.id
+            , handleSpotifyTimestamps(track.album.release_date, track.album.release_date_precision)
+            , 'spotify'
+            , curr.played_at);
       }
       query = `
                INSERT INTO listen (listen_id
                                  , email
+                                 , artists_count
                                  , artists
+                                 , platform_artistID
                                  , album
+                                 , platform_albumID
                                  , title
+                                 , platform_trackID
                                  , released_on
                                  , platform
-                                 , platform_trackID
                                  , listened_on)
                VALUES ${innerquery}
                on conflict (email, listened_on) do nothing;`
       // console.log(query);
-      client.query(query, values, function(err, res) {
+      client.query(query, values, function (err, res) {
          if (err) {
-            console.log('DB: error listening to track');
+            console.log('DB: error listening to tracks');
             console.log(err)
             console.log(query)
          }
       })
    },
-   getEmail: function(username, callback){
+   getEmail: function (username, callback) {
       query = `SELECT email FROM account WHERE username = $1;`
       // console.log(query);
       values = [username]
-      client.query(query, values, function(err, res) {
+      client.query(query, values, function (err, res) {
          if (!err && res.rows[0]) {
             callback(res.rows[0].email);
          } else if (!err && !res.rows[0]) {
             callback(null)
          } else {
-            console.log('DB: error getting tokens');
+            console.log('DB: error getting username from email');
             console.log(err)
          }
       })
    },
-   checkAuth: function(email, callback){
+   checkAuth: function (email, callback) {
       query = `SELECT refresh_token, access_token FROM account WHERE email = $1`
       values = [email]
-      client.query(query, values, function(err, res) {
+      client.query(query, values, function (err, res) {
          if (!err && res.rows[0]) {
             callback(true);
          } else if (!err && !res.rows[0]) {
             callback(false)
          } else {
-            console.log('DB: error checking auth');
+            console.log(`DB: error checking auth for ${email}`);
             console.log(err)
          }
       });
+   },
+   getUserInfo: function (email, callback){
+      query = `select email, username, platforms, created_on, last_login
+               from account 
+               where email = $1`;
+      values = [email];
+      client.query(query, values, function(err, res){
+         if (!err && res.rows[0]) {
+            callback(res.rows[0]);
+         } else if (!err && !res.rows[0]) {
+            callback(null)
+         } else {
+            console.log(`DB: error getting user info for ${email}`);
+            console.log(err)
+         }
+      })
    }
 };
 
 function handleSpotifyTimestamps(txt, precision) {
-   if(precision == 'year'){
-      return txt+'-01-01'
-   }else if (precision == 'month'){
-      return txt+'-01'
-   }else{
+   if (precision == 'year') {
+      return txt + '-01-01'
+   } else if (precision == 'month') {
+      return txt + '-01'
+   } else {
       return txt;
    }
 }

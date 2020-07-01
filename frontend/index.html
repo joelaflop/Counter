@@ -19,15 +19,18 @@
                   <li class="nav-item">
 
                      <a id="recently played button" class="nav-link py-1 pl-1 pr-0" href="#">
-                        <img src="app/img/icons/clock-history.svg" class="invert pb-1 pr-1" alt="" width="25" height="25" title="Bootstrap">history</a>
+                        <img src="app/img/icons/clock-history.svg" class="invert pb-1 pr-1" alt="" width="25"
+                           height="25" title="Bootstrap">history</a>
                   </li>
                   <li class="nav-item">
                      <a id="user page button" class="nav-link py-1 pl-1 pr-0" href="#">
-                        <img src="app/img/icons/person-square.svg" class="invert pb-1 pr-1" alt="" width="25" height="25" title="Bootstrap">user</a>
+                        <img src="app/img/icons/person-square.svg" class="invert pb-1 pr-1" alt="" width="25"
+                           height="25" title="Bootstrap">user</a>
                   </li>
                   <li class="nav-item">
                      <a id="data page button" class="nav-link py-1 pl-1 pr-0" href="#">
-                        <img src="app/img/icons/clipboard-data.svg" class="invert pb-1 pr-1" alt="" width="25" height="25" title="Bootstrap">data</a>
+                        <img src="app/img/icons/clipboard-data.svg" class="invert pb-1 pr-1" alt="" width="25"
+                           height="25" title="Bootstrap">data</a>
                   </li>
                </ul>
             </nav>
@@ -77,14 +80,14 @@
    <!-- <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script> -->
    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
    <script src="./app/resources/Handlebars/track_object_full.precompiled.js"></script>
+   <script src="./app/resources/Handlebars/user_object.precompiled.js"></script>
 
    <script>
       var full_track_template = Handlebars.templates.track_object_full;
-      var simple_track_template = Handlebars.templates.track_object_simplified;
-      ipcRenderer.on("auth-button-task-finished", function(event, arg) {
+      ipcRenderer.on("auth-button-task-finished", function (event, arg) {
          console.log("renderer got confirmation of authbutton click")
       });
-      ipcRenderer.on("nowplaying-button-task-finished", function(event, track) {
+      ipcRenderer.on("nowplaying-button-task-finished", function (event, track) {
          console.log('got a nowplaying finish')
          if (track === "nothingplaying") {
             let nothingplayingdiv = document.createElement('div');
@@ -93,7 +96,7 @@
             document.getElementById('nowplaying').innerHTML = full_track_template(track)
          }
       });
-      ipcRenderer.on("recentlyplayed-button-task-finished", function(event, tracks) {
+      ipcRenderer.on("recentlyplayed-button-task-finished", function (event, tracks) {
          parent = document.getElementById('recentlyplaying')
          parent.innerHTML = ""
          for (let i = 0; i < tracks.length; i++) {
@@ -104,6 +107,15 @@
             appendChild.innerHTML = full_track_template(tracks[i]);
             // console.log(1)
          }
+      });
+   </script>
+
+   <script>
+      var user_template = Handlebars.templates.user_object;
+      ipcRenderer.on("user-button-task-finished", function (event, user) {
+         console.log('got a user page finish')
+         console.log(user)
+         document.getElementById('usermainpage').innerHTML = user_template(user)
       });
    </script>
 </body>

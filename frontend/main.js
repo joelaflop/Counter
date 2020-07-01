@@ -8,6 +8,9 @@ const {
 const keytar = require('keytar')
 const path = require('path')
 
+require('electron-reload')(__dirname);
+
+
 const config = require('../config')
 const httpConfig = config.httpInfo[1]
 
@@ -17,8 +20,7 @@ const fs = require('fs');
 
 let email;
 let authed = false;
-
-// app.allowRendererProcessReuse = true;
+let gettingAuthed = false;
 
 var loginWindow, mainWindow;
 
@@ -44,7 +46,7 @@ function createMainWindow() {
       // frame: false,
       titleBarStyle: 'hidden',
       resizeable: true,
-      backgroundColor:'#262626',
+      backgroundColor: '#262626',
       webPreferences: {
          preload: path.join(__dirname, 'app/js/preload/main.js'),
          nodeIntegration: true
@@ -52,21 +54,21 @@ function createMainWindow() {
    })
    mainWindow.loadFile('index.html')
 
-   mainWindow.webContents.on('dom-ready', function(){
+   mainWindow.webContents.on('dom-ready', function () {
       console.log(`mainwindow dom is ready`);
       updateNowPlaying(mainWindow)
-      config.loginnInfo="{lmao}"
+      config.loginnInfo = "{lmao}"
    })
 
    var nowplayingIntervalID;
 
-   mainWindow.on('focus', function() {
+   mainWindow.on('focus', function () {
       console.log(`mainwindow has focus `);
       updateNowPlaying(mainWindow)
-      nowplayingIntervalID = setInterval(function() { //TODO remove this interval on event blur
+      nowplayingIntervalID = setInterval(function () { //TODO remove this interval on event blur
          console.log(`nowplaying interval HIT`)
          if (authed) {
-            if(mainWindow.isFocused()){
+            if (mainWindow.isFocused()) {
                console.log(`mainwindow has focus - autoupdating nowplaying`);
                updateNowPlaying(mainWindow)
             }
@@ -74,12 +76,10 @@ function createMainWindow() {
       }, 50000) //25 min * 60000 ms/min = 1500000 ms
    })
 
-   mainWindow.on('blur', function(){
+   mainWindow.on('blur', function () {
       console.log(`main window blured, intID: ${nowplayingIntervalID}`)
       clearInterval(nowplayingIntervalID);
    })
-
-
 
    mainWindow.webContents.openDevTools()
 }
@@ -87,34 +87,21 @@ function createMainWindow() {
 //
 //               IPC Incoming
 //
-ipcMain.on("nowplaying_click", function(event, arg) {
+
+ipcMain.on("nowplaying_click", function (event, arg) {
    console.log("nowplaying button clicked")
    // client.write('nowplaying\v' + email + '\v\r');
 
-   const clientS = http2.connect(httpConfig.URL, {
-      ca: fs.readFileSync(`./certs/${httpConfig.name}-cert.pem`)
-   }, function() {
-      console.log('connected to https server');
-   });
-   const req = clientS.request({
+   headers = {
       ':path': '/nowplaying',
       'email': email
-   });
-   req.on('response', (headers, flags) => {
-      console.log('responses (headers):')
-      for (const name in headers) {
-         console.log(`${name}: ${headers[name]}`);
-      }
-      console.log('---------')
-   });
-   req.setEncoding('utf8');
-   let data = '';
-   req.on('data', (chunk) => {
-      data += chunk;
-   });
-   req.on('end', () => {
+   };
+   clientRequest(headers, function (data) {
       if (data === 'getauth') {
-         authSpot();
+         if (!gettingAuthed) {
+            gettingAuthed = true
+            authSpot();
+         }
       } else if (data === 'nothingplaying') {
          event.reply("nowplaying-button-task-finished", data);
       } else {
@@ -125,39 +112,24 @@ ipcMain.on("nowplaying_click", function(event, arg) {
             console.log(`error parsing now-playing json: ${data}`);
          }
       }
-      clientS.close();
    });
-   req.end();
+
 
 });
 
-ipcMain.on("recentlyplayed_click", function(event, arg) {
+ipcMain.on("recentlyplayed_click", function (event, arg) {
    console.log("recentplayed button clicked")
    // client.write('recentlyplayed\v' + email + '\v\r');
-   const clientS = http2.connect(httpConfig.URL, {
-      ca: fs.readFileSync(`./certs/${httpConfig.name}-cert.pem`)
-   }, function() {
-      console.log('connected to https server');
-   });
-   const req = clientS.request({
+   headers = {
       ':path': '/recentlyplayed',
       'email': email
-   });
-   req.on('response', (headers, flags) => {
-      console.log('responses (headers):')
-      for (const name in headers) {
-         console.log(`${name}: ${headers[name]}`);
-      }
-      console.log('---------')
-   });
-   req.setEncoding('utf8');
-   let data = '';
-   req.on('data', (chunk) => {
-      data += chunk;
-   });
-   req.on('end', () => {
+   };
+   clientRequest(headers, function (data) {
       if (data === 'getauth') {
-         authSpot();
+         if (!gettingAuthed) {
+            gettingAuthed = true
+            authSpot();
+         }
       } else {
          try {
             tracks = JSON.parse(data)
@@ -167,40 +139,21 @@ ipcMain.on("recentlyplayed_click", function(event, arg) {
          }
 
       }
-      clientS.close();
    });
-   req.end();
+
 });
 
-ipcMain.on("loginbutton_click", function(event, arg) {
+ipcMain.on("loginbutton_click", function (event, arg) {
    console.log("login button clicked")
    // client.write('login\v' + arg[0] + '\v' + arg[1] + '\v' + arg[2] + '\v\r');
-
-   const clientS = http2.connect(httpConfig.URL, {
-      ca: fs.readFileSync(`./certs/${httpConfig.name}-cert.pem`)
-   }, function() {
-      console.log('connected to https server');
-   });
    //email password username
-   const req = clientS.request({
+   headers = {
       ':path': '/login',
       'email': arg[0],
       'username': arg[1],
       'password': arg[2]
-   });
-   req.on('response', (headers, flags) => {
-      console.log('responses (headers):')
-      for (const name in headers) {
-         console.log(`${name}: ${headers[name]}`);
-      }
-      console.log('---------')
-   });
-   req.setEncoding('utf8');
-   let data = '';
-   req.on('data', (chunk) => {
-      data += chunk;
-   });
-   req.on('end', () => {
+   };
+   clientRequest(headers, function (data) {
       splits = data.split('\n');
       console.log(splits)
       if (splits[0] === 'loginerror') {
@@ -211,40 +164,20 @@ ipcMain.on("loginbutton_click", function(event, arg) {
          email = splits[1]
          keytar.setPassword("Counter-app", email, splits[2]);
       }
-      clientS.close();
-   });
-   req.end();
+   })
 
 });
 
-ipcMain.on("signupbutton_click", function(event, arg) {
+ipcMain.on("signupbutton_click", function (event, arg) {
    console.log("signup button clicked")
    // client.write('signup\v' + arg[0] + '\v' + arg[1] + '\v' + arg[2] + '\v\r');
-   const clientS = http2.connect(httpConfig.URL, {
-      ca: fs.readFileSync(`./certs/${httpConfig.name}-cert.pem`)
-   }, function() {
-      console.log('connected to https server');
-   });
-   //email password username
-   const req = clientS.request({
+   headers = {
       ':path': '/signup',
       'email': arg[0],
       'username': arg[1],
       'password': arg[2]
-   });
-   req.on('response', (headers, flags) => {
-      console.log('responses (headers):')
-      for (const name in headers) {
-         console.log(`${name}: ${headers[name]}`);
-      }
-      console.log('---------')
-   });
-   req.setEncoding('utf8');
-   let data = '';
-   req.on('data', (chunk) => {
-      data += chunk;
-   });
-   req.on('end', () => {
+   };
+   clientRequest(headers, function (data) {
       splits = data.split('\n');
       console.log(splits)
       if (splits[0] === 'signuperror') {
@@ -255,44 +188,41 @@ ipcMain.on("signupbutton_click", function(event, arg) {
          email = splits[1]
          keytar.setPassword("Counter-app", email, splits[2]);
       }
-      clientS.close();
-   });
-   req.end();
+   })
+
+});
+
+ipcMain.on("userprofile_click", function (event, arg) {
+   console.log("user profile button clicked")
+
+   headers = {
+      ':path': '/userprofile',
+      'email': email
+   };
+   clientRequest(headers, function(data){
+      splits = data.split('\n');
+      console.log(splits)
+      if (splits[0] === 'userProfileError') {
+         event.reply("userprofile-error", splits[1]);
+      } else {
+         event.reply("user-button-task-finished", { email: splits[0], username: splits[1], platform: splits[2], created_on: splits[3] });
+      }
+   })
 });
 
 //
 //             Interval DB recording
 //
-setInterval(function() {
+setInterval(function () {
    if (authed) {
       // client.write('updateListens\v' + email + '\v\r');
       // client.write('nowplaying\v' + email + '\v\r');
 
-      const clientS = http2.connect(httpConfig.URL, {
-         ca: fs.readFileSync(`./certs/${httpConfig.name}-cert.pem`)
-      }, function() {
-         console.log('connected to https server');
-      });
-      const req = clientS.request({
+      headers = {
          ':path': '/updatelistens',
          'email': email
-      });
-      req.on('response', (headers, flags) => {
-         console.log('responses (headers):')
-         for (const name in headers) {
-            console.log(`${name}: ${headers[name]}`);
-         }
-         console.log('---------')
-      });
-      req.setEncoding('utf8');
-      let data = '';
-      req.on('data', (chunk) => {
-         data += chunk;
-      });
-      req.on('end', () => {
-         clientS.close();
-      });
-      req.end();
+      };
+      clientRequest(headers, function(data){});
 
    }
 }, 1500000) //25 min * 60000 ms/min = 1500000 ms
@@ -302,18 +232,18 @@ setInterval(function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(function() {
+app.whenReady().then(function () {
    startup();
 });
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() {
+app.on('window-all-closed', function () {
    // On macOS it is common for applications and their menu bar
    // to stay active until the user quits explicitly with Cmd + Q
    if (process.platform !== 'darwin') app.quit()
 })
 
-app.on('activate', function() {
+app.on('activate', function () {
    // On macOS it's common to re-create a window in the app when the
    // dock icon is clicked and there are no other windows open.
    if (BrowserWindow.getAllWindows().length === 0) {
@@ -324,35 +254,14 @@ app.on('activate', function() {
 //              helper functions
 
 function authSpot() {
-   const clientS = http2.connect(httpConfig.URL, {
-      ca: fs.readFileSync(`./certs/${httpConfig.name}-cert.pem`)
-   }, function() {
-      console.log('connected to https server');
-   });
-   //email password username
-   const req = clientS.request({
+   headers = {
       ':path': '/authspotify',
       'email': email
-   });
-   req.on('response', (headers, flags) => {
-      console.log('responses (headers):')
-      for (const name in headers) {
-         console.log(`${name}: ${headers[name]}`);
-      }
-      console.log('---------')
-   });
-   req.setEncoding('utf8');
-   // let data = '';
-   // req.on('data', (chunk) => {
-   //    data += chunk;
-   // });
-   req.on('end', () => {
-      clientS.close();
-   });
-   req.end();
+   };
+   clientRequest(headers, function(data){})
 
 
-   shell.openExternal(`https://${httpConfig.IP}:8888/login`).then(function() {
+   shell.openExternal(`https://${httpConfig.IP}:8888/login`).then(function () {
       console.log('opened external browser to get auth')
    })
 
@@ -360,41 +269,23 @@ function authSpot() {
 
 function startup() {
    let secret = keytar.findCredentials('Counter-app')
-      .then(function(result) {
+      .then(function (result) {
          if (result[0]) {
             email = result[0].account
             // client.write('autologin\v' + result[0].account + '\v' + result[0].password + '\v\r');
-            const clientS = http2.connect(httpConfig.URL, {
-               ca: fs.readFileSync(`./certs/${httpConfig.name}-cert.pem`)
-            }, function() {
-               console.log('connected to https server');
-            });
-            const req = clientS.request({
+            headers = {
                ':path': '/autologin',
                'email': result[0].account,
                'password': result[0].password
-            });
-            req.on('response', (headers, flags) => {
-               console.log('responses (headers):')
-               for (const name in headers) {
-                  console.log(`${name}: ${headers[name]}`);
-               }
-               console.log('---------')
-            });
-            req.setEncoding('utf8');
-            let data = '';
-            req.on('data', (chunk) => {
-               data += chunk;
-            });
-            req.on('end', () => {
+            };
+            clientRequest(headers, function(data){
                if (data === 'autologinerror') {
                   createLoginWindow();
                } else {
                   createMainWindow();
                }
-               clientS.close();
-            });
-            req.end();
+            })
+
 
          } else {
             createLoginWindow()
@@ -402,37 +293,25 @@ function startup() {
       });
 }
 
-function updateNowPlaying(win){
-   const clientS = http2.connect(httpConfig.URL, {
-      ca: fs.readFileSync(`./certs/${httpConfig.name}-cert.pem`)
-   }, function() {
-      console.log('connected to https server');
-   });
-   const req = clientS.request({
+function updateNowPlaying(win) {
+   headers = {
       ':path': '/nowplaying',
       'email': email
-   });
-   req.on('response', (headers, flags) => {
-      console.log('responses (headers):')
-      for (const name in headers) {
-         console.log(`${name}: ${headers[name]}`);
-      }
-      console.log('---------')
-   });
-   req.setEncoding('utf8');
-   let data = '';
-   req.on('data', (chunk) => {
-      data += chunk;
-   });
-   req.on('end', () => {
+   };
+   clientRequest(headers, function(data){
       if (data === 'getauth') {
-         authSpot();
+         if (!gettingAuthed) {
+            gettingAuthed = true
+            authSpot();
+         }
       } else if (data === 'nothingplaying') {
+         gettingAuthed = false;
          authed = true;
          win.webContents.send("nowplaying-button-task-finished", data);
          win.webContents.send("nowplaying-button-task-finished", data);
       } else {
          try {
+            gettingAuthed = false;
             authed = true;
             track = JSON.parse(data)
             // event.reply("nowplaying-button-task-finished", track);
@@ -442,6 +321,29 @@ function updateNowPlaying(win){
 
          }
       }
+   });
+}
+
+function clientRequest(headers, callback) {
+   const clientS = http2.connect(httpConfig.URL, {
+      ca: fs.readFileSync(`./certs/${httpConfig.name}-cert.pem`)
+   }, function () {
+      console.log('connected to https server');
+   });
+   const req = clientS.request(headers);
+   req.on('response', (headers, flags) => {
+      console.log('responses (headers):')
+      for (const name in headers) {
+         console.log(`${name}: ${headers[name]}`);
+      }
+      console.log('---------')
+   });
+   let data = '';
+   req.on('data', (chunk) => {
+      data += chunk;
+   });
+   req.on('end', () => {
+      callback(data);
       clientS.close();
    });
    req.end();

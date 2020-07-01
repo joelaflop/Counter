@@ -9968,7 +9968,7 @@ html {
 }
 
 .mainpagedrop {
-  padding-top: 30px;
+  margin-top: 40px;
 }
 
 .songholder {
@@ -10003,6 +10003,51 @@ html {
 }
 
 .songartist {
+  padding-top: 10px;
+  padding-bottom: 4px;
+  margin: 0;
+  max-width: 100%;
+}
+
+.userholder {
+  display: table;
+  width: 100%;
+  margin-top: 10px;
+  padding-left: 25px;
+}
+
+.userpic {
+  display: table-cell;
+  width: 100px;
+}
+
+.userinfo {
+  display: table-cell;
+  vertical-align: top;
+  padding-left: 10px;
+  max-width: 100%;
+}
+
+.username {
+  margin: 0;
+  padding-top: 4px;
+  max-width: 100%;
+}
+
+.email {
+  margin: 0;
+  padding-top: 10px;
+  max-width: 100%;
+}
+
+.platform {
+  padding-top: 10px;
+  padding-bottom: 4px;
+  margin: 0;
+  max-width: 100%;
+}
+
+.created-on {
   padding-top: 10px;
   padding-bottom: 4px;
   margin: 0;
