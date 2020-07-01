@@ -23,135 +23,141 @@ serverS.on('error', (err) => console.error(err));
 serverS.on('stream', (stream, headers) => {
    console.log('header:')
    console.log(headers)
-   if (headers[':path'] === '/recentlyplayed') {
-      spotify.recentlyPlayed(50, headers.email, function (tracks) {
-         if (tracks == 'clientneedsauth') {
-            console.log("Client request requires authentification")
-            // connection.write('getauth\v\r');
-            streamRespond(stream, 'getauth')
-         } else if (tracks != 'undefined') {
-            var trackList = []
-            for (let j = 0; j < tracks.items.length; j++) {
-               trackList.push(buildTrackJSON(tracks.items[j].track))
-            }
-            streamRespond(stream, JSON.stringify(trackList))
-         } else {
-            console.log('tracks are undefined')
-         }
-      });
-
-   } else if (headers[':path'] === '/nowplaying') {
-      spotify.nowPlaying(headers.email, function (track) {
-         if (track == 'clientneedsauth') {
-            console.log("Client request requires authentification")
-            streamRespond(stream, 'getauth')
-         } else if (track === "nothingplaying") {
-            streamRespond(stream, 'nothingplaying')
-         } else if (track != 'undefined') {
-            // console.log(buildTrackJSON(track))
-            // connection.write('nowplaying\v' + JSON.stringify(track.item))
-            // connection.write('nowplaying\v' + JSON.stringify(buildTrackJSON(track.item)) + '\v\r')
-            streamRespond(stream, JSON.stringify(buildTrackJSON(track.item)))
-         } else {
-            console.log('track is undefined')
-         }
-      });
-   } else if (headers[':path'] === '/login') {
-      console.log("login attempt")
-      email = headers.email
-      password = headers.password
-      username = headers.username
-      if (!email) {
-         db.getEmail(username, function (email) {
-            if (!email) {
-               // connection.write('loginerror\v' + 'This username was not found\v\r');
-               streamRespond(stream, 'loginerror\nThis username was not found.')
+   switch (headers[':path']) {
+      case '/recentlyplayed':
+         spotify.recentlyPlayed(50, headers.email, function (tracks) {
+            if (tracks == 'clientneedsauth') {
+               console.log("Client request requires authentification")
+               // connection.write('getauth\v\r');
+               streamRespond(stream, 'getauth')
+            } else if (tracks != 'undefined') {
+               var trackList = []
+               for (let j = 0; j < tracks.items.length; j++) {
+                  trackList.push(buildTrackJSON(tracks.items[j].track))
+               }
+               streamRespond(stream, JSON.stringify(trackList))
             } else {
-               login(email, password, stream);
-               updateListens(email);
+               console.log('tracks are undefined')
             }
-         })
-      } else {
-         login(email, password, stream);
-         updateListens(email);
-      }
-   } else if (headers[':path'] === '/signup') {
-      console.log("signup attempt")
-
-      email = headers.email
-      password = headers.password
-      username = headers.username
-      console.log(`email: ${email}`)
-      console.log(`password: ${password}`)
-      console.log(`username: ${username}`)
-      db.getEmail(username, function (returnedEmail) {
-         if (!returnedEmail && username) {
-            signup(email, password, username, stream)
-         }
-         if (!username) {
-            streamRespond(stream, 'signuperror\nPlease enter a username.')
-         } else if (returnedEmail) {
-            streamRespond(stream, 'signuperror\nThis username is taken.')
-         }
-      });
-   } else if (headers[':path'] === '/authspotify') {
-      spotify.authSpot(httpConfig.name, httpConfig.IP, function (refresh, access) {
-         // console.log(refresh);
-         // console.log(access);
-         email = headers.email
-         db.setTokens(email, refresh, access, function () {
-            //callback for if there is no such user to login
          });
-         updateListens(email);
-         stream.end()
-      })
-   } else if (headers[':path'] === '/autologin') {
-      console.log("autologin attempt")
-      email = headers.email
-      password = headers.password
-      auth.login(email, password,
-         function (error) {
-            switch (error.code) {
-               case "auth/invalid-email":
-                  break;
-               case "auth/invalid-user-token":
-                  break;
-               case "auth/requires-recent-login":
-                  break;
-               case "auth/user-token-expired":
-                  break;
-               default:
-                  // console.log(error)
-                  console.log(error.code);
-                  console.log(error.message);
-                  streamRespond(stream, 'autologinerror\n' + error.message)
+         break;
+      case '/nowplaying':
+         spotify.nowPlaying(headers.email, function (track) {
+            if (track == 'clientneedsauth') {
+               console.log("Client request requires authentification")
+               streamRespond(stream, 'getauth')
+            } else if (track === "nothingplaying") {
+               streamRespond(stream, 'nothingplaying')
+            } else if (track != 'undefined') {
+               // console.log(buildTrackJSON(track))
+               // connection.write('nowplaying\v' + JSON.stringify(track.item))
+               // connection.write('nowplaying\v' + JSON.stringify(buildTrackJSON(track.item)) + '\v\r')
+               streamRespond(stream, JSON.stringify(buildTrackJSON(track.item)))
+            } else {
+               console.log('track is undefined')
             }
-         },
-         function (success) {
-            streamRespond(stream, 'autologinsuccess')
-            db.login(email, function () {
-               console.log('this user is not in the DB, but was in auth!')
+         });
+         break;
+      case '/login':
+         console.log("login attempt")
+         email = headers.email
+         password = headers.password
+         username = headers.username
+         if (!email) {
+            db.getEmail(username, function (email) {
+               if (!email) {
+                  // connection.write('loginerror\v' + 'This username was not found\v\r');
+                  streamRespond(stream, 'loginerror\nThis username was not found.')
+               } else {
+                  login(email, password, stream);
+                  updateListens(email);
+               }
+            })
+         } else {
+            login(email, password, stream);
+            updateListens(email);
+         }
+         break;
+      case '/signup':
+         console.log("signup attempt")
+
+         email = headers.email
+         password = headers.password
+         username = headers.username
+         console.log(`email: ${email}`)
+         console.log(`password: ${password}`)
+         console.log(`username: ${username}`)
+         db.getEmail(username, function (returnedEmail) {
+            if (!returnedEmail && username) {
+               signup(email, password, username, stream)
+            }
+            if (!username) {
+               streamRespond(stream, 'signuperror\nPlease enter a username.')
+            } else if (returnedEmail) {
+               streamRespond(stream, 'signuperror\nThis username is taken.')
+            }
+         });
+         break;
+      case '/authspotify':
+         spotify.authSpot(httpConfig.name, httpConfig.IP, function (refresh, access) {
+            // console.log(refresh);
+            // console.log(access);
+            email = headers.email
+            db.setTokens(email, refresh, access, function () {
+               //callback for if there is no such user to login
             });
             updateListens(email);
-         });
-   } else if (headers[':path'] === '/updatelistens') {
-      updateListens(headers.email);
-      stream.end()
-   } else if (headers[':path'] === '/userprofile') {
-      console.log("get user profile attempt")
-      email = headers.email
-      db.getUserInfo(email, function (res) {
-         if (res) {
-            streamRespond(stream, res.email + '\n' + res.username + '\n' + res.platforms + '\n' + res.created_on)
-         } else {
-            streamRespond(stream, userProfileError)
-         }
-      })
-   } else {
-      console.log('unknown header')
+            stream.end()
+         })
+         break;
+      case '/autologin':
+         console.log("autologin attempt")
+         email = headers.email
+         password = headers.password
+         auth.login(email, password,
+            function (error) {
+               switch (error.code) {
+                  case "auth/invalid-email":
+                     break;
+                  case "auth/invalid-user-token":
+                     break;
+                  case "auth/requires-recent-login":
+                     break;
+                  case "auth/user-token-expired":
+                     break;
+                  default:
+                     // console.log(error)
+                     console.log(error.code);
+                     console.log(error.message);
+                     streamRespond(stream, 'autologinerror\n' + error.message)
+               }
+            },
+            function (success) {
+               streamRespond(stream, 'autologinsuccess')
+               db.login(email, function () {
+                  console.log('this user is not in the DB, but was in auth!')
+               });
+               updateListens(email);
+            });
+         break;
+      case '/updatelistens':
+         updateListens(headers.email);
+         stream.end()
+         break;
+      case '/userprofile':
+         console.log("get user profile attempt")
+         email = headers.email
+         db.getUserInfo(email, function (res) {
+            if (res) {
+               streamRespond(stream, res.email + '\n' + res.username + '\n' + res.platforms + '\n' + res.created_on)
+            } else {
+               streamRespond(stream, userProfileError)
+            }
+         })
+         break;
+      default:
+         console.log(`unknown header: ${headers[':path']}`)
    }
-
-
 });
 
 
@@ -220,12 +226,14 @@ function signup(email, password, username, stream) {
    });
 }
 
-function streamRespond(stream, t) {
+function streamRespond(stream
+   , t, headers = {
+      'content-type': 'text',
+      ':status': 200
+   }
+) {
    try {
-      stream.respond({
-         'content-type': 'text',
-         ':status': 200
-      });
+      stream.respond(headers);
       stream.write(t, function () {
          stream.end()
       });
