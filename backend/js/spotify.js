@@ -141,7 +141,7 @@ module.exports = {
                   console.log('recently played success')
                   callback(body);
                } else if (response.statusCode === 401) {
-                  console.log("attempting to refresh token")
+                  console.log("attempting to refresh token - first resort")
                   refreshToken(email, refresh, recentlyPlayed, callback, count);
                } else {
                   console.log('error getting recently played:')

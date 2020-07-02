@@ -43,7 +43,6 @@ function createMainWindow() {
    mainWindow = new BrowserWindow({
       width: 900,
       height: 900,
-      // frame: false,
       titleBarStyle: 'hidden',
       resizeable: true,
       backgroundColor: '#262626',
@@ -90,8 +89,6 @@ function createMainWindow() {
 
 ipcMain.on("nowplaying_click", function (event, arg) {
    console.log("nowplaying button clicked")
-   // client.write('nowplaying\v' + email + '\v\r');
-
    headers = {
       ':path': '/nowplaying',
       'email': email
@@ -113,13 +110,10 @@ ipcMain.on("nowplaying_click", function (event, arg) {
          }
       }
    });
-
-
 });
 
 ipcMain.on("recentlyplayed_click", function (event, arg) {
    console.log("recentplayed button clicked")
-   // client.write('recentlyplayed\v' + email + '\v\r');
    headers = {
       ':path': '/recentlyplayed',
       'email': email
@@ -133,20 +127,17 @@ ipcMain.on("recentlyplayed_click", function (event, arg) {
       } else {
          try {
             tracks = JSON.parse(data)
+            console.log(tracks[0])
             event.reply("recentlyplayed-button-task-finished", tracks)
          } catch (e) {
             console.log(`error parsing recently-played json: ${data}`);
          }
-
       }
    });
-
 });
 
 ipcMain.on("loginbutton_click", function (event, arg) {
    console.log("login button clicked")
-   // client.write('login\v' + arg[0] + '\v' + arg[1] + '\v' + arg[2] + '\v\r');
-   //email password username
    headers = {
       ':path': '/login',
       'email': arg[0],
@@ -170,7 +161,6 @@ ipcMain.on("loginbutton_click", function (event, arg) {
 
 ipcMain.on("signupbutton_click", function (event, arg) {
    console.log("signup button clicked")
-   // client.write('signup\v' + arg[0] + '\v' + arg[1] + '\v' + arg[2] + '\v\r');
    headers = {
       ':path': '/signup',
       'email': arg[0],
@@ -215,9 +205,6 @@ ipcMain.on("userprofile_click", function (event, arg) {
 //
 setInterval(function () {
    if (authed) {
-      // client.write('updateListens\v' + email + '\v\r');
-      // client.write('nowplaying\v' + email + '\v\r');
-
       headers = {
          ':path': '/updatelistens',
          'email': email
@@ -251,8 +238,9 @@ app.on('activate', function () {
    }
 })
 
+//
 //              helper functions
-
+//
 function authSpot() {
    headers = {
       ':path': '/authspotify',
@@ -260,11 +248,9 @@ function authSpot() {
    };
    clientRequest(headers, function(data){})
 
-
    shell.openExternal(`https://${httpConfig.IP}:8888/login`).then(function () {
       console.log('opened external browser to get auth')
    })
-
 }
 
 function startup() {
@@ -272,21 +258,19 @@ function startup() {
       .then(function (result) {
          if (result[0]) {
             email = result[0].account
-            // client.write('autologin\v' + result[0].account + '\v' + result[0].password + '\v\r');
             headers = {
                ':path': '/autologin',
                'email': result[0].account,
                'password': result[0].password
             };
             clientRequest(headers, function(data){
-               if (data === 'autologinerror') {
-                  createLoginWindow();
-               } else {
+               if (data === 'autologinsuccess') {
                   createMainWindow();
+               } else {
+                  createLoginWindow();
+                  console.log(data)
                }
             })
-
-
          } else {
             createLoginWindow()
          }

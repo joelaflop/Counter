@@ -18,7 +18,9 @@ const serverS = http2.createSecureServer({
 // openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost--privkey.pem -out localhost--cert.pem
 // openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=192.168.1.57' -keyout joesmac-privkey.pem -out joesmac-cert.pem
 
-serverS.on('error', (err) => console.error(err));
+serverS.on('error', (err) => {
+   console.log('stream error:')
+   console.error(err)});
 
 serverS.on('stream', (stream, headers) => {
    console.log('header:')
@@ -33,7 +35,7 @@ serverS.on('stream', (stream, headers) => {
             } else if (tracks != 'undefined') {
                var trackList = []
                for (let j = 0; j < tracks.items.length; j++) {
-                  trackList.push(buildTrackJSON(tracks.items[j].track))
+                  trackList.push(buildTrackJSON(tracks.items[j], true))
                }
                streamRespond(stream, JSON.stringify(trackList))
             } else {
@@ -52,7 +54,7 @@ serverS.on('stream', (stream, headers) => {
                // console.log(buildTrackJSON(track))
                // connection.write('nowplaying\v' + JSON.stringify(track.item))
                // connection.write('nowplaying\v' + JSON.stringify(buildTrackJSON(track.item)) + '\v\r')
-               streamRespond(stream, JSON.stringify(buildTrackJSON(track.item)))
+               streamRespond(stream, JSON.stringify(buildTrackJSON(track, false)))
             } else {
                console.log('track is undefined')
             }
@@ -242,7 +244,13 @@ function streamRespond(stream
    }
 }
 
-function buildTrackJSON(track) {
+function buildTrackJSON(recentlyplayedobject, recentlyplay) {
+   let track;
+   if(recentlyplay){
+      track = recentlyplayedobject.track
+   } else {
+      track = recentlyplayedobject.item
+   }
    artistNames = []
    for (let i = 0; i < track.artists.length; i++) {
       artistNames.push(track.artists[i].name)
@@ -253,7 +261,8 @@ function buildTrackJSON(track) {
          name: track.album.name,
          imageURL: track.album.images[0].url
       },
-      artists: artistNames
+      artists: artistNames,
+      played_at: recentlyplayedobject.played_at,
    }
    return json;
 }
