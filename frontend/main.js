@@ -64,7 +64,7 @@ function createMainWindow() {
    mainWindow.on('focus', function () {
       console.log(`mainwindow has focus `);
       updateNowPlaying(mainWindow)
-      nowplayingIntervalID = setInterval(function () { //TODO remove this interval on event blur
+      nowplayingIntervalID = setInterval(function () { 
          console.log(`nowplaying interval HIT`)
          if (authed) {
             if (mainWindow.isFocused()) {

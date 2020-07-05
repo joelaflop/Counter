@@ -41,38 +41,47 @@
             </div>
          </div>
       </div>
-      <nav class="navbar fixed-bottom garamond-font bg-gray text-white pt-0 pl-0">
-         <div class="maintable">
-            <div class="tablecell leftbar">
-               <h4 class="p-1 pt-3">now playing</h4>
-            </div>
-            <div class="tablecell avoidleftbar">
+      <nav class="navbar navbar-expand-lg bottombar fixed-bottom garamond-font bg-gray text-white pt-0 pl-0 ">
+         <ul class="navbar-nav">
+            <li class="nav-item leftbar pt-0 pl-3">
+               <div id='nowplayingleftbar'>
+               </div>
+            </li>
+            <li class="nav-item avoidleftbar">
                <div id="nowplaying"></div>
-            </div>
-         </div>
+            </li>
+         </ul>
       </nav>
    </div>
 
-
-   <div id="countsPage">
-      <div class="pagetitlebox bg-gray">
-         <h4 class="pagetitle text-white">history</h4>
+   <div>
+      <div id="countsPage">
+         <div class="pagetitlebox bg-gray">
+            <h4 class="pagetitle text-white">history</h4>
+         </div>
+         <div id="recentlyplaying" class="mainpagedrop"></div>
       </div>
-      <div id="recentlyplaying" class="mainpagedrop"></div>
-   </div>
 
-   <div id="userPage">
-      <div class="pagetitlebox bg-gray">
-         <h4 class="pagetitle text-white">user profile</h4>
+      <div id="userPage">
+         <div class="pagetitlebox bg-gray">
+            <h4 class="pagetitle text-white">user profile</h4>
+         </div>
+         <div id="usermainpage" class="mainpagedrop"></div>
       </div>
-      <div id="usermainpage" class="mainpagedrop"></div>
-   </div>
 
-   <div id="dataPage">
-      <div class="pagetitlebox bg-gray">
-         <h4 class="pagetitle text-white">data insights</h4>
+      <div id="dataPage">
+         <div class="pagetitlebox bg-gray">
+            <h4 class="pagetitle text-white">data insights</h4>
+         </div>
+         <div id="datamainpage" class="mainpagedrop"></div>
       </div>
-      <div id="datamainpage" class="mainpagedrop"></div>
+
+      <div id='playingsomething'>
+         <h4 class="nowtext">now</h4>
+         <h4 class="playinngtext">playing</h4>
+         <!-- <span class="navbar-brand pb-0 h1">now</span>
+      <span class="navbar-brand pt-0 h1">playing</span> -->
+      </div>
    </div>
 
    <!-- You can also require other files to run in this process -->
@@ -90,10 +99,14 @@
       ipcRenderer.on("nowplaying-button-task-finished", function (event, track) {
          console.log('got a nowplaying finish')
          if (track === "nothingplaying") {
-            let nothingplayingdiv = document.createElement('div');
-            document.getElementById('nowplaying').innerHTML = 'were not playing nothing'
+            let nothingdiv = document.getElementById('nowplaying');
+            nothingdiv.className = ' pl-3'
+            nothingdiv.innerHTML = 'you\'re not playing anything'
+            // document.getElementById('nowplayingleftbar').innerHTML = ''
          } else {
             document.getElementById('nowplaying').innerHTML = full_track_template(track)
+            document.getElementById('nowplayingleftbar').innerHTML = document.getElementById('playingsomething').innerHTML
+
          }
       });
       ipcRenderer.on("recentlyplayed-button-task-finished", function (event, tracks) {

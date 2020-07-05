@@ -53,7 +53,7 @@ function generateNowPlayingOptions(access) {
    };
 }
 
-function refreshToken(email, refresh_token, use_token, other_callback, count) {
+function refreshToken(email, refresh_token, use_token, handletrack, count) {
    var authOptions = {
       url: 'https://accounts.spotify.com/api/token',
       headers: {
@@ -66,34 +66,37 @@ function refreshToken(email, refresh_token, use_token, other_callback, count) {
       json: true
    };
 
-   request.post(authOptions, function(error, response, body) {
+   request.post(authOptions, function (error, response, body) {
       if (!error && response.statusCode === 200) {
          access_token = body.access_token;
-         db.setTokens(email, access_token, refresh_token, function() {
+         db.setTokens(email, access_token, refresh_token, function () {
             //callback for if there is no such user to login
          });
-         use_token(access_token, other_callback, count)
+         use_token(access_token, handletrack, count)
       } else {
-         other_callback('clientneedsauth');
+         handletrack('clientneedsauth');
       }
    });
 }
 
-function nowPlaying(access, callback) {
+function nowPlaying(access, handletrack) {
    var nowplayingoptions = generateNowPlayingOptions(access);
-   request.get(nowplayingoptions, function(error, response, body) {
+   request.get(nowplayingoptions, function (error, response, body) {
       if (!error && response.statusCode === 200) {
          console.log('now playing success')
-         callback(body);
+         handletrack(body);
+      } else if (response.statusCode === 204) {
+         console.log("user is not playing anything")
+         handletrack("nothingplaying")
       } else {
-         console.log('error getting nowplaying - last resort');
+         console.log('error getting nowplaying - last resort:');
       }
    });
 }
 
 function recentlyPlayed(access, callback, count) { //count has to be last argument
    var recentlyplayedoptions = generateRecentlyPlayedOptions(count, access);
-   request.get(recentlyplayedoptions, function(error, response, body) {
+   request.get(recentlyplayedoptions, function (error, response, body) {
       if (!error && response.statusCode === 200) {
          console.log('recently played success')
          callback(body);
@@ -104,22 +107,22 @@ function recentlyPlayed(access, callback, count) { //count has to be last argume
 }
 
 module.exports = {
-   nowPlaying: function(email, callback) {
-      db.getTokens(email, function(access, refresh) {
+   nowPlaying: function (email, handletrack) {
+      db.getTokens(email, function (access, refresh) {
          if (!refresh) {
-            callback('clientneedsauth');
+            handletrack('clientneedsauth');
          } else {
             var nowplayingoptions = generateNowPlayingOptions(access);
-            request.get(nowplayingoptions, function(error, response, body) {
+            request.get(nowplayingoptions, function (error, response, body) {
                if (!error && response.statusCode === 200) {
                   console.log('now playing success')
-                  callback(body);
+                  handletrack(body);
                } else if (response.statusCode === 401) {
                   console.log("attempting to refresh token")
-                  refreshToken(email, refresh, nowPlaying, callback);
+                  refreshToken(email, refresh, nowPlaying, handletrack);
                } else if (response.statusCode === 204) {
                   console.log("user is not playing anything")
-                  callback("nothingplaying")
+                  handletrack("nothingplaying")
                } else {
                   console.log('error getting now playing:')
                   console.log(error)
@@ -129,14 +132,14 @@ module.exports = {
          }
       })
    },
-   recentlyPlayed: function(count, email, callback) {
-      db.getTokens(email, function(access, refresh) {
+   recentlyPlayed: function (count, email, callback) {
+      db.getTokens(email, function (access, refresh) {
          console.log(email)
          if (!access || !refresh) {
             callback('clientneedsauth');
          } else {
             var recentlyplayedoptions = generateRecentlyPlayedOptions(count, access);
-            request.get(recentlyplayedoptions, function(error, response, body) {
+            request.get(recentlyplayedoptions, function (error, response, body) {
                if (!error && response.statusCode === 200) {
                   console.log('recently played success')
                   callback(body);
@@ -152,7 +155,7 @@ module.exports = {
          }
       })
    },
-   authSpot: function(name, IP, callback) {
+   authSpot: function (name, IP, callback) {
       let access_token;
       let refresh_token;
 
@@ -172,7 +175,7 @@ module.exports = {
 
       serverS.listen(8888)
 
-      app.get(`/login`, function(req, res) {
+      app.get(`/login`, function (req, res) {
 
          var state = generateRandomString(16);
          res.cookie(stateKey, state);
@@ -189,7 +192,7 @@ module.exports = {
             }));
       });
 
-      app.get('/callback', function(req, res) {
+      app.get('/callback', function (req, res) {
 
          // your application requests refresh and access tokens
          // after checking the state parameter
@@ -218,7 +221,7 @@ module.exports = {
                json: true
             };
 
-            request.post(authOptions, function(error, response, body) {
+            request.post(authOptions, function (error, response, body) {
                if (!error && response.statusCode === 200) {
 
                   access_token = body.access_token;

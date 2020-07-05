@@ -21,6 +21,9 @@ userPageDiv.style.display = 'none';
 let dataPageDiv = document.getElementById('dataPage');
 dataPageDiv.style.visibility = 'hidden';
 dataPageDiv.style.display = 'none';
+let playingsomethingleftbardiv = document.getElementById('playingsomething');
+playingsomethingleftbardiv.style.visibility = 'hidden';
+playingsomethingleftbardiv.style.display = 'none';
 
 
 // const nowplayingbutton = document.getElementById("now playing button");
