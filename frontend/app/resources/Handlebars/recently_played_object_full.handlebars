@@ -1,9 +1,9 @@
-<div class="songholder">
+<div class="songholder container-fluid">
    <div class="albumcover">
       <img class="someClass" src="{{album.imageURL}}" width="100" height="100">
    </div>
    <div class="songinfo">
-      <div class="songtitle">
+      <div class="songtitle ">
          <h4 class="m-0 textoverflow">{{name}}</h4>
       </div>
       <div class="songalbum">
@@ -12,5 +12,8 @@
       <div class="songartist">
          <h5 class="m-0 textoverflow">{{#each artists}} {{this}} {{/each}}</h5>
       </div>
+   </div>
+   <div class="playedat">
+         <p class="m-0">{{played_at}}</p>
    </div>
 </div>

@@ -20,7 +20,8 @@ const serverS = http2.createSecureServer({
 
 serverS.on('error', (err) => {
    console.log('stream error:')
-   console.error(err)});
+   console.error(err)
+});
 
 serverS.on('stream', (stream, headers) => {
    console.log('header:')
@@ -246,7 +247,7 @@ function streamRespond(stream
 
 function buildTrackJSON(recentlyplayedobject, recentlyplay) {
    let track;
-   if(recentlyplay){
+   if (recentlyplay) {
       track = recentlyplayedobject.track
    } else {
       track = recentlyplayedobject.item
@@ -255,14 +256,20 @@ function buildTrackJSON(recentlyplayedobject, recentlyplay) {
    for (let i = 0; i < track.artists.length; i++) {
       artistNames.push(track.artists[i].name)
    }
-   json = {
-      name: track.name,
-      album: {
-         name: track.album.name,
-         imageURL: track.album.images[0].url
-      },
-      artists: artistNames,
-      played_at: recentlyplayedobject.played_at,
+   let json;
+   try {
+      json = {
+         name: track.name,
+         album: {
+            name: track.album.name,
+            imageURL: track.album.images[0] != undefined ? track.album.images[0].url : 'null',
+         },
+         artists: artistNames != undefined ? artistNames : 'null',
+         played_at: recentlyplayedobject.played_at,
+      }
+   } catch (error) {
+      console.log('JSON ERRRR:')
+      console.log(error)
    }
    return json;
 }

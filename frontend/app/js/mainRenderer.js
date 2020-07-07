@@ -36,7 +36,7 @@ playingsomethingleftbardiv.style.display = 'none';
 // });
 
 const recentlyplayedbutton = document.getElementById("recently played button");
-recentlyplayedbutton.addEventListener('click', function() {
+recentlyplayedbutton.addEventListener('click', function () {
    mainPageDiv.innerHTML = countsPageDiv.innerHTML;
    // titleBar.innerHTML = 'history';
    var arg = "secondparam";
@@ -44,15 +44,29 @@ recentlyplayedbutton.addEventListener('click', function() {
 });
 
 const userButton = document.getElementById("user page button");
-userButton.addEventListener('click', function() {
+userButton.addEventListener('click', function () {
    mainPageDiv.innerHTML = userPageDiv.innerHTML;
    var arg = "secondparam";
    ipcRenderer.send("userprofile_click", arg); // ipcRender.send will pass the information to main process
 });
 
+let datadropdown = document.getElementById('datadropdown');
+datadropdown.style.visibility = 'hidden';
+datadropdown.style.display = 'none';
+var datadropdowntoggle = true;
 const dataButton = document.getElementById("data page button");
-dataButton.addEventListener('click', function() {
+dataButton.addEventListener('click', function () {
    mainPageDiv.innerHTML = dataPageDiv.innerHTML;
    var arg = "secondparam";
    ipcRenderer.send("dataprofile_click", arg);
+   datadropdowntoggle = !datadropdowntoggle;
+   if (datadropdowntoggle) {
+      
+      datadropdown.style.visibility = 'hidden';
+      datadropdown.style.display = 'none';
+   } else {
+      datadropdown.style.visibility = 'visible';
+      datadropdown.style.display = 'block';
+   }
+
 });

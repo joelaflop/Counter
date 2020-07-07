@@ -1,11 +1,3 @@
-/**
- * This is an example of a basic node.js script that performs
- * the Authorization Code oAuth2 flow to authenticate against
- * the Spotify Accounts.
- *
- * For more information, read
- * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
- */
 var express = require('express'); // Express web server framework
 var https = require('https');
 const fs = require('fs');
@@ -86,7 +78,7 @@ function nowPlaying(access, handletrack) {
          console.log('now playing success')
          handletrack(body);
       } else if (response.statusCode === 204) {
-         console.log("user is not playing anything")
+         console.log("user is not playing anything - inner call - last")
          handletrack("nothingplaying")
       } else {
          console.log('error getting nowplaying - last resort:');
@@ -94,12 +86,12 @@ function nowPlaying(access, handletrack) {
    });
 }
 
-function recentlyPlayed(access, callback, count) { //count has to be last argument
+function recentlyPlayed(access, handletracks, count) { //count has to be last argument
    var recentlyplayedoptions = generateRecentlyPlayedOptions(count, access);
    request.get(recentlyplayedoptions, function (error, response, body) {
       if (!error && response.statusCode === 200) {
          console.log('recently played success')
-         callback(body);
+         handletracks(body);
       } else {
          console.log('error getting recently played - last resort');
       }
@@ -121,7 +113,7 @@ module.exports = {
                   console.log("attempting to refresh token")
                   refreshToken(email, refresh, nowPlaying, handletrack);
                } else if (response.statusCode === 204) {
-                  console.log("user is not playing anything")
+                  console.log("user is not playing anything - first ride")
                   handletrack("nothingplaying")
                } else {
                   console.log('error getting now playing:')
@@ -132,20 +124,20 @@ module.exports = {
          }
       })
    },
-   recentlyPlayed: function (count, email, callback) {
+   recentlyPlayed: function (count, email, handletracks) {
       db.getTokens(email, function (access, refresh) {
          console.log(email)
          if (!access || !refresh) {
-            callback('clientneedsauth');
+            handletracks('clientneedsauth');
          } else {
             var recentlyplayedoptions = generateRecentlyPlayedOptions(count, access);
             request.get(recentlyplayedoptions, function (error, response, body) {
                if (!error && response.statusCode === 200) {
                   console.log('recently played success')
-                  callback(body);
+                  handletracks(body);
                } else if (response.statusCode === 401) {
                   console.log("attempting to refresh token - first resort")
-                  refreshToken(email, refresh, recentlyPlayed, callback, count);
+                  refreshToken(email, refresh, recentlyPlayed, handletracks, count);
                } else {
                   console.log('error getting recently played:')
                   console.log(error)

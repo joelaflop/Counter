@@ -10,7 +10,6 @@ const path = require('path')
 
 require('electron-reload')(__dirname);
 
-
 const config = require('../config')
 const httpConfig = config.httpInfo[1]
 
@@ -18,9 +17,9 @@ const http2 = require('http2');
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 const fs = require('fs');
 
-let email;
-let authed = false;
-let gettingAuthed = false;
+var email;
+var authed = false;
+var gettingAuthed = false;
 
 var loginWindow, mainWindow;
 
@@ -42,6 +41,7 @@ function createMainWindow() {
    // Create the browser window.
    mainWindow = new BrowserWindow({
       width: 900,
+      minWidth: 500,
       height: 900,
       titleBarStyle: 'hidden',
       resizeable: true,

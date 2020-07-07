@@ -9985,7 +9985,9 @@ html {
 
 .songholder {
   display: table;
-  width: 100%;
+  table-layout: fixed;
+  width: calc(100%-150px);
+  text-overflow: ellipsis;
   margin-top: 10px;
   padding-left: 25px;
 }
@@ -9995,11 +9997,19 @@ html {
   width: 100px;
 }
 
+.textoverflow {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 .songinfo {
   display: table-cell;
   vertical-align: top;
+  text-overflow: ellipsis;
   padding-left: 10px;
-  max-width: 100%;
+  padding-right: 110px;
+  width: 100%;
 }
 
 .songtitle {
@@ -10019,6 +10029,14 @@ html {
   padding-bottom: 4px;
   margin: 0;
   max-width: 100%;
+}
+
+.playedat {
+  display: table-cell;
+  vertical-align: top;
+  position: absolute;
+  right: 0px;
+  padding-right: 10px;
 }
 
 .userholder {

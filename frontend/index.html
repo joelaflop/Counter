@@ -28,9 +28,13 @@
                            height="25" title="Bootstrap">user</a>
                   </li>
                   <li class="nav-item">
-                     <a id="data page button" class="nav-link py-1 pl-1 pr-0" href="#">
+                     <a id="data page button" class="nav-link pt-1 pb-0 pl-1 pr-0" href="#">
                         <img src="app/img/icons/clipboard-data.svg" class="invert pb-1 pr-1" alt="" width="25"
                            height="25" title="Bootstrap">data</a>
+                     <div id="datadropdown" class="pl-4">
+                        <a id="datatype1" class="nav-link py-0 pl-2 pr-0" href="#">type1</a>
+                        <a id="datatype2" class="nav-link py-0 pl-2 pr-0" href="#">type2</a>
+                     </div>
                   </li>
                </ul>
             </nav>
@@ -90,8 +94,10 @@
    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
    <script src="./app/resources/Handlebars/track_object_full.precompiled.js"></script>
    <script src="./app/resources/Handlebars/user_object.precompiled.js"></script>
+   <script src="./app/resources/Handlebars/recently_played_object_full.precompiled.js"></script>
 
    <script>
+
       var full_track_template = Handlebars.templates.track_object_full;
       ipcRenderer.on("auth-button-task-finished", function (event, arg) {
          console.log("renderer got confirmation of authbutton click")
@@ -106,21 +112,65 @@
          } else {
             document.getElementById('nowplaying').innerHTML = full_track_template(track)
             document.getElementById('nowplayingleftbar').innerHTML = document.getElementById('playingsomething').innerHTML
-
          }
       });
+      var recently_played_track_template = Handlebars.templates.recently_played_object_full;
       ipcRenderer.on("recentlyplayed-button-task-finished", function (event, tracks) {
          parent = document.getElementById('recentlyplaying')
          parent.innerHTML = ""
          for (let i = 0; i < tracks.length; i++) {
-            console.log(tracks[i])
+            timestamp = handleTime(tracks[i].played_at)
+            tracks[i].played_at = timestamp;
             child = document.createElement('div');
             child.className = "text-white";
             appendChild = parent.appendChild(child)
-            appendChild.innerHTML = full_track_template(tracks[i]);
+            appendChild.innerHTML = recently_played_track_template(tracks[i]);
             // console.log(1)
          }
+
+         function handleTime (str) {
+            let year = parseInt(str.substring(0, 4))
+            let month = parseInt(str.substring(5, 7)) - 1
+            let day = parseInt(str.substring(8, 10))
+            let hour = parseInt(str.substring(11, 13))
+            let min = parseInt(str.substring(14, 16))
+            let sec = parseInt(str.substring(17, 19))
+            let ms = parseInt(str.substring(20, 23))
+            console.log(`listen: ${year}-${month}-${day} -- ${hour}:${min}:${sec}.${ms}`)
+            var played_at = Date.UTC(year, month, day, hour, min, sec, ms)
+            var now = Date.now();
+            console.log(now)
+            console.log(played_at)
+            let min_passed = (now - played_at) / (1000 * 60);
+            let res;
+            if (min_passed < 1.5){
+               res = `1 minute ago`
+            }else if(min_passed < 60){
+               min_passed = Math.round(min_passed)
+               res = `${min_passed} minutes ago`
+            } else if (min_passed < (60*24)){
+               hours_passed = min_passed / 60;
+               hours_passed = Math.round(hours_passed)
+               if(hours_passed === 1){
+                  res = `1 hour ago`
+               } else {
+                  res = `${hours_passed} hours ago`
+               }
+            } else if (min_passed < (60*24*2)) {
+               res = `yesterday`
+            } else {
+               days_passed = min_passed / (60*24);
+               days_passed = Math.round(days_passed)
+               if(days_passed === 1){
+                  res = `1 day ago`
+               } else {
+                  res = `${days_passed} days ago`
+               }
+            }
+            return res;
+         }
       });
+
    </script>
 
    <script>
