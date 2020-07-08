@@ -20,8 +20,8 @@ templates['recently_played_object_full'] = template({"1":function(container,dept
     + alias2(alias1(((stack1 = (depth0 != null ? lookupProperty(depth0,"album") : depth0)) != null ? lookupProperty(stack1,"name") : stack1), depth0))
     + "</h6>\n      </div>\n      <div class=\"songartist\">\n         <h5 class=\"m-0 textoverflow\">"
     + ((stack1 = lookupProperty(helpers,"each").call(alias3,(depth0 != null ? lookupProperty(depth0,"artists") : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":13,"column":38},"end":{"line":13,"column":74}}})) != null ? stack1 : "")
-    + "</h5>\n      </div>\n   </div>\n   <div class=\"playedat\">\n         <p class=\"m-0\">"
-    + alias2(((helper = (helper = lookupProperty(helpers,"played_at") || (depth0 != null ? lookupProperty(depth0,"played_at") : depth0)) != null ? helper : alias4),(typeof helper === alias5 ? helper.call(alias3,{"name":"played_at","hash":{},"data":data,"loc":{"start":{"line":17,"column":24},"end":{"line":17,"column":37}}}) : helper)))
+    + "</h5>\n      </div>\n   </div>\n   <div class=\"playedat\">\n         <p style=\"text-align: right;\">"
+    + alias2(((helper = (helper = lookupProperty(helpers,"played_at") || (depth0 != null ? lookupProperty(depth0,"played_at") : depth0)) != null ? helper : alias4),(typeof helper === alias5 ? helper.call(alias3,{"name":"played_at","hash":{},"data":data,"loc":{"start":{"line":17,"column":39},"end":{"line":17,"column":52}}}) : helper)))
     + "</p>\n   </div>\n</div>";
 },"useData":true});
 })();

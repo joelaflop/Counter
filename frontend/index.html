@@ -7,6 +7,9 @@
    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'"> -->
    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
    <link href="app/css/main.css" rel="stylesheet" type="text/css" />
+   <div class="pagetitlebox bg-gray">
+      <h4 id="pageTitleText" class="pagetitle text-white">welcome</h4>
+   </div>
 </head>
 
 <body>
@@ -17,7 +20,6 @@
                <ul class="navbar-nav flex-column leftbarmovementfix">
                   <a class="navbar-brand pl-0" href="#">Counter</a>
                   <li class="nav-item">
-
                      <a id="recently played button" class="nav-link py-1 pl-1 pr-0" href="#">
                         <img src="app/img/icons/clock-history.svg" class="invert pb-1 pr-1" alt="" width="25"
                            height="25" title="Bootstrap">history</a>
@@ -39,13 +41,15 @@
                </ul>
             </nav>
          </div>
-         <div id="mainpage" class="tablecell avoidleftbar garamond-font">
-            <div class="pagetitlebox bg-gray">
+         <div id="mainpageholder" class="mainpageholder">
+            <div id="mainpage" class="tablecell  garamond-font">
+               <!-- <div class="pagetitlebox bg-gray">
                <h4 class="pagetitle text-white">welcome</h4>
+            </div> -->
             </div>
          </div>
       </div>
-      <nav class="navbar navbar-expand-lg bottombar fixed-bottom garamond-font bg-gray text-white pt-0 pl-0 ">
+      <nav class="navbar navbar-expand-lg bottombar fixed-bottom garamond-font bg-gray text-white pt-0 pl-0">
          <ul class="navbar-nav">
             <li class="nav-item leftbar pt-0 pl-3">
                <div id='nowplayingleftbar'>
@@ -58,31 +62,56 @@
       </nav>
    </div>
 
-   <div>
+   <div class="invisible">
       <div id="countsPage">
-         <div class="pagetitlebox bg-gray">
+         <!-- <div class="pagetitlebox bg-gray">
             <h4 class="pagetitle text-white">history</h4>
-         </div>
-         <div id="recentlyplaying" class="mainpagedrop"></div>
+         </div> -->
+         <div id="recentlyplaying" class=""></div>
+         <!-- mainpagedrop -->
       </div>
 
       <div id="userPage">
-         <div class="pagetitlebox bg-gray">
+         <!-- <div class="pagetitlebox bg-gray">
             <h4 class="pagetitle text-white">user profile</h4>
-         </div>
-         <div id="usermainpage" class="mainpagedrop"></div>
+         </div> -->
+         <div id="usermainpage" class=""></div>
+         <!-- mainpagedrop -->
       </div>
 
       <div id="dataPage">
-         <div class="pagetitlebox bg-gray">
+         <!-- <div class="pagetitlebox bg-gray">
             <h4 class="pagetitle text-white">data insights</h4>
+         </div> -->
+         <div id="datamainpage" class="">
+            <p class=" text-white">menu of things to choose from</p>
          </div>
-         <div id="datamainpage" class="mainpagedrop"></div>
+         <!-- mainpagedrop -->
+      </div>
+
+      <div id="dataType1Page">
+         <!-- <div class="pagetitlebox bg-gray">
+            <h4 class="pagetitle text-white">data insights</h4>
+         </div> -->
+         <div id="datamainpage" class="">
+            <p class=" text-white">lmao1</p>
+         </div>
+         <!-- mainpagedrop -->
+      </div>
+
+      <div id="dataType2Page">
+         <!-- <div class="pagetitlebox bg-gray">
+            <h4 class="pagetitle text-white">data insights</h4>
+         </div> -->
+         <div id="datamainpage" class="">
+            <p class=" text-white">lmao2</p>
+         </div>
+         <!-- mainpagedrop -->
       </div>
 
       <div id='playingsomething'>
          <h4 class="nowtext">now</h4>
-         <h4 class="playinngtext">playing</h4>
+         <h4 class="playingtext">playing</h4>
          <!-- <span class="navbar-brand pb-0 h1">now</span>
       <span class="navbar-brand pt-0 h1">playing</span> -->
       </div>
@@ -108,10 +137,14 @@
             let nothingdiv = document.getElementById('nowplaying');
             nothingdiv.className = ' pl-3'
             nothingdiv.innerHTML = 'you\'re not playing anything'
-            // document.getElementById('nowplayingleftbar').innerHTML = ''
+            document.getElementById('nowplayingleftbar').innerHTML = ''
+            document.getElementById('mainpageholder').style.height = 'calc(100vh - 80px)';
+            document.getElementById('mainpageholder').style.marginBottom = '50px';
          } else {
             document.getElementById('nowplaying').innerHTML = full_track_template(track)
             document.getElementById('nowplayingleftbar').innerHTML = document.getElementById('playingsomething').innerHTML
+            document.getElementById('mainpageholder').style.height = 'calc(100vh - 148px)'
+            document.getElementById('mainpageholder').style.marginBottom = '118px';
          }
       });
       var recently_played_track_template = Handlebars.templates.recently_played_object_full;
@@ -128,7 +161,7 @@
             // console.log(1)
          }
 
-         function handleTime (str) {
+         function handleTime(str) {
             let year = parseInt(str.substring(0, 4))
             let month = parseInt(str.substring(5, 7)) - 1
             let day = parseInt(str.substring(8, 10))
@@ -143,25 +176,25 @@
             console.log(played_at)
             let min_passed = (now - played_at) / (1000 * 60);
             let res;
-            if (min_passed < 1.5){
+            if (min_passed < 1.5) {
                res = `1 minute ago`
-            }else if(min_passed < 60){
+            } else if (min_passed < 60) {
                min_passed = Math.round(min_passed)
                res = `${min_passed} minutes ago`
-            } else if (min_passed < (60*24)){
+            } else if (min_passed < (60 * 24)) {
                hours_passed = min_passed / 60;
                hours_passed = Math.round(hours_passed)
-               if(hours_passed === 1){
+               if (hours_passed === 1) {
                   res = `1 hour ago`
                } else {
                   res = `${hours_passed} hours ago`
                }
-            } else if (min_passed < (60*24*2)) {
+            } else if (min_passed < (60 * 24 * 2)) {
                res = `yesterday`
             } else {
-               days_passed = min_passed / (60*24);
+               days_passed = min_passed / (60 * 24);
                days_passed = Math.round(days_passed)
-               if(days_passed === 1){
+               if (days_passed === 1) {
                   res = `1 day ago`
                } else {
                   res = `${days_passed} days ago`
@@ -178,6 +211,7 @@
       ipcRenderer.on("user-button-task-finished", function (event, user) {
          console.log('got a user page finish')
          console.log(user)
+         // document.getElementById('pageTitleText').innerText = 'user page';
          document.getElementById('usermainpage').innerHTML = user_template(user)
       });
    </script>
