@@ -1,6 +1,18 @@
 ## To Use
 
-Download and configure [Node.js](https://nodejs.org/en/download/), then from your command line (in the backend directory):
+First, download and configure [Node.js](https://nodejs.org/en/download/).
+
+Then you need to add the server's IP address to the AWS RDS, Firebase (fully open atm), and the config file (as templated).
+
+Then we need to generate some SSL keys:
+
+```bash
+# building ssl keys
+openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=<serversIPAddress>' -keyout <nameForServer>-privkey.pem -out <nameForServer>-cert.pem
+#both the privkey.pem and the cert.pem must be in backend/certs and only the cert.pem should to be in frontend/certs
+```
+
+Lastly, from your command line (in the backend directory):
 
 ```bash
 # Install dependencies
@@ -16,6 +28,20 @@ npm start
 npm install
 # Run the app
 npm start
+```
+
+## Relvant Commands
+
+```bash
+# (pre)Compiling a handlebars template
+cd frontend/app/resources/Handlebars
+handlebars example_object.handlebars -f example_object.precompiled.js
+```
+
+```bash
+# Watch for changes to .scss files to build coresponding .css
+cd frontend/app/css
+sass --watch .
 ```
 
 ## DB architecture:
