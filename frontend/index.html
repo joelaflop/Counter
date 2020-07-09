@@ -49,17 +49,11 @@
             </div>
          </div>
       </div>
-      <nav class="navbar navbar-expand-lg bottombar fixed-bottom garamond-font bg-gray text-white pt-0 pl-0">
-         <ul class="navbar-nav">
-            <li class="nav-item leftbar pt-0 pl-3">
-               <div id='nowplayingleftbar'>
-               </div>
-            </li>
-            <li class="nav-item avoidleftbar">
-               <div id="nowplaying"></div>
-            </li>
-         </ul>
-      </nav>
+      <div class=" bottombar fixed-bottom garamond-font bg-gray text-white pt-0 pl-0">
+         <div class="leftbar pt-0 pl-3 " id='nowplayingleftbar'></div>
+         <div class="avoidleftbar" id="nowplaying"></div>
+      </div>
+
    </div>
 
    <div class="invisible">
@@ -135,13 +129,13 @@
          console.log('got a nowplaying finish')
          if (track === "nothingplaying") {
             let nothingdiv = document.getElementById('nowplaying');
-            nothingdiv.className = ' pl-3'
-            nothingdiv.innerHTML = 'you\'re not playing anything'
+            nothingdiv.innerHTML = '<h5 class="pt-2 pl-3">you\'re not playing anything</h5>'
             document.getElementById('nowplayingleftbar').innerHTML = ''
             document.getElementById('mainpageholder').style.height = 'calc(100vh - 80px)';
             document.getElementById('mainpageholder').style.marginBottom = '50px';
          } else {
             document.getElementById('nowplaying').innerHTML = full_track_template(track)
+            document.getElementById('nowplaying').className = "avoidleftbar"
             document.getElementById('nowplayingleftbar').innerHTML = document.getElementById('playingsomething').innerHTML
             document.getElementById('mainpageholder').style.height = 'calc(100vh - 148px)'
             document.getElementById('mainpageholder').style.marginBottom = '118px';
@@ -152,60 +146,14 @@
          parent = document.getElementById('recentlyplaying')
          parent.innerHTML = ""
          for (let i = 0; i < tracks.length; i++) {
-            timestamp = handleTime(tracks[i].played_at)
-            tracks[i].played_at = timestamp;
             child = document.createElement('div');
             child.className = "text-white";
             appendChild = parent.appendChild(child)
             appendChild.innerHTML = recently_played_track_template(tracks[i]);
-            // console.log(1)
-         }
-
-         function handleTime(str) {
-            let year = parseInt(str.substring(0, 4))
-            let month = parseInt(str.substring(5, 7)) - 1
-            let day = parseInt(str.substring(8, 10))
-            let hour = parseInt(str.substring(11, 13))
-            let min = parseInt(str.substring(14, 16))
-            let sec = parseInt(str.substring(17, 19))
-            let ms = parseInt(str.substring(20, 23))
-            console.log(`listen: ${year}-${month}-${day} -- ${hour}:${min}:${sec}.${ms}`)
-            var played_at = Date.UTC(year, month, day, hour, min, sec, ms)
-            var now = Date.now();
-            console.log(now)
-            console.log(played_at)
-            let min_passed = (now - played_at) / (1000 * 60);
-            let res;
-            if (min_passed < 1.5) {
-               res = `1 minute ago`
-            } else if (min_passed < 60) {
-               min_passed = Math.round(min_passed)
-               res = `${min_passed} minutes ago`
-            } else if (min_passed < (60 * 24)) {
-               hours_passed = min_passed / 60;
-               hours_passed = Math.round(hours_passed)
-               if (hours_passed === 1) {
-                  res = `1 hour ago`
-               } else {
-                  res = `${hours_passed} hours ago`
-               }
-            } else if (min_passed < (60 * 24 * 2)) {
-               res = `yesterday`
-            } else {
-               days_passed = min_passed / (60 * 24);
-               days_passed = Math.round(days_passed)
-               if (days_passed === 1) {
-                  res = `1 day ago`
-               } else {
-                  res = `${days_passed} days ago`
-               }
-            }
-            return res;
          }
       });
 
    </script>
-
    <script>
       var user_template = Handlebars.templates.user_object;
       ipcRenderer.on("user-button-task-finished", function (event, user) {

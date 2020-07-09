@@ -10,12 +10,9 @@ const path = require('path')
 
 require('electron-reload')(__dirname);
 
-const config = require('../config')
-const httpConfig = config.httpInfo[1]
+// const config = require('../config')
 
-const http2 = require('http2');
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
-const fs = require('fs');
+const util = require('./app/js/mainUtil')
 
 var email;
 var authed = false;
@@ -56,7 +53,6 @@ function createMainWindow() {
    mainWindow.webContents.on('dom-ready', function () {
       console.log(`mainwindow dom is ready`);
       updateNowPlaying(mainWindow)
-      config.loginnInfo = "{lmao}"
    })
 
    var nowplayingIntervalID;
@@ -93,7 +89,7 @@ ipcMain.on("nowplaying_click", function (event, arg) {
       ':path': '/nowplaying',
       'email': email
    };
-   clientRequest(headers, function (data) {
+   util.clientRequest(headers, function (data) {
       if (data === 'getauth') {
          if (!gettingAuthed) {
             gettingAuthed = true
@@ -118,7 +114,7 @@ ipcMain.on("recentlyplayed_click", function (event, arg) {
       ':path': '/recentlyplayed',
       'email': email
    };
-   clientRequest(headers, function (data) {
+   util.clientRequest(headers, function (data) {
       if (data === 'getauth') {
          if (!gettingAuthed) {
             gettingAuthed = true
@@ -127,7 +123,10 @@ ipcMain.on("recentlyplayed_click", function (event, arg) {
       } else {
          try {
             tracks = JSON.parse(data)
-            console.log(tracks[0])
+            // console.log(tracks[0])
+            for(var i=0; i<tracks.length; i++){
+               tracks[i].played_at = util.handleTime(tracks[i].played_at)
+            }
             event.reply("recentlyplayed-button-task-finished", tracks)
          } catch (e) {
             console.log(`error parsing recently-played json: ${data}`);
@@ -144,7 +143,7 @@ ipcMain.on("loginbutton_click", function (event, arg) {
       'username': arg[1],
       'password': arg[2]
    };
-   clientRequest(headers, function (data) {
+   util.clientRequest(headers, function (data) {
       splits = data.split('\n');
       console.log(splits)
       if (splits[0] === 'loginerror') {
@@ -167,7 +166,7 @@ ipcMain.on("signupbutton_click", function (event, arg) {
       'username': arg[1],
       'password': arg[2]
    };
-   clientRequest(headers, function (data) {
+   util.clientRequest(headers, function (data) {
       splits = data.split('\n');
       console.log(splits)
       if (splits[0] === 'signuperror') {
@@ -189,13 +188,16 @@ ipcMain.on("userprofile_click", function (event, arg) {
       ':path': '/userprofile',
       'email': email
    };
-   clientRequest(headers, function(data){
+   util.clientRequest(headers, function(data){
       splits = data.split('\n');
       console.log(splits)
       if (splits[0] === 'userProfileError') {
          event.reply("userprofile-error", splits[1]);
       } else {
-         event.reply("user-button-task-finished", { email: splits[0], username: splits[1], platform: splits[2], created_on: splits[3] });
+         let created_on = splits[3].split(' ');
+         created_on = util.handleDBTime(created_on[1], created_on[2], created_on[3])
+         event.reply("user-button-task-finished", { email: splits[0], username: splits[1], platform: splits[2], created_on: created_on });
+         
       }
    })
 });
@@ -209,7 +211,7 @@ setInterval(function () {
          ':path': '/updatelistens',
          'email': email
       };
-      clientRequest(headers, function(data){});
+      util.clientRequest(headers, function(data){});
 
    }
 }, 1500000) //25 min * 60000 ms/min = 1500000 ms
@@ -246,7 +248,7 @@ function authSpot() {
       ':path': '/authspotify',
       'email': email
    };
-   clientRequest(headers, function(data){})
+   util.clientRequest(headers, function(data){})
 
    shell.openExternal(`https://${httpConfig.IP}:8888/login`).then(function () {
       console.log('opened external browser to get auth')
@@ -263,7 +265,7 @@ function startup() {
                'email': result[0].account,
                'password': result[0].password
             };
-            clientRequest(headers, function(data){
+            util.clientRequest(headers, function(data){
                if (data === 'autologinsuccess') {
                   createMainWindow();
                } else {
@@ -282,7 +284,7 @@ function updateNowPlaying(win) {
       ':path': '/nowplaying',
       'email': email
    };
-   clientRequest(headers, function(data){
+   util.clientRequest(headers, function(data){
       if (data === 'getauth') {
          if (!gettingAuthed) {
             gettingAuthed = true
@@ -302,33 +304,8 @@ function updateNowPlaying(win) {
             win.webContents.send("nowplaying-button-task-finished", track);
          } catch (e) {
             console.log(`error parsing now-playing json: ${data}`);
-
          }
       }
    });
 }
 
-function clientRequest(headers, callback) {
-   const clientS = http2.connect(httpConfig.URL, {
-      ca: fs.readFileSync(`./certs/${httpConfig.name}-cert.pem`)
-   }, function () {
-      console.log('connected to https server');
-   });
-   const req = clientS.request(headers);
-   req.on('response', (headers, flags) => {
-      console.log('responses (headers):')
-      for (const name in headers) {
-         console.log(`${name}: ${headers[name]}`);
-      }
-      console.log('---------')
-   });
-   let data = '';
-   req.on('data', (chunk) => {
-      data += chunk;
-   });
-   req.on('end', () => {
-      callback(data);
-      clientS.close();
-   });
-   req.end();
-}
