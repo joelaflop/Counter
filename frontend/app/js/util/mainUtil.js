@@ -1,7 +1,7 @@
 const http2 = require('http2');
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 const fs = require('fs');
-const config = require('../../../config.json')
+const config = require('../../../../config.json')
 const httpConfig = config.httpInfo[1]
 
 module.exports = {

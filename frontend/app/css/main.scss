@@ -4,10 +4,6 @@
    src: url("../resources/fonts/EB_Garamond/static/EBGaramond-Regular.ttf");
 }
 
-.garamond-font {
-   // font-family: "EBGaramond";
-}
-
 body,
 html {
    height: 100vh;
@@ -261,4 +257,30 @@ html {
 .invisible{
    display:none;
    visibility: hidden;
+}
+
+
+//svg stuff
+
+.svg-container{
+   display:inline-block;
+   position: relative;
+   width:100%;
+   padding-bottom: 100%;
+   vertical-align: top;
+   overflow: hidden;
+}
+
+.svg-content-responsive{
+   display: inline-block;
+   position: absolute;
+   top: 0px;
+   left: 0px;
+}
+
+.testover{
+   color:blue;
+   width:0px;
+   background-color: blue;
+   stroke-width: 100px;;
 }

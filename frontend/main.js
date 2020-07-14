@@ -12,7 +12,7 @@ require('electron-reload')(__dirname);
 
 // const config = require('../config')
 
-const util = require('./app/js/mainUtil')
+const util = require('./app/js/util/mainUtil')
 
 var email;
 var authed = false;
@@ -24,6 +24,7 @@ function createLoginWindow() {
    loginWindow = new BrowserWindow({
       width: 325,
       height: 400,
+      backgroundColor: '#262626',
       webPreferences: {
          preload: path.join(__dirname, 'app/js/preload/login.js'),
          nodeIntegration: true
@@ -40,6 +41,7 @@ function createMainWindow() {
       width: 900,
       minWidth: 500,
       height: 900,
+      backgroundColor: '#262626',
       titleBarStyle: 'hidden',
       resizeable: true,
       backgroundColor: '#262626',
@@ -60,7 +62,7 @@ function createMainWindow() {
    mainWindow.on('focus', function () {
       console.log(`mainwindow has focus `);
       updateNowPlaying(mainWindow)
-      nowplayingIntervalID = setInterval(function () { 
+      nowplayingIntervalID = setInterval(function () {
          console.log(`nowplaying interval HIT`)
          if (authed) {
             if (mainWindow.isFocused()) {
@@ -124,7 +126,7 @@ ipcMain.on("recentlyplayed_click", function (event, arg) {
          try {
             tracks = JSON.parse(data)
             // console.log(tracks[0])
-            for(var i=0; i<tracks.length; i++){
+            for (var i = 0; i < tracks.length; i++) {
                tracks[i].played_at = util.handleTime(tracks[i].played_at)
             }
             event.reply("recentlyplayed-button-task-finished", tracks)
@@ -188,7 +190,7 @@ ipcMain.on("userprofile_click", function (event, arg) {
       ':path': '/userprofile',
       'email': email
    };
-   util.clientRequest(headers, function(data){
+   util.clientRequest(headers, function (data) {
       splits = data.split('\n');
       console.log(splits)
       if (splits[0] === 'userProfileError') {
@@ -197,10 +199,64 @@ ipcMain.on("userprofile_click", function (event, arg) {
          let created_on = splits[3].split(' ');
          created_on = util.handleDBTime(created_on[1], created_on[2], created_on[3])
          event.reply("user-button-task-finished", { email: splits[0], username: splits[1], platform: splits[2], created_on: created_on });
-         
+
       }
    })
 });
+
+ipcMain.on("dataprofile_click", function (event, arg) {
+
+   if (authed) {
+      headers = {
+         ':path': '/updatelistens',
+         'email': email
+      };
+      util.clientRequest(headers, function (data) { });
+
+   } else {
+      console.log('not authed')
+   }
+});
+
+ipcMain.on("datatype1_click", function (event, arg) {
+   if (authed) {
+      headersArtists = {
+         ':path': '/counts',
+         'email': email,
+         'type': 'artists',
+         'days': '50',
+         'count': '8',
+      };
+      util.clientRequest(headersArtists, function (data) {
+         event.reply("datatype1-artistcounts-finished", data)
+      })
+      headersAlbums = {
+         ':path': '/counts',
+         'email': email,
+         'type': 'albums',
+         'days': '50',
+         'count': '8',
+      };
+      util.clientRequest(headersAlbums, function (data) {
+         event.reply("datatype1-albumcounts-finished", data)
+      })
+
+      headersSongs = {
+         ':path': '/counts',
+         'email': email,
+         'type': 'songs',
+         'days': '50',
+         'count': '8',
+      };
+      util.clientRequest(headersSongs, function (data) {
+         event.reply("datatype1-songcounts-finished", data)
+      })
+   } else {
+      console.log('not authed')
+   }
+
+});
+
 
 //
 //             Interval DB recording
@@ -211,7 +267,7 @@ setInterval(function () {
          ':path': '/updatelistens',
          'email': email
       };
-      util.clientRequest(headers, function(data){});
+      util.clientRequest(headers, function (data) { });
 
    }
 }, 1500000) //25 min * 60000 ms/min = 1500000 ms
@@ -248,7 +304,7 @@ function authSpot() {
       ':path': '/authspotify',
       'email': email
    };
-   util.clientRequest(headers, function(data){})
+   util.clientRequest(headers, function (data) { })
 
    shell.openExternal(`https://${httpConfig.IP}:8888/login`).then(function () {
       console.log('opened external browser to get auth')
@@ -256,7 +312,8 @@ function authSpot() {
 }
 
 function startup() {
-   let secret = keytar.findCredentials('Counter-app')
+   // let secret = 
+   keytar.findCredentials('Counter-app')
       .then(function (result) {
          if (result[0]) {
             email = result[0].account
@@ -265,7 +322,7 @@ function startup() {
                'email': result[0].account,
                'password': result[0].password
             };
-            util.clientRequest(headers, function(data){
+            util.clientRequest(headers, function (data) {
                if (data === 'autologinsuccess') {
                   createMainWindow();
                } else {
@@ -284,7 +341,7 @@ function updateNowPlaying(win) {
       ':path': '/nowplaying',
       'email': email
    };
-   util.clientRequest(headers, function(data){
+   util.clientRequest(headers, function (data) {
       if (data === 'getauth') {
          if (!gettingAuthed) {
             gettingAuthed = true

@@ -158,6 +158,16 @@ serverS.on('stream', (stream, headers) => {
             }
          })
          break;
+      case '/counts':
+         console.log("counts attempt");
+         type = headers.type;
+         email = headers.email;
+         days = parseInt(headers.days);
+         count = parseInt(headers.count);
+         db.getPlayCounts(email, days, count, type, function (res) {
+            streamRespond(stream, JSON.stringify(res))
+         });
+         break;
       default:
          console.log(`unknown header: ${headers[':path']}`)
    }

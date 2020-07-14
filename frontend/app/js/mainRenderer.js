@@ -9,6 +9,8 @@ const {
    ipcRenderer
 } = require("electron");
 
+const graphUtil = require('./app/js/util/graphUtil')
+
 let mainPageDiv = document.getElementById('mainpage');
 var titleText = document.getElementById('pageTitleText');
 
@@ -76,6 +78,7 @@ datatype1Button.addEventListener('click', function () {
 
    titleText.innerText = 'data analysis type 1';
    mainPageDiv.innerHTML = dataType1PageDiv.innerHTML;
+
    var arg = "secondparam";
    ipcRenderer.send("datatype1_click", arg);
 
@@ -88,5 +91,37 @@ datatype2Button.addEventListener('click', function () {
 
    var arg = "secondparam";
    ipcRenderer.send("datatype2_click", arg);
+
+});
+
+ipcRenderer.on("datatype1-artistcounts-finished", function (event, dat) {
+   data = JSON.parse(dat)
+   data.forEach(element => {
+      element.count = parseInt(element.count)
+   });
+   graphUtil.countsBarGraph(data, 'dataType1ArtistCounts', 'artists')
+
+
+});
+
+ipcRenderer.on("datatype1-albumcounts-finished", function (event, dat) {
+   data = JSON.parse(dat)
+   data.forEach(element => {
+      element.count = parseInt(element.count)
+   });
+   graphUtil.countsBarGraph(data, 'dataType1AlbumCounts', 'album')
+   // data = [{ artists: 'a', count: 25 }, { artists: 'b', count: 2.5 }, { artists: 'c', count: 5 }, { artists: 'd', count: 15 }]
+
+
+
+
+});
+
+ipcRenderer.on("datatype1-songcounts-finished", function (event, dat) {
+   data = JSON.parse(dat)
+   data.forEach(element => {
+      element.count = parseInt(element.count)
+   });
+   graphUtil.countsBarGraph(data, 'dataType1SongCounts', 'song')
 
 });

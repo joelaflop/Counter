@@ -9909,10 +9909,6 @@ h3 {
     border-color: #dee2e6;
   }
 }
-@font-face {
-  font-family: EBGaramond;
-  src: url(../resources/fonts/EB_Garamond/static/EBGaramond-Regular.ttf);
-}
 .p-m-t {
   margin-top: 16px;
 }

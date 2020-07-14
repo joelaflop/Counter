@@ -194,6 +194,33 @@ module.exports = {
             console.log(err)
          }
       })
+   },
+   getPlayCounts: function (email, days, count, type, callback){
+      var query;
+      if(type === 'artists'){
+         // console.log('getting artists')
+         query = `select * from public.artistcounts($1, $2, $3);`;
+      } else if (type === 'albums'){
+         // console.log('getting albums')
+         query = `select * from public.albumcounts($1, $2, $3);`;
+      } else if (type === 'songs'){
+         // console.log('getting songs')
+         query = `select * from public.songcounts($1, $2, $3);`;
+      } else {
+         throw new Error('unrecognized type for play counts!')
+      }
+      
+      values = [email, days, count];
+      client.query(query, values, function(err, res){
+         if (!err && res.rows[0]) {
+            callback(res.rows);
+         } else if (!err && !res.rows) {
+            callback(null);
+         } else {
+            console.log(`DB: error getting counts info for ${email}`);
+            console.log(err)
+         }
+      })
    }
 };
 

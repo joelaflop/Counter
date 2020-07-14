@@ -34,7 +34,7 @@
                         <img src="app/img/icons/clipboard-data.svg" class="invert pb-1 pr-1" alt="" width="25"
                            height="25" title="Bootstrap">data</a>
                      <div id="datadropdown" class="pl-4">
-                        <a id="datatype1" class="nav-link py-0 pl-2 pr-0" href="#">type1</a>
+                        <a id="datatype1" class="nav-link py-0 pl-2 pr-0" href="#">counts</a>
                         <a id="datatype2" class="nav-link py-0 pl-2 pr-0" href="#">type2</a>
                      </div>
                   </li>
@@ -42,7 +42,7 @@
             </nav>
          </div>
          <div id="mainpageholder" class="mainpageholder">
-            <div id="mainpage" class="tablecell  garamond-font">
+            <div id="mainpage">
                <!-- <div class="pagetitlebox bg-gray">
                <h4 class="pagetitle text-white">welcome</h4>
             </div> -->
@@ -87,8 +87,16 @@
          <!-- <div class="pagetitlebox bg-gray">
             <h4 class="pagetitle text-white">data insights</h4>
          </div> -->
-         <div id="datamainpage" class="">
-            <p class=" text-white">lmao1</p>
+         <div class="pr-4 pl-2 pt-1 text-white">
+            <div id="dataType1ArtistCounts" class="svg-container">
+               <h4>top artists</h4>
+            </div>
+            <div id="dataType1AlbumCounts" class="svg-container">
+               <h4>top albums</h4>
+            </div>
+            <div id="dataType1SongCounts" class="svg-container">
+               <h4>top songs</h4>
+            </div>
          </div>
          <!-- mainpagedrop -->
       </div>
@@ -97,7 +105,7 @@
          <!-- <div class="pagetitlebox bg-gray">
             <h4 class="pagetitle text-white">data insights</h4>
          </div> -->
-         <div id="datamainpage" class="">
+         <div id="dataType2mainpage" class="">
             <p class=" text-white">lmao2</p>
          </div>
          <!-- mainpagedrop -->
@@ -162,6 +170,9 @@
          // document.getElementById('pageTitleText').innerText = 'user page';
          document.getElementById('usermainpage').innerHTML = user_template(user)
       });
+   </script>
+   <script>
+      
    </script>
 </body>
 
