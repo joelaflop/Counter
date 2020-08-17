@@ -43,6 +43,7 @@
          </div>
          <div id="mainpageholder" class="mainpageholder">
             <div id="mainpage">
+
                <!-- <div class="pagetitlebox bg-gray">
                <h4 class="pagetitle text-white">welcome</h4>
             </div> -->
@@ -87,15 +88,43 @@
          <!-- <div class="pagetitlebox bg-gray">
             <h4 class="pagetitle text-white">data insights</h4>
          </div> -->
-         <div class="pr-4 pl-2 pt-1 text-white">
-            <div id="dataType1ArtistCounts" class="svg-container">
-               <h4>top artists</h4>
+         <div class="pr-4 pl-2 pt-1 text-white position-relative">
+
+            <div class="position-fixed" style="right:0px;top:30px;z-index: 100;">
+               <a id="dataType1SettingsMenuButton" class="nav-link py-1 pl-1 pr-0" href="#" style='z-index: 10000;'>
+                  <img src="app/img/icons/three-dots-vertical.svg" class="invert pb-1 pr-1" alt="" width="25"
+                     height="25" title="Bootstrap">
+               </a>
             </div>
+            <div id="dataType1SettingsMenu" class="position-fixed settingsMenu bg-lightgray">
+               <div id="signup-page" class="container">
+                  <div class="mt-2">
+                     <input type="text" class="form-control" id="dataType1DaysInput" placeholder="enter a value in days" list="timespans"/>
+                     <datalist id="timespans">
+                        <option>today</option>
+                        <option>this last week</option>
+                        <option>this last month</option>
+                        <option>this last year</option>
+                        <option>all time</option>
+                     </datalist>
+                  </div>
+
+                  <div class="mt-2">
+                     <input type="number" class="form-control" id="dataType1CountInput" placeholder="number of results">
+                  </div>
+               </div>
+            </div>
+            <h4>top artists</h4>
+            <div id="dataType1ArtistCounts" class="svg-container position-relative" style="left:0px;top:0px;">
+
+            </div>
+            <h4>top albums</h4>
             <div id="dataType1AlbumCounts" class="svg-container">
-               <h4>top albums</h4>
+
             </div>
+            <h4>top songs</h4>
             <div id="dataType1SongCounts" class="svg-container">
-               <h4>top songs</h4>
+
             </div>
          </div>
          <!-- mainpagedrop -->
@@ -172,7 +201,7 @@
       });
    </script>
    <script>
-      
+
    </script>
 </body>
 

@@ -243,6 +243,10 @@ html {
 .bg-gray {
    background: #404040;
 }
+
+.bg-lightgray {
+   background: #606060;
+}
 //menubar
 .saturate { filter: saturate(3); }
 .grayscale { filter: grayscale(100%); }
@@ -259,28 +263,37 @@ html {
    visibility: hidden;
 }
 
+.settingsMenu{
+   right:20px;
+   top:60px;
+   width:300px;
+   height:500px;
+   z-index: 1000;
+   box-shadow: 0px 0px 6px 3px black;
+}
+
 
 //svg stuff
 
-.svg-container{
-   display:inline-block;
-   position: relative;
-   width:100%;
-   padding-bottom: 100%;
-   vertical-align: top;
-   overflow: hidden;
-}
+// .svg-container{
+//    display:inline-block;
+//    position: relative;
+//    width:100%;
+//    padding-bottom: 100%;
+//    vertical-align: top;
+//    overflow: hidden;
+// }
 
-.svg-content-responsive{
-   display: inline-block;
-   position: absolute;
-   top: 0px;
-   left: 0px;
-}
+// .svg-content-responsive{
+//    display: inline-block;
+//    position: absolute;
+//    top: 0px;
+//    left: 0px;
+// }
 
-.testover{
-   color:blue;
-   width:0px;
-   background-color: blue;
-   stroke-width: 100px;;
-}
+// .testover{
+//    color:blue;
+//    width:0px;
+//    background-color: blue;
+//    stroke-width: 100px;;
+// }

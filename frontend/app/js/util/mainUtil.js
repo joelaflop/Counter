@@ -98,25 +98,36 @@ module.exports = {
         const clientS = http2.connect(httpConfig.URL, {
            ca: fs.readFileSync(`./certs/${httpConfig.name}-cert.pem`)
         }, function () {
-           console.log('connected to https server');
+            //call back for once we've connnected
+            console.log('connected to server!')
+            const req = clientS.request(headers);
+            req.on('error', (err)=> {
+                console.log('error processing this request');
+                callback('connectionFailure');
+            })
+            req.on('response', (headers, flags) => {
+               console.log('responses (headers):')
+               for (const name in headers) {
+                  console.log(`${name}: ${headers[name]}`);
+               }
+               console.log('---------')
+            });
+            let data = '';
+            req.on('data', (chunk) => {
+               data += chunk;
+            });
+            req.on('end', () => {
+               callback(data);
+               clientS.close();
+            });
+            req.end();
         });
-        const req = clientS.request(headers);
-        req.on('response', (headers, flags) => {
-           console.log('responses (headers):')
-           for (const name in headers) {
-              console.log(`${name}: ${headers[name]}`);
-           }
-           console.log('---------')
-        });
-        let data = '';
-        req.on('data', (chunk) => {
-           data += chunk;
-        });
-        req.on('end', () => {
-           callback(data);
-           clientS.close();
-        });
-        req.end();
+        clientS.on('error', (err)=>{
+            //case for when server is not running
+            console.log('server does not appear to be running!');
+            callback('connectionFailure')
+        })
+
      }
 
 }

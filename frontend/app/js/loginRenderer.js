@@ -41,6 +41,7 @@ loginButton.addEventListener('click', function() {
 });
 
 document.addEventListener("keydown", function(event) {
+   console.log('login render got key event')
    if (event.key == "Enter") {
       if (/.*@.*\..*/.test(loginInputID.value)) {
          //got an email probably

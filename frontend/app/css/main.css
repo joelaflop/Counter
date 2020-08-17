@@ -10115,6 +10115,10 @@ html {
   background: #404040;
 }
 
+.bg-lightgray {
+  background: #606060;
+}
+
 .saturate {
   filter: saturate(3);
 }
@@ -10154,6 +10158,15 @@ html {
 .invisible {
   display: none;
   visibility: hidden;
+}
+
+.settingsMenu {
+  right: 20px;
+  top: 60px;
+  width: 300px;
+  height: 500px;
+  z-index: 1000;
+  box-shadow: 0px 0px 6px 3px black;
 }
 
 /*# sourceMappingURL=main.css.map */

@@ -65,7 +65,7 @@ function createMainWindow() {
       nowplayingIntervalID = setInterval(function () {
          console.log(`nowplaying interval HIT`)
          if (authed) {
-            if (mainWindow.isFocused()) {
+            if (mainWindow && mainWindow.isFocused()) {
                console.log(`mainwindow has focus - autoupdating nowplaying`);
                updateNowPlaying(mainWindow)
             }
@@ -150,7 +150,11 @@ ipcMain.on("loginbutton_click", function (event, arg) {
       console.log(splits)
       if (splits[0] === 'loginerror') {
          event.reply("login-error", splits[1]);
+      } else if(splits[0] === 'connectionFailure'){
+         console.log('CAUGHT LOGIN ERROR CONNECTION IN CLICK LISTENER')
+         event.reply("login-error", 'We are unable to connect to Counter\'s server at this time');
       } else {
+         console.log('CREATING MAIN WINDOW FROM LOGIN CLICK LISTENER')
          createMainWindow()
          loginWindow.close()
          email = splits[1]
@@ -173,7 +177,9 @@ ipcMain.on("signupbutton_click", function (event, arg) {
       console.log(splits)
       if (splits[0] === 'signuperror') {
          event.reply("signup-error", splits[1]);
-      } else {
+      } else if(splits[0] === 'connectionFailure'){
+         event.reply("login-error", 'We are unable to connect to Counter\'s server at this time');
+      }  else {
          createMainWindow()
          loginWindow.close()
          email = splits[1]
@@ -206,7 +212,7 @@ ipcMain.on("userprofile_click", function (event, arg) {
 
 ipcMain.on("dataprofile_click", function (event, arg) {
 
-   if (authed) {
+   if (authed) { //TODO: make only if haven't done in a while
       headers = {
          ':path': '/updatelistens',
          'email': email
@@ -218,14 +224,14 @@ ipcMain.on("dataprofile_click", function (event, arg) {
    }
 });
 
-ipcMain.on("datatype1_click", function (event, arg) {
+ipcMain.on("datatype1_click", function (event, arr) {
    if (authed) {
       headersArtists = {
          ':path': '/counts',
          'email': email,
          'type': 'artists',
-         'days': '50',
-         'count': '8',
+         'days': arr[0],
+         'count': arr[1],
       };
       util.clientRequest(headersArtists, function (data) {
          event.reply("datatype1-artistcounts-finished", data)
@@ -234,8 +240,8 @@ ipcMain.on("datatype1_click", function (event, arg) {
          ':path': '/counts',
          'email': email,
          'type': 'albums',
-         'days': '50',
-         'count': '8',
+         'days': arr[0],
+         'count': arr[1],
       };
       util.clientRequest(headersAlbums, function (data) {
          event.reply("datatype1-albumcounts-finished", data)
@@ -245,8 +251,8 @@ ipcMain.on("datatype1_click", function (event, arg) {
          ':path': '/counts',
          'email': email,
          'type': 'songs',
-         'days': '50',
-         'count': '8',
+         'days': arr[0],
+         'count': arr[1],
       };
       util.clientRequest(headersSongs, function (data) {
          event.reply("datatype1-songcounts-finished", data)
@@ -331,6 +337,7 @@ function startup() {
                }
             })
          } else {
+            console.log('creating loginn window at startup')
             createLoginWindow()
          }
       });

@@ -1,6 +1,8 @@
 const {
    Client
 } = require('pg')
+const { exists } = require('fs')
+const { exit } = require('process')
 
 const client = new Client({
    user: 'postgres',
@@ -9,10 +11,24 @@ const client = new Client({
    password: 'counterDBpassword',
    port: 5432,
 })
-client.connect()
+
+client.connect((err) => {
+   if (err) {
+      console.log('Error connecting to database:')
+      console.log(err);
+      console.log('Exitting backend due to fatal error ^')
+      exit(-1);
+   } else {
+      console.log('Connected to DB')
+   }
+
+})
 
 
 module.exports = {
+   testConnection: function () {
+      query = '';
+   },
    newUser: function (email, username, password, platforms) {
       query = `INSERT INTO account (email
                                   , username
@@ -109,7 +125,7 @@ module.exports = {
          }
          // console.log(JSON.stringify(track.name))
          if (i == 0) {
-            innerquery = `(DEFAULT, $${i * 11 + 1}, $${i * 11 + 2}, $${i * 11 + 3}, $${i * 11 + 4}, $${i * 11 + 5}, $${i * 11 + 6}, $${i * 11 + 7}, $${i * 11 + 8}, $${i * 11 + 9}, $${i *11 + 10}, $${i * 11 + 11}) \n`
+            innerquery = `(DEFAULT, $${i * 11 + 1}, $${i * 11 + 2}, $${i * 11 + 3}, $${i * 11 + 4}, $${i * 11 + 5}, $${i * 11 + 6}, $${i * 11 + 7}, $${i * 11 + 8}, $${i * 11 + 9}, $${i * 11 + 10}, $${i * 11 + 11}) \n`
          } else {
             innerquery += `, (DEFAULT, $${i * 11 + 1}, $${i * 11 + 2}, $${i * 11 + 3}, $${i * 11 + 4}, $${i * 11 + 5}, $${i * 11 + 6}, $${i * 11 + 7}, $${i * 11 + 8}, $${i * 11 + 9}, $${i * 11 + 10}, $${i * 11 + 11}) \n`
          }
@@ -179,12 +195,12 @@ module.exports = {
          }
       });
    },
-   getUserInfo: function (email, callback){
+   getUserInfo: function (email, callback) {
       query = `select email, username, platforms, created_on, last_login
                from account 
                where email = $1`;
       values = [email];
-      client.query(query, values, function(err, res){
+      client.query(query, values, function (err, res) {
          if (!err && res.rows[0]) {
             callback(res.rows[0]);
          } else if (!err && !res.rows[0]) {
@@ -195,23 +211,23 @@ module.exports = {
          }
       })
    },
-   getPlayCounts: function (email, days, count, type, callback){
+   getPlayCounts: function (email, days, count, type, callback) {
       var query;
-      if(type === 'artists'){
+      if (type === 'artists') {
          // console.log('getting artists')
          query = `select * from public.artistcounts($1, $2, $3);`;
-      } else if (type === 'albums'){
+      } else if (type === 'albums') {
          // console.log('getting albums')
          query = `select * from public.albumcounts($1, $2, $3);`;
-      } else if (type === 'songs'){
+      } else if (type === 'songs') {
          // console.log('getting songs')
          query = `select * from public.songcounts($1, $2, $3);`;
       } else {
          throw new Error('unrecognized type for play counts!')
       }
-      
+
       values = [email, days, count];
-      client.query(query, values, function(err, res){
+      client.query(query, values, function (err, res) {
          if (!err && res.rows[0]) {
             callback(res.rows);
          } else if (!err && !res.rows) {
