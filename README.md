@@ -44,6 +44,12 @@ cd frontend/app/css
 sass --watch .
 ```
 
+```bash
+# Generate ssl keys for http2 examples
+openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost--privkey.pem -out localhost--cert.pem
+openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=192.168.1.57' -keyout joesmac-privkey.pem -out joesmac-cert.pem
+```
+
 ## DB architecture:
 
 Users: unique index email, username, password, platforms, refresh token, access token, date created, lastlogin \
