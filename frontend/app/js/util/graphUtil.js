@@ -80,5 +80,8 @@ module.exports = {
 
       d3.select("#" + location).selectAll('svg').remove();
       d3.select("#" + location).node().append(svg.node())
-   }
+   },
+   artistsSteamGraph : function(data, location){
+
+   },
 }

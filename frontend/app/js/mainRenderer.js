@@ -124,6 +124,7 @@ datatype1Button.addEventListener('click', function () {
                   } else if (daysTemp === 'all time') {
                      days = 10000;
                   } else {
+                     //TODO: case when we arent given a valid string
                      console.log(daysTemp)
                      console.log('\n\n\n\n\n\n\n\n\n\n\n\n\n')
                   }
@@ -173,7 +174,6 @@ ipcRenderer.on("datatype1-albumcounts-finished", function (event, dat) {
       element.count = parseInt(element.count)
    });
    graphUtil.countsBarGraph(data, 'dataType1AlbumCounts', 'album')
-   // data = [{ artists: 'a', count: 25 }, { artists: 'b', count: 2.5 }, { artists: 'c', count: 5 }, { artists: 'd', count: 15 }]
 
 });
 
