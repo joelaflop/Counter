@@ -194,6 +194,7 @@ datatype2Button.addEventListener('click', function () {
    mainPageDiv.innerHTML = dataType2PageDiv.innerHTML;
 
    // var days = '50';
-   ipcRenderer.send("datatype2_click", '');
+   // ipcRenderer.send("datatype2_click", '');
+   graphUtil.artistsSteamGraph(null, 'dataType2ArtistSteamGraph')
 
 });

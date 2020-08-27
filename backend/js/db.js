@@ -26,9 +26,6 @@ client.connect((err) => {
 
 
 module.exports = {
-   testConnection: function () {
-      query = '';
-   },
    newUser: function (email, username, password, platforms) {
       query = `INSERT INTO account (email
                                   , username
