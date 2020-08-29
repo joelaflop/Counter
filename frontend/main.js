@@ -263,6 +263,23 @@ ipcMain.on("datatype1_click", function (event, arr) {
 
 });
 
+ipcMain.on("datatype2_click", function (event, arr) {
+   if (authed) {
+      headersArtists = {
+         ':path': '/artistsovertime',
+         'email': email,
+         'days': arr[0],
+         'count': arr[1],
+      };
+      util.clientRequest(headersArtists, function (data) {
+         event.reply("datatype2-finished", data)
+      })
+   } else {
+      console.log('not authed')
+   }
+
+});
+
 
 //
 //             Interval DB recording

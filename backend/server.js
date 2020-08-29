@@ -168,6 +168,15 @@ serverS.on('stream', (stream, headers) => {
             streamRespond(stream, JSON.stringify(res))
          });
          break;
+      case '/artistsovertime':
+         console.log("counts attempt");
+         email = headers.email;
+         days = parseInt(headers.days);
+         count = parseInt(headers.count);
+         db.getArtistSteamGraph(email, days, count, function (res) {
+            streamRespond(stream, JSON.stringify(res))
+         });
+         break;
       default:
          console.log(`unknown header: ${headers[':path']}`)
    }

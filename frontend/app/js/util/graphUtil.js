@@ -90,10 +90,9 @@ module.exports = {
 
       margin = ({ top: 0, right: 20, bottom: 30, left: 20 })
 
-      const readFile = util.promisify(fs.readFile); //use await readFile
 
-      data = Object.assign(await d3.csv('./unemployment-2.csv', d3.autoType), { y: "Unemployment" })
-      console.log(data)
+      // data = Object.assign(await d3.csv('./unemployment-2.csv', d3.autoType), { y: "Unemployment" })
+      // console.log(data)
 
       series = d3.stack()
          .keys(data.columns.slice(1))

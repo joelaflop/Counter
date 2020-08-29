@@ -193,8 +193,42 @@ datatype2Button.addEventListener('click', function () {
    titleText.innerText = 'data analysis type 2';
    mainPageDiv.innerHTML = dataType2PageDiv.innerHTML;
 
+   var count = 5;
+   var days = 10000;
+   ipcRenderer.send("datatype2_click", [days, count]);
+
    // var days = '50';
    // ipcRenderer.send("datatype2_click", '');
-   graphUtil.artistsSteamGraph(null, 'dataType2ArtistSteamGraph')
+   // data = Object.assign(await d3.csv('./unemployment-2.csv', d3.autoType), { y: "Unemployment" })
+
+});
+
+ipcRenderer.on("datatype2-finished", function (event, dat) {
+   dat = JSON.parse(dat)
+   console.log('NEED TO PARSE THIS DATA TO LOOK CORRECT')
+   console.log(dat)
+   cols = new Set();
+   for(i = 0; i < dat.length; i++){
+      cols.add(dat[i]['artists'])
+   }
+   cols = Array.from(cols)
+
+
+   data = []
+   for(i = 0; i < dat.length; i++){
+      if(!data[dat[i].month]){
+         data[dat[i].month] = {date: dat[i].month};
+      }
+      data[dat[i].month][dat[i].artists] = parseInt(dat[i].count);
+   }
+   
+
+   data = data.filter(function(el){
+      if(el){return el;}
+   })
+   data["y"] = "plays"
+   data["columns"] = ['month'].concat(Array.from(cols))
+   console.log(data)
+   graphUtil.artistsSteamGraph(data, 'dataType2ArtistSteamGraph')
 
 });

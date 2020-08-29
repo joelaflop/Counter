@@ -234,6 +234,21 @@ module.exports = {
             console.log(err)
          }
       })
+   },
+   getArtistSteamGraph(email, days, count, callback) {
+      query = `select * from public.top_artists_overtime_month($1, $2, $3)`;
+      values = [email, days, count];
+      client.query(query, values, function (err, res) {
+         if (!err && res.rows[0]) {
+            callback(res.rows);
+         } else if (!err && !res.rows) {
+            callback(null);
+         } else {
+            console.log(`DB: error getting counts info for ${email}`);
+            console.log(err)
+         }
+      });
+      
    }
 };
 
