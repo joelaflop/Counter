@@ -236,7 +236,7 @@ module.exports = {
       })
    },
    getArtistSteamGraph(email, days, count, callback) {
-      query = `select * from public.top_artists_overtime_month($1, $2, $3)`;
+      query = `select * from public.top_artists_overtime_week($1, $2, $3)`;
       values = [email, days, count];
       client.query(query, values, function (err, res) {
          if (!err && res.rows[0]) {

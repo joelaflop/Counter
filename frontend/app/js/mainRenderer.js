@@ -9,7 +9,8 @@ const {
    ipcRenderer
 } = require("electron");
 
-const graphUtil = require('./app/js/util/graphUtil')
+const graphUtil = require('./app/js/util/graphUtil');
+const { keys } = require("d3");
 
 let mainPageDiv = document.getElementById('mainpage');
 var titleText = document.getElementById('pageTitleText');
@@ -215,19 +216,31 @@ ipcRenderer.on("datatype2-finished", function (event, dat) {
 
 
    data = []
+   artists = new Set();
    for(i = 0; i < dat.length; i++){
-      if(!data[dat[i].month]){
-         data[dat[i].month] = {date: dat[i].month};
+      if(!data[dat[i].datepart]){
+         data[dat[i].datepart] = {date: dat[i].datepart};
       }
-      data[dat[i].month][dat[i].artists] = parseInt(dat[i].count);
+      data[dat[i].datepart][dat[i].artists] = parseInt(dat[i].count);
+      artists.add(dat[i].artists);
    }
    
 
    data = data.filter(function(el){
       if(el){return el;}
-   })
+   });
+
+   for(i = 0; i < data.length; i++){
+      console.log(i)
+      artists.forEach(el => {
+         if(!data[i].hasOwnProperty(el)){
+            data[i][el] = 0;
+         }
+      })
+   }
+   
    data["y"] = "plays"
-   data["columns"] = ['month'].concat(Array.from(cols))
+   data["columns"] = ['datepart'].concat(Array.from(cols))
    console.log(data)
    graphUtil.artistsSteamGraph(data, 'dataType2ArtistSteamGraph')
 
