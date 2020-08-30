@@ -11,6 +11,7 @@ const {
 
 const graphUtil = require('./app/js/util/graphUtil');
 const { keys } = require("d3");
+const { data } = require("jquery");
 
 let mainPageDiv = document.getElementById('mainpage');
 var titleText = document.getElementById('pageTitleText');
@@ -191,13 +192,14 @@ ipcRenderer.on("datatype1-songcounts-finished", function (event, dat) {
 const datatype2Button = document.getElementById("datatype2");
 datatype2Button.addEventListener('click', function () {
    ipcRenderer.send("dataprofile_click", '');
-   titleText.innerText = 'Top 5 artists - weekly';
+
    mainPageDiv.innerHTML = dataType2PageDiv.innerHTML;
 
    var count = 5;
    var days = 10000;
    var type = 'weekly';
    ipcRenderer.send("datatype2_click", [days, count, type]);
+   titleText.innerText = `Top ${count} artists - ${type}`;
 
    const datatype2settingsbutton = document.getElementById("dataType2SettingsMenuButton");
    var settingsMenuToggle = false;
@@ -215,7 +217,6 @@ datatype2Button.addEventListener('click', function () {
          })
          const dataType2CountInput = document.getElementById('dataType2CountInput');
          const dataType2TypeInput = document.getElementById('dataType2TypeInput');
-         dataType2TypeInput.value = 'weekly'
          dataType2TypeInput.addEventListener('click', function () {
             dataType2TypeInput.value = '';
          })
@@ -228,6 +229,9 @@ datatype2Button.addEventListener('click', function () {
          }
          if (!dataType2CountInput.value) {
             dataType2CountInput.value = count
+         }
+         if (!dataType2TypeInput.value) {
+            dataType2TypeInput.value = type
          }
 
          dataType2SettingsMenu.addEventListener("keydown", function (event) {
@@ -252,9 +256,8 @@ datatype2Button.addEventListener('click', function () {
                   }
                } else {
                   days = daysTemp
-                  titleText.innerText = `Counts - last ${days} days`;
+                  titleText.innerText = `Top ${count} artists - ${type}`;
                }
-               console.log(days)
 
                count = dataType2CountInput.value
                if (!count) {
@@ -262,11 +265,12 @@ datatype2Button.addEventListener('click', function () {
                }
 
                type = dataType2TypeInput.value;
-               if(type != 'weekly' && type != 'monthly'){
+               if (type != 'weekly' && type != 'monthly') {
                   type = 'weekly';
                }
                if (days && count && type) {
                   ipcRenderer.send("datatype2_click", [days, count, type]);
+                  titleText.innerText = `Top ${count} artists - ${type}`;
 
                   dataType2SettingsMenu.style.visibility = 'invisible';
                   dataType2SettingsMenu.style.display = 'none';
@@ -285,43 +289,71 @@ datatype2Button.addEventListener('click', function () {
 });
 
 ipcRenderer.on("datatype2-finished", function (event, dat) {
-   dat = JSON.parse(dat)
-   console.log('NEED TO PARSE THIS DATA TO LOOK CORRECT')
-   console.log(dat)
+   var type = dat[1]
+   dat = JSON.parse(dat[0])
    cols = new Set();
-   for(i = 0; i < dat.length; i++){
+   for (i = 0; i < dat.length; i++) {
       cols.add(dat[i]['artists'])
    }
    cols = Array.from(cols)
 
 
-   data = []
+   var data = []
    artists = new Set();
-   for(i = 0; i < dat.length; i++){
-      if(!data[dat[i].datepart]){
-         data[dat[i].datepart] = {date: dat[i].datepart};
+   for (i = 0; i < dat.length; i++) {
+      var datepart = dat[i].datepart;
+      if (!data[dat[i].datepart]) {
+         if(type == 'weekly'){
+            if(datepart >20210){
+               data[dat[i].datepart] = { date: Date.UTC(2020,  0, (dat[i].datepart - 202000)*7 -1) };
+            } else {
+               data[dat[i].datepart] = { date: Date.UTC(2020,  0, (dat[i].datepart - 202000)*7 -1)  };
+            }
+         } else if(type == 'monthly'){
+            if(datepart > 20210){ //case for two digits
+               data[dat[i].datepart] = { date: Date.UTC(2020, (dat[i].datepart - 202000), 0) };
+            } else { //case for 1 digit
+               data[dat[i].datepart] = { date: Date.UTC(2020, (dat[i].datepart - 20200), 0) };
+            }
+         } else{
+            console.log('we dont know this tyupe' + type)
+         }
+         
       }
       data[dat[i].datepart][dat[i].artists] = parseInt(dat[i].count);
       artists.add(dat[i].artists);
-   }
-   
 
-   data = data.filter(function(el){
-      if(el){return el;}
+      // let datestring = `2020-0${i % 12}-00`
+      // console.log(datestring)
+      // data[].date = Date.UTC(2020, dat[i].datepart % 12, 0)
+   }
+
+
+   data = data.filter(function (el) {
+      if (el) { return el; }
    });
 
-   for(i = 0; i < data.length; i++){
-      console.log(i)
+   for (i = 0; i < data.length; i++) {
       artists.forEach(el => {
-         if(!data[i].hasOwnProperty(el)){
+         if (!data[i].hasOwnProperty(el)) {
             data[i][el] = 0;
          }
       })
+      // if (type == 'weekly') {
+      //    // let datestring = `2020-0${i % 12}-00`
+      //    // console.log(datestring)
+      //    // console.log(Date.UTC(2020, i % 12, 0))
+      //    // data[i].date = Date.UTC(2020, i % 12, 0)
+      //    data[i].date = i
+
+      // } else if (type = 'monthly') {
+
+      // } else { console.log('!!!!!!!!!!!!!!!!!') }
    }
-   
+
    data["y"] = "plays"
-   data["columns"] = ['datepart'].concat(Array.from(cols))
+   data["columns"] = ['date'].concat(Array.from(cols))
    console.log(data)
-   graphUtil.artistsSteamGraph(data, 'dataType2ArtistSteamGraph')
+   graphUtil.artistsSteamGraph(data, 'dataType2ArtistSteamGraph', 'DataType2Legend')
 
 });

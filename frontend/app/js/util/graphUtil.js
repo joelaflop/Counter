@@ -85,7 +85,7 @@ module.exports = {
       d3.select("#" + location).selectAll('svg').remove();
       d3.select("#" + location).node().append(svg.node())
    },
-   artistsSteamGraph: async function (data, location) {
+   artistsSteamGraph: async function (data, location, location2) {
       height = 500
       width = 500;
 
@@ -114,7 +114,7 @@ module.exports = {
          .domain([d3.min(series, d => d3.min(d, d => d[0])), d3.max(series, d => d3.max(d, d => d[1]))])
          .range([height - margin.bottom, margin.top])
 
-      color = d3.scaleOrdinal()
+      var color = d3.scaleOrdinal()
          .domain(data.columns.slice(1))
          .range(d3.schemeCategory10)
 
@@ -139,10 +139,45 @@ module.exports = {
       svg.append("g")
          .call(xAxis);
 
-      // key = swatches({color, marginLeft: margin.left, columns: "180px"})
+      var keys = data.columns.filter((e)=>{
+         if(e != 'date'){
+            return e;
+         }
+      })
+
+      // Add one dot in the legend for each name.
+      const legend = d3.create("svg")
+         .style("width", 270)
+         .style("height", 250);
+
+      legend.selectAll("mydots")
+         .data(keys)
+         .enter()
+         .append("circle")
+         .attr("cx", 20)
+         .attr("cy", function (d, i) { return 20 + i * 25 }) // 100 is where the first dot appears. 25 is the distance between dots
+         .attr("r", 7)
+         .style("fill", function (d) { return color(d) })
+
+      // Add one dot in the legend for each name.
+      legend.selectAll("mylabels")
+         .data(keys)
+         .enter()
+         .append("text")
+         .attr("x", 50)
+         .attr("y", function (d, i) { return 20 + i * 25 }) // 100 is where the first dot appears. 25 is the distance between dots
+         .style("fill", function (d) { return color(d) })
+         .text(function (d) { return d })
+         .attr("text-anchor", "left")
+         .style("alignment-baseline", "middle")
 
       d3.select("#" + location).selectAll('svg').remove();
-      d3.select("#" + location).node().append(svg.node())
+      d3.select("#" + location).node().append(svg.node());
+      if (location2) {
+
+         d3.select("#" + location2).selectAll('svg').remove();
+         d3.select("#" + location2).node().append(legend.node());
+      }
       // d3.select("#" + location).node().append(key)
 
 

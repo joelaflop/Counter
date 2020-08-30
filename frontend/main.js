@@ -273,7 +273,8 @@ ipcMain.on("datatype2_click", function (event, arr) {
          'type': arr[2],
       };
       util.clientRequest(headersArtists, function (data) {
-         event.reply("datatype2-finished", data)
+         arg = [data, arr[2]]
+         event.reply("datatype2-finished", arg)
       })
    } else {
       console.log('not authed')
