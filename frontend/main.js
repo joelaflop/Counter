@@ -270,6 +270,7 @@ ipcMain.on("datatype2_click", function (event, arr) {
          'email': email,
          'days': arr[0],
          'count': arr[1],
+         'type': arr[2],
       };
       util.clientRequest(headersArtists, function (data) {
          event.reply("datatype2-finished", data)

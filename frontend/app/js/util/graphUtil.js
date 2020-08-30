@@ -1,7 +1,8 @@
 d3 = require("d3")
 fs = require('fs')
 const util = require('util');
-// swatches = require("@d3/color-legend")
+swatches = require("d3-color-legend")
+// import * as swatch from 'd3/color-legend';
 
 module.exports = {
    countsBarGraph: function (data, location, objectType) {
@@ -138,8 +139,12 @@ module.exports = {
       svg.append("g")
          .call(xAxis);
 
+      // key = swatches({color, marginLeft: margin.left, columns: "180px"})
+
       d3.select("#" + location).selectAll('svg').remove();
       d3.select("#" + location).node().append(svg.node())
+      // d3.select("#" + location).node().append(key)
+
 
    },
 }

@@ -109,7 +109,7 @@ datatype1Button.addEventListener('click', function () {
             dataType1CountInput.value = count
          }
 
-         document.addEventListener("keydown", function (event) {
+         dataType1SettingsMenu.addEventListener("keydown", function (event) {
             if (event.key == "Enter") {
                let daysTemp = dataType1DaysInput.value
                if (isNaN(daysTemp)) {
@@ -191,16 +191,96 @@ ipcRenderer.on("datatype1-songcounts-finished", function (event, dat) {
 const datatype2Button = document.getElementById("datatype2");
 datatype2Button.addEventListener('click', function () {
    ipcRenderer.send("dataprofile_click", '');
-   titleText.innerText = 'data analysis type 2';
+   titleText.innerText = 'Top 5 artists - weekly';
    mainPageDiv.innerHTML = dataType2PageDiv.innerHTML;
 
    var count = 5;
    var days = 10000;
-   ipcRenderer.send("datatype2_click", [days, count]);
+   var type = 'weekly';
+   ipcRenderer.send("datatype2_click", [days, count, type]);
 
-   // var days = '50';
-   // ipcRenderer.send("datatype2_click", '');
-   // data = Object.assign(await d3.csv('./unemployment-2.csv', d3.autoType), { y: "Unemployment" })
+   const datatype2settingsbutton = document.getElementById("dataType2SettingsMenuButton");
+   var settingsMenuToggle = false;
+   const dataType2SettingsMenu = document.getElementById("dataType2SettingsMenu");
+   dataType2SettingsMenu.style.visibility = 'invisible';
+   dataType2SettingsMenu.style.display = 'none';
+   datatype2settingsbutton.addEventListener('click', function () {
+      settingsMenuToggle = !settingsMenuToggle
+      if (settingsMenuToggle) {
+         dataType2SettingsMenu.style.visibility = 'visible';
+         dataType2SettingsMenu.style.display = 'block';
+         const dataType2DaysInput = document.getElementById('dataType2DaysInput');
+         dataType2DaysInput.addEventListener('click', function () {
+            dataType2DaysInput.value = '';
+         })
+         const dataType2CountInput = document.getElementById('dataType2CountInput');
+         const dataType2TypeInput = document.getElementById('dataType2TypeInput');
+         dataType2TypeInput.value = 'weekly'
+         dataType2TypeInput.addEventListener('click', function () {
+            dataType2TypeInput.value = '';
+         })
+         // dataType1CountInput.addEventListener('click', function () {
+         //    dataType1CountInput.value = '';
+         // })
+
+         if (!dataType2DaysInput.value) {
+            dataType2DaysInput.value = 'all time'
+         }
+         if (!dataType2CountInput.value) {
+            dataType2CountInput.value = count
+         }
+
+         dataType2SettingsMenu.addEventListener("keydown", function (event) {
+            if (event.key == "Enter") {
+               let daysTemp = dataType2DaysInput.value
+               if (isNaN(daysTemp)) {
+                  titleText.innerText = `Counts - ${daysTemp}`;
+                  if (daysTemp === 'today') {
+                     days = 1;
+                  } else if (daysTemp === 'this last week') {
+                     days = 7;
+                  } else if (daysTemp === 'this last month') {
+                     days = 31;
+                  } else if (daysTemp === 'this last year') {
+                     days = 365;
+                  } else if (daysTemp === 'all time') {
+                     days = 10000;
+                  } else {
+                     //TODO: case when we arent given a valid string
+                     console.log(daysTemp)
+                     console.log('\n\n\n\n\n\n\n\n\n\n\n\n\n')
+                  }
+               } else {
+                  days = daysTemp
+                  titleText.innerText = `Counts - last ${days} days`;
+               }
+               console.log(days)
+
+               count = dataType2CountInput.value
+               if (!count) {
+                  count = 5
+               }
+
+               type = dataType2TypeInput.value;
+               if(type != 'weekly' && type != 'monthly'){
+                  type = 'weekly';
+               }
+               if (days && count && type) {
+                  ipcRenderer.send("datatype2_click", [days, count, type]);
+
+                  dataType2SettingsMenu.style.visibility = 'invisible';
+                  dataType2SettingsMenu.style.display = 'none';
+                  settingsMenuToggle = !settingsMenuToggle
+               }
+
+            }
+         });
+      } else {
+         dataType2SettingsMenu.style.visibility = 'invisible';
+         dataType2SettingsMenu.style.display = 'none';
+      }
+
+   });
 
 });
 

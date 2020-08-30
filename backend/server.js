@@ -173,7 +173,8 @@ serverS.on('stream', (stream, headers) => {
          email = headers.email;
          days = parseInt(headers.days);
          count = parseInt(headers.count);
-         db.getArtistSteamGraph(email, days, count, function (res) {
+         type = headers.type;
+         db.getArtistSteamGraph(email, days, count, type, function (res) {
             streamRespond(stream, JSON.stringify(res))
          });
          break;

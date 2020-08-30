@@ -235,8 +235,18 @@ module.exports = {
          }
       })
    },
-   getArtistSteamGraph(email, days, count, callback) {
-      query = `select * from public.top_artists_overtime_week($1, $2, $3)`;
+   getArtistSteamGraph(email, days, count, type, callback) {
+      query;
+      if(type == 'weekly'){
+         query = `select * from public.top_artists_overtime_week($1, $2, $3)`;
+      } else if (type == 'monthly'){
+         query = `select * from public.top_artists_overtime_month($1, $2, $3)`;
+      } else {
+         console.log(`artist steam graph does not suppport type: ${type}`)
+         callback(null);
+         return;
+      }
+      
       values = [email, days, count];
       client.query(query, values, function (err, res) {
          if (!err && res.rows[0]) {
