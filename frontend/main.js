@@ -377,13 +377,11 @@ function updateNowPlaying(win) {
          gettingAuthed = false;
          authed = true;
          win.webContents.send("nowplaying-button-task-finished", data);
-         win.webContents.send("nowplaying-button-task-finished", data);
       } else {
          try {
             gettingAuthed = false;
             authed = true;
             track = JSON.parse(data)
-            // event.reply("nowplaying-button-task-finished", track);
             win.webContents.send("nowplaying-button-task-finished", track);
          } catch (e) {
             console.log(`error parsing now-playing json: ${data}`);

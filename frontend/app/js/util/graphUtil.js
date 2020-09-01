@@ -6,12 +6,21 @@ swatches = require("d3-color-legend")
 
 module.exports = {
    countsBarGraph: function (data, location, objectType) {
-      margin = ({ top: 20, right: 0, bottom: 30, left: 150 })
+      var maxDatum = 0;
+      // var minDatum;
+      data.forEach((d) => {
+         if (d.count > maxDatum) {
+            maxDatum = d.count
+         }
+         // if(d.count < minDatum){
+         //    minDatum = d.count
+         // }
+      })
+
+      margin = ({ top: 20, right: 0, bottom: 30, left: 15 })
       width = 500
       barHeight = 25
       height = Math.ceil((data.length + 0.1) * barHeight) + margin.top + margin.bottom
-      //   console.log(`height: ${height}`)
-
 
       x = d3.scaleLinear()
          .domain([0, d3.max(data, d => d.count)])
@@ -21,18 +30,21 @@ module.exports = {
          .domain(d3.range(data.length))
          .rangeRound([margin.top, height - margin.bottom])
          .padding(0.1)
-      format = x.tickFormat(2, data.format)
 
-      function wrap(s) {
-         if (s.length > 27)
-            return s.substring(0, 27) + '...'
+      format = x.tickFormat(10, data.format)
+
+      function wrap(s, len) {
+         // console.log(`max:${maxDatum} ; curr:${len}`)
+         if (s.length > 80 * len / maxDatum)
+            return s.substring(0, 80 * len / maxDatum).trim() + '...'
          else return s
       }
 
       yAxis = g => g
          .attr("color", `white`)
          .attr("transform", `translate(${margin.left},0)`)
-         .call(d3.axisLeft(y).tickFormat(i => wrap(data[i][objectType])).tickSizeOuter(0))
+         .call(d3.axisRight(y).tickFormat(i => wrap(data[i][objectType], data[i].count)).tickSizeOuter(0))
+         .call(g => g.select(".domain").remove())
 
       // xAxis = g => g
       //    .attr("color", `white`)
@@ -85,11 +97,11 @@ module.exports = {
       d3.select("#" + location).selectAll('svg').remove();
       d3.select("#" + location).node().append(svg.node())
    },
-   artistsSteamGraph: async function (data, location, location2) {
+   artistsSteamGraph: async function (data, location, legendLocation) {
       height = 500
       width = 500;
 
-      margin = ({ top: 0, right: 20, bottom: 30, left: 20 })
+      margin = ({ top: 10, right: 20, bottom: 30, left: 20 })
 
 
       // data = Object.assign(await d3.csv('./unemployment-2.csv', d3.autoType), { y: "Unemployment" })
@@ -139,46 +151,99 @@ module.exports = {
       svg.append("g")
          .call(xAxis);
 
-      var keys = data.columns.filter((e)=>{
-         if(e != 'date'){
+      svg.on('mouseover', function (v) {
+         console.log('lmao')
+      })
+
+      var keys = data.columns.filter((e) => {
+         if (e != 'date') {
             return e;
          }
       })
 
       // Add one dot in the legend for each name.
-      const legend = d3.create("svg")
-         .style("width", 270)
-         .style("height", 250);
 
-      legend.selectAll("mydots")
-         .data(keys)
-         .enter()
-         .append("circle")
-         .attr("cx", 20)
-         .attr("cy", function (d, i) { return 20 + i * 25 }) // 100 is where the first dot appears. 25 is the distance between dots
-         .attr("r", 7)
-         .style("fill", function (d) { return color(d) })
-
-      // Add one dot in the legend for each name.
-      legend.selectAll("mylabels")
-         .data(keys)
-         .enter()
-         .append("text")
-         .attr("x", 50)
-         .attr("y", function (d, i) { return 20 + i * 25 }) // 100 is where the first dot appears. 25 is the distance between dots
-         .style("fill", function (d) { return color(d) })
-         .text(function (d) { return d })
-         .attr("text-anchor", "left")
-         .style("alignment-baseline", "middle")
 
       d3.select("#" + location).selectAll('svg').remove();
       d3.select("#" + location).node().append(svg.node());
-      if (location2) {
+      if (legendLocation) {
+         const legend = d3.create("svg")
+            .style("width", 270)
+         // .style("height", 250);
 
-         d3.select("#" + location2).selectAll('svg').remove();
-         d3.select("#" + location2).node().append(legend.node());
+         legend.selectAll("mydots")
+            .data(keys)
+            .enter()
+            .append("circle")
+            .attr("cx", 20)
+            .attr("cy", function (d, i) { return 20 + i * 25 }) // 100 is where the first dot appears. 25 is the distance between dots
+            .attr("r", 7)
+            .style("fill", function (d) { return color(d) })
+
+         // Add one dot in the legend for each name.
+         legend.selectAll("mylabels")
+            .data(keys)
+            .enter()
+            .append("text")
+            .attr("x", 50)
+            .attr("y", function (d, i) { return 20 + i * 25 }) // 100 is where the first dot appears. 25 is the distance between dots
+            .style("fill", function (d) { return color(d) })
+            .text(function (d) { return d })
+            .attr("text-anchor", "left")
+            .style("alignment-baseline", "middle")
+
+         d3.select("#" + legendLocation).selectAll('svg').remove();
+         d3.select("#" + legendLocation).node().append(legend.node());
       }
       // d3.select("#" + location).node().append(key)
+
+      var vertical = d3.select("#" + location)
+         .append("div")
+         .attr("class", "remove")
+         .style("position", "absolute")
+         .style("z-index", "19")
+         .style("width", "1px")
+         // .style("height", `calc(${svg.style("height")} - 400px)`)
+         .style("top", "40px")
+         // .style("bottom", "300px")
+         .style("left", "0px")
+         .style("background", "#fff");
+
+      d3.select("#" + location)
+         .on("mousemove", function () {
+            mousex = d3.mouse(this);
+            mousex = mousex[0] + 100;
+            minDistance = 100000;
+            bestx = -1;
+            for (i = 0; i < data.length; i++) {
+               let e = (parseInt(svg.style("width")) * .002 + -.001) * x(data[i].date) + 100
+               let dis = Math.abs(mousex - e)
+               if (dis < minDistance) {
+                  minDistance = dis;
+                  bestx = e
+               }
+            }
+            
+            vertical.style("left", bestx + "px")
+         })
+         .on("mouseover", function () {
+            mousex = d3.mouse(this);
+            mousex = mousex[0] + 100;
+            minDistance = 100000;
+            bestx = -1;
+            for (i = 0; i < data.length; i++) {
+               let e = (parseInt(svg.style("width")) * .002 + -.001) * x(data[i].date) + 100
+               let dis = Math.abs(mousex - e)
+               if (dis < minDistance) {
+                  minDistance = dis;
+                  bestx = e
+               }
+            }
+
+            vertical.style("left", bestx + "px").style("height", `calc(${svg.style("height")} - 3em)`)
+         })
+
+
 
 
    },

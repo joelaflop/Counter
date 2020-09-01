@@ -11,7 +11,7 @@ const {
 
 const graphUtil = require('./app/js/util/graphUtil');
 const { keys } = require("d3");
-const { data } = require("jquery");
+// const { data } = require("jquery");
 
 let mainPageDiv = document.getElementById('mainpage');
 var titleText = document.getElementById('pageTitleText');
@@ -302,18 +302,18 @@ ipcRenderer.on("datatype2-finished", function (event, dat) {
    artists = new Set();
    for (i = 0; i < dat.length; i++) {
       var datepart = dat[i].datepart;
-      if (!data[dat[i].datepart]) {
+      if (!data[datepart]) {
          if(type == 'weekly'){
-            if(datepart >20210){
-               data[dat[i].datepart] = { date: Date.UTC(2020,  0, (dat[i].datepart - 202000)*7 -1) };
+            if(datepart > 20210){
+               data[datepart] = { date: Date.UTC(2020,  0, (datepart - 202000)*7) };
             } else {
-               data[dat[i].datepart] = { date: Date.UTC(2020,  0, (dat[i].datepart - 202000)*7 -1)  };
+               data[datepart] = { date: Date.UTC(2020,  0, (datepart - 202000)*7)  };
             }
          } else if(type == 'monthly'){
             if(datepart > 20210){ //case for two digits
-               data[dat[i].datepart] = { date: Date.UTC(2020, (dat[i].datepart - 202000), 0) };
+               data[datepart] = { date: Date.UTC(2020, (datepart - 202000), 0) };
             } else { //case for 1 digit
-               data[dat[i].datepart] = { date: Date.UTC(2020, (dat[i].datepart - 20200), 0) };
+               data[datepart] = { date: Date.UTC(2020, (datepart - 20200), 0) };
             }
          } else{
             console.log('we dont know this tyupe' + type)
