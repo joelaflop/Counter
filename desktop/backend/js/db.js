@@ -21,7 +21,6 @@ client.connect((err) => {
    } else {
       console.log('Connected to DB')
    }
-
 })
 
 
@@ -194,7 +193,7 @@ module.exports = {
    },
    getUserInfo: function (email, callback) {
       query = `select email, username, platforms, created_on, last_login
-               from account 
+               from account
                where email = $1`;
       values = [email];
       client.query(query, values, function (err, res) {
@@ -246,7 +245,7 @@ module.exports = {
          callback(null);
          return;
       }
-      
+
       values = [email, days, count];
       client.query(query, values, function (err, res) {
          if (!err && res.rows[0]) {
@@ -258,7 +257,7 @@ module.exports = {
             console.log(err)
          }
       });
-      
+
    }
 };
 

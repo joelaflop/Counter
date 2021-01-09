@@ -1,0 +1,2 @@
+export const COUNTER_CHANGE = 'COUNTER_CHANGE';
+export const PAGE_CHANGE = 'PAGE_CHANGE';
