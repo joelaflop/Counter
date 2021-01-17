@@ -1,15 +1,73 @@
 import React, {Component} from 'react';
 import {StyleSheet, TouchableOpacity, Text, View, Button} from 'react-native';
 
-export function DataScreen({navigation}) {
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
+
+import DataHome from './dataHome/dataHome';
+import Counts from './counts/counts';
+import ArtistsOverTime from './artistsOverTime/artistsOverTime';
+
+import NowPlayingBar from '../nowPlayingBar';
+
+function headerTest() {
+  return HeaderBackButton;
+}
+
+const DataStack = createStackNavigator();
+
+function DataScreen() {
   return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Details Screen</Text>
-      <Button title="Go to Home" onPress={() => navigation.navigate('Home')} />
-      <Button
-        title="Go to Details... again"
-        onPress={() => navigation.navigate('Details')}
-      />
+    <View style={{flex: 13}}>
+      <DataStack.Navigator>
+        <DataStack.Screen
+          name="DataHome"
+          component={DataHome}
+          options={{
+            headerBackTitleVisible: false,
+            headerTransparent: true,
+            headerTitle: null,
+          }}
+        />
+        <DataStack.Screen
+          name="Counts"
+          component={Counts}
+          options={{
+            headerBackTitleVisible: false,
+            headerTransparent: true,
+            headerTitle: null,
+          }}
+        />
+        <DataStack.Screen
+          name="ArtistsOverTime"
+          component={ArtistsOverTime}
+          options={{
+            headerBackTitleVisible: false,
+            headerTransparent: true,
+            headerTitle: null,
+          }}
+        />
+      </DataStack.Navigator>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  green: {
+    width: '100%',
+    backgroundColor: 'lightgreen',
+  },
+});
+
+const mapStateToProps = (state) => {
+  return {};
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators({}, dispatch);
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(DataScreen);

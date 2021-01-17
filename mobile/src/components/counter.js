@@ -20,10 +20,12 @@ class Counter extends Component {
     const {count} = this.props;
     return (
       <View style={styles.container}>
-        <Button title="increment" onPress={() => this.incrementCount()} />
-        <Text>{count}</Text>
-        <Button title="decrement" onPress={() => this.decrementCount()} />
-        {/* <Button title="test" onPress={() => this.test()} /> */}
+        <View style={{alignItems: 'center', justifiyContent: 'center'}}>
+          <Button title="increment" onPress={() => this.incrementCount()} />
+          <Text>{count}</Text>
+          <Button title="decrement" onPress={() => this.decrementCount()} />
+          {/* <Button title="test" onPress={() => this.test()} /> */}
+        </View>
       </View>
     );
   }
@@ -31,9 +33,7 @@ class Counter extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 13,
   },
   button: {
     alignItems: 'center',

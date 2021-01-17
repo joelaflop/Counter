@@ -1,25 +1,34 @@
 import React, {Component} from 'react';
-import {StyleSheet, TouchableOpacity, Text, View, Button} from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  View,
+  Pressable,
+} from 'react-native';
 import {connect, useSelector} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
+import NowPlayingBar from './nowPlayingBar';
 import {changePage} from '../actions/menubar';
+
+import {GRAY} from '../assets/colors';
 
 const menubar = (props) => {
   return (
     <View style={styles.bar}>
-      <View style={styles.button}>
-        <Button title="Home" onPress={() => props.changePage(0)} />
-      </View>
-      <View style={styles.button}>
-        <Button title="History" onPress={() => props.changePage(1)} />
-      </View>
-      <View style={styles.button}>
-        <Button title="Data" onPress={() => props.changePage(2)} />
-      </View>
-      <View style={styles.button}>
-        <Button title="test" onPress={() => props.changePage(3)} />
-      </View>
+      <Pressable onPress={() => props.changePage(0)}>
+        <Text style={styles.buttonText}>Home</Text>
+      </Pressable>
+      <Pressable onPress={() => props.changePage(1)}>
+        <Text style={styles.buttonText}>History</Text>
+      </Pressable>
+      <Pressable onPress={() => props.changePage(2)}>
+        <Text style={styles.buttonText}>Data</Text>
+      </Pressable>
+      <Pressable onPress={() => props.changePage(3)}>
+        <Text style={styles.buttonText}>Counter</Text>
+      </Pressable>
     </View>
   );
 };
@@ -31,13 +40,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'flex-start',
     width: '100%',
-    backgroundColor: 'gray',
+    backgroundColor: GRAY,
+    borderTopColor: 'black',
+    borderTopWidth: 0.3,
   },
-  button: {
-    flex: 1,
-    // alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-    backgroundColor: 'lightblue',
+  buttonText: {
+    textAlign: 'center',
+    color: 'white',
+    marginTop: 5,
   },
 });
 
