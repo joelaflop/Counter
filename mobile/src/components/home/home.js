@@ -4,36 +4,35 @@ import {StyleSheet, TouchableOpacity, Text, View, Button} from 'react-native';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
+
 import {flopNowPlaying} from '../../actions/flopNowPlaying';
 
 import TopBar from '../topBar';
 
-const song = {
-  id: 'lmao',
-  title: 'first song has a really long namen',
-  album: 'my twisted weiners',
-  artist: 'kanye penis',
-  time: '60 minutes ago',
-};
+import NowPlayingBar from '../nowPlayingBar';
 
-function toggleNowPlaying(props) {
-  if (props.userIsPlayingSomething) {
-    props.flopNowPlaying(null);
-  } else {
-    props.flopNowPlaying(song);
-  }
-}
+import homeMainScreen from './homeMainScreen';
+
+const HomeStack = createStackNavigator();
 
 function HomeScreen(props) {
   return (
     <View style={{flex: 13}}>
-      <Text>Home Screen</Text>
-      <Button
-        title="nowplayingflop"
-        onPress={() => {
-          toggleNowPlaying(props);
-        }}
-      />
+      <TopBar />
+      <HomeStack.Navigator>
+        <HomeStack.Screen
+          name="homeHome"
+          component={homeMainScreen}
+          options={{
+            headerBackTitleVisible: false,
+            headerTransparent: true,
+            headerTitle: null,
+          }}
+        />
+      </HomeStack.Navigator>
+      <NowPlayingBar />
     </View>
   );
 }
@@ -46,12 +45,10 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state) => {
-  return {
-    userIsPlayingSomething: state.nowPlaying.currentlyPlaying,
-  };
+  return {};
 };
 
-const ActionCreators = Object.assign({}, {flopNowPlaying});
+const ActionCreators = Object.assign({}, {});
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(ActionCreators, dispatch);
 };

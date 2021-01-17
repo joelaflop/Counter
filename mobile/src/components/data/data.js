@@ -12,6 +12,7 @@ import Counts from './counts/counts';
 import ArtistsOverTime from './artistsOverTime/artistsOverTime';
 
 import NowPlayingBar from '../nowPlayingBar';
+import TopBar from '../topBar';
 
 function headerTest() {
   return HeaderBackButton;
@@ -22,6 +23,7 @@ const DataStack = createStackNavigator();
 function DataScreen() {
   return (
     <View style={{flex: 13}}>
+      <TopBar />
       <DataStack.Navigator>
         <DataStack.Screen
           name="DataHome"
@@ -51,6 +53,7 @@ function DataScreen() {
           }}
         />
       </DataStack.Navigator>
+      <NowPlayingBar />
     </View>
   );
 }

@@ -4,6 +4,8 @@
  *
  * @format
  * @flow strict-local
+
+ *TODO: move 'mainscreens' into own components and connect to redux 
  */
 
 import React, {Component} from 'react';
@@ -15,14 +17,13 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {connect, useSelector, shallowEqual} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
-import Counter from './src/components/counter';
-import HomeScreen from './src/components/home/homeScreen';
-import ProfileScreen from './src/components/profile/profileScreen';
-import {HistoryScreen} from './src/components/history/historyScreen';
+import HomeScreen from './src/components/home/home';
+import ProfileScreen from './src/components/profile/profile';
+import {HistoryScreen} from './src/components/history/history';
 import DataScreen from './src/components/data/data';
+
 import Menubar from './src/components/menubar';
 import NowPlayingBar from './src/components/nowPlayingBar';
-
 import TopBar from './src/components/topBar';
 
 import {DARK_GRAY} from './src/assets/colors';
@@ -31,50 +32,75 @@ import {useNavigation} from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 
-function App() {
-  const navigationRef = React.useRef(null);
+function MyTabBar({state, descriptors, navigation}) {
   return (
-    <NavigationContainer ref={navigationRef}>
-      <TopBar navigation={navigationRef} />
-      <Tab.Navigator
-        tabBarOptions={{
-          activeTintColor: 'tomato',
-          inactiveTintColor: 'gray',
-        }}>
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="History" component={HistoryScreen} />
-        <Tab.Screen name="Data" component={DataScreen} />
-        <Tab.Screen name="Counter" component={Counter} />
-        <Tab.Screen name="User" component={ProfileScreen} />
-        {/* add a screen for now playing screen - on nowplayingbar click */}
-      </Tab.Navigator>
-      <NowPlayingBar navigation={navigationRef} />
-    </NavigationContainer>
+    <View style={{flexDirection: 'row'}}>
+      {state.routes.map((route, index) => {
+        const {options} = descriptors[route.key];
+        const label =
+          options.tabBarLabel !== undefined
+            ? options.tabBarLabel
+            : options.title !== undefined
+            ? options.title
+            : route.name;
+
+        const isFocused = state.index === index;
+
+        const onPress = () => {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+          });
+
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
+
+        const onLongPress = () => {
+          navigation.emit({
+            type: 'tabLongPress',
+            target: route.key,
+          });
+        };
+
+        return (
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityState={isFocused ? {selected: true} : {}}
+            accessibilityLabel={options.tabBarAccessibilityLabel}
+            testID={options.tabBarTestID}
+            onPress={onPress}
+            onLongPress={onLongPress}
+            style={{flex: 1}}>
+            <Text style={{color: isFocused ? '#673ab7' : '#222'}}>{label}</Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
   );
 }
 
-// return (
-//   <View style={styles.app}>
-//     <View style={styles.mainScreen}>
-//       <TopBar />
-//       {this.props.page === 0 ? (
-//         <HomeScreen />
-//       ) : this.props.page === 1 ? (
-//         <HistoryScreen />
-//       ) : this.props.page === 2 ? (
-//         <DataScreen />
-//       ) : this.props.page === 3 ? (
-//         <Counter />
-//       ) : this.props.page === 4 ? (
-//         <ProfileScreen />
-//       ) : (
-//         <Text> nonexistent screen </Text>
-//       )}
-//       <NowPlayingBar />
-//     </View>
-//     <Menubar />
-//   </View>
-// );
+class App extends Component {
+  render() {
+    return (
+      <NavigationContainer>
+        {/* <TopBar navigation={navigationRef} /> */}
+        <Tab.Navigator
+          tabBarOptions={{
+            activeTintColor: 'tomato',
+            inactiveTintColor: 'gray',
+          }}>
+          <Tab.Screen name="Home" component={HomeScreen} />
+          <Tab.Screen name="History" component={HistoryScreen} />
+          <Tab.Screen name="Data" component={DataScreen} />
+          <Tab.Screen name="User" component={ProfileScreen} />
+          {/* add a screen for now playing screen - on nowplayingbar click */}
+        </Tab.Navigator>
+      </NavigationContainer>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   app: {

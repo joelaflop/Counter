@@ -18,12 +18,13 @@ import {changePage} from '../actions/menubar';
 import {TOP_BAR_HEIGHT} from '../assets/constants';
 
 const TopBar = (props) => {
+  const navigation = useNavigation();
   return (
     <View style={styles.topBar}>
       <Pressable
         onPress={() => {
           // props.changePage(4);
-          props.navigation.current?.navigate('User');
+          navigation.navigate('User');
         }}>
         <Image style={styles.prof} source={require('../assets/tree.png')} />
       </Pressable>

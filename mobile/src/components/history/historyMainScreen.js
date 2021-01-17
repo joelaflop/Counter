@@ -8,11 +8,7 @@ import {
   FlatList,
 } from 'react-native';
 
-import {TOP_BAR_HEIGHT} from '../../assets/constants';
-
 import {historyItem} from './historyItem';
-
-import NowPlayingBar from '../nowPlayingBar';
 
 const DATA = [
   {
@@ -87,21 +83,14 @@ const DATA = [
   },
 ];
 
-export function HistoryScreen() {
+function historyMainScreen() {
   return (
-    <View style={{flex: 13}}>
-      <FlatList
-        data={DATA}
-        renderItem={historyItem}
-        keyExtractor={(item) => item.id}
-      />
-    </View>
+    <FlatList
+      data={DATA}
+      renderItem={historyItem}
+      keyExtractor={(item) => item.id}
+    />
   );
 }
 
-const styles = StyleSheet.create({
-  topBar: {
-    height: 100,
-    backgroundColor: 'gray',
-  },
-});
+export default historyMainScreen;

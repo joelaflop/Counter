@@ -3,15 +3,18 @@ import {StyleSheet, Pressable, Text, View, Button, Image} from 'react-native';
 import {connect, useSelector} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
+import {useNavigation} from '@react-navigation/native';
+
 import {GRAY} from '../assets/colors';
 
 const NowPlayingBar = (props) => {
+  const navigation = useNavigation();
   if (props.userIsPlayingSomething) {
     return (
       <Pressable
         style={styles.bar}
         onPress={() => {
-          console.log('nowPlayingPress');
+          navigation.navigate('Home');
         }}>
         <View>
           <Image
@@ -49,8 +52,10 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     width: '100%',
-    // maxHeight: 50,
+    maxHeight: 50,
     backgroundColor: GRAY,
+    // position: 'absolute',
+    // bottom: 0,
   },
   albumCover: {
     height: 50,
