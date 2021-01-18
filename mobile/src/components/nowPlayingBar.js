@@ -54,8 +54,6 @@ const styles = StyleSheet.create({
     width: '100%',
     maxHeight: 50,
     backgroundColor: GRAY,
-    // position: 'absolute',
-    // bottom: 0,
   },
   albumCover: {
     height: 50,
